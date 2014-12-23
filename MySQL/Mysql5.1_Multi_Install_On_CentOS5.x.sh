@@ -52,7 +52,7 @@ else
   /bin/cp mysql-5.1.73-linux-i686-glibc23 /usr/local/mysql
 fi
 
-wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/mysonnet/CentOS/MySQL/master/Mysql5.1_Multi_My.cnf_Sample1
+wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/zasfe/Labs/MySQL/master/Mysql5.1_Multi_My.cnf_Sample1
 
 chown -R mysql.dba /usr/local/mysql
 
@@ -99,7 +99,7 @@ cd /usr/local/mysql
 
 #### Mysql Config Download ####
 cd /usr/local/src
-wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/mysonnet/CentOS/master/Mysql5.1_Multi_My.cnf_Sample1
+wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/zasfe/Labs/master/Mysql5.1_Multi_My.cnf_Sample1
 chown mysql.dba /etc/my.cnf
 
 
