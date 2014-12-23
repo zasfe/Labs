@@ -54,7 +54,7 @@ cd /usr/local
 ln -s mysql-5.1.73-linux-i686-glibc23 mysql
 fi
 
-wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/mysonnet/CentOS/MySQL//master/Mysql5.1_My.cnf_Sample1
+wget --no-check-certificate -O /etc/my.cnf https://raw.githubusercontent.com/zasfe/Labs/MySQL/master/Mysql5.1_My.cnf_Sample1
 
 chown -R mysql.dba /usr/local/mysql*
 cp mysql/support-files/mysql.server /etc/init.d/mysqld
