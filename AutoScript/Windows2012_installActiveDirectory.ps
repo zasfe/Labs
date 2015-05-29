@@ -1,1 +1,21 @@
-aaa
+#
+# AD DS Service Install -  Windows PowerShell 스크립트
+#
+Add-WindowsFeature AD-Domain-Services
+
+#
+# AD DS 배포용 - Windows PowerShell 스크립트
+#
+Import-Module ADDSDeployment
+Install-ADDSForest `
+-CreateDnsDelegation:$false `
+-DatabasePath "C:\Windows\NTDS" `
+-DomainMode "Win2012R2" `
+-DomainName "rdp.zasfe.local" `
+-DomainNetbiosName "RDP" `
+-ForestMode "Win2012R2" `
+-InstallDns:$true `
+-LogPath "C:\Windows\NTDS" `
+-NoRebootOnCompletion:$false `
+-SysvolPath "C:\Windows\SYSVOL" `
+-Force:$true
