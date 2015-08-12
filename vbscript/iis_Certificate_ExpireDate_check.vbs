@@ -18,16 +18,16 @@ SUB EnumServersites( objSrv )
 				wscript.Echo "Days Remaining: " & DaysRemaining(GetSSLExpirationDate(objServer.Name))
 				wscript.echo vbcrlf & "-----------------------------" & vbcrlf
 
-				'StrVar0 = ""
-				'if DaysRemaining(GetSSLExpirationDate(objServer.Name)) < 30 Then
-				'	'wscript.echo "entered loop"
-				'	StrVar0 = StrVar0 & "Site ID : " & objServer.Name & VbCrLf & "Comment : " & objServer.ServerComment & VbCrLf & "SSL Certificate Expiration Date : " &GetSSLExpirationDate(objServer.Name) & VbCrLf & "Days Remaining : " & DaysRemaining(GetSSLExpirationDate(objServer.Name))
-'
-'					strCommand = "eventcreate /T Warning /ID 351 /L Application /SO CertWarning /D " & _
-'					Chr(34) & StrVar0 & Chr(34)
-'					WshShell.Run strcommand
-'
-'				END IF
+				StrVar0 = ""
+				if DaysRemaining(GetSSLExpirationDate(objServer.Name)) < 30 Then
+					'wscript.echo "entered loop"
+					StrVar0 = StrVar0 & "Site ID : " & objServer.Name & VbCrLf & "Comment : " & objServer.ServerComment & VbCrLf & "SSL Certificate Expiration Date : " &GetSSLExpirationDate(objServer.Name) & VbCrLf & "Days Remaining : " & DaysRemaining(GetSSLExpirationDate(objServer.Name))
+
+					strCommand = "eventcreate /T Warning /ID 351 /L Application /SO CertWarning /D " & _
+					Chr(34) & StrVar0 & Chr(34)
+					WshShell.Run strcommand
+
+				END IF
 			END IF
 		END IF
 		strBindings = ""
