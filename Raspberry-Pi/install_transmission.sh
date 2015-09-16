@@ -26,7 +26,7 @@ if [ -e /etc/transmission-daemon/settings.json ]; then
   sudo sed -i 's/"rpc-username": "transmission",/"rpc-username": "tr",/' /etc/transmission-daemon/settings.json
   sudo sed -i 's/"rpc-password": "{df6efdd717bc8c718674956b985f86fec3d36b16VeqGhBy.",/"rpc-password": "mi",/' /etc/transmission-daemon/settings.json
 
-  sudo sed -e 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /etc/transmission-daemon/settings.json
+  sudo sed -i 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /etc/transmission-daemon/settings.json
 fi
 
 
@@ -38,7 +38,7 @@ if [ -e /var/lib/transmission-daemon/info/settings.json ]; then
   sudo sed -i 's/"rpc-username": "transmission",/"rpc-username": "tr",/' /var/lib/transmission-daemon/info/settings.json
   sudo sed -i 's/"rpc-password": "{df6efdd717bc8c718674956b985f86fec3d36b16VeqGhBy.",/"rpc-password": "mi",/' /var/lib/transmission-daemon/info/settings.json
 
-  sudo sed -e 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /var/lib/transmission-daemon/info/settings.json
+  sudo sed -i 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /var/lib/transmission-daemon/info/settings.json
 fi
 
 
@@ -50,7 +50,7 @@ if [ -e /root/.config/transmission-daemon/settings.json ]; then
   sudo sed -i 's/"rpc-username": "transmission",/"rpc-username": "tr",/' /root/.config/transmission-daemon/settings.json
   sudo sed -i 's/"rpc-password": "{df6efdd717bc8c718674956b985f86fec3d36b16VeqGhBy.",/"rpc-password": "mi",/' /root/.config/transmission-daemon/settings.json
 
-  sudo sed -e 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /root/.config/transmission-daemon/settings.json
+  sudo sed -i 's/"rpc-whitelist-enabled": false,/"rpc-whitelist-enabled": true,/' /root/.config/transmission-daemon/settings.json
 fi
 
 sudo /etc/init.d/transmission-daemon start
