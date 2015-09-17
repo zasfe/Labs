@@ -58,6 +58,12 @@ chgrp -R debian-transmission /Tdown/
 chmod -R 770 /Tdown/
 addgroup pi debian-transmission
 
+# Transmission system tunning
+# http://www.htpcguides.com/install-transmission-raspberry-pi-latest-version-raspbian/
+sudo sed -i 's/$/ smsc95xx.turbo_mode=N/' /boot/cmdline.txt
+sudo sed -i 's/^vm.min_free/vm.min_free_kbytes = 16384\n#vm.min_free/' /etc/sysctl.conf
+
+
 sudo /etc/init.d/transmission-daemon start
 
 echo "http://192.168.219.219:9091/transmission/web/"
