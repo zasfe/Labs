@@ -125,7 +125,7 @@ Function GET_CLOUDFLARE_API(sURL, pType, pValue,pCharset, pAuthkey, pAuthmail)
 	End select
 
 	GET_CLOUDFLARE_API = ""
-    'XMLHTTP를 이용하여 전송
+
     With CreateObject("Msxml2.ServerXMLHTTP")
 	If vType = "GET" then
 			.Open "GET", sURL&"?"&pValue, False
@@ -179,7 +179,7 @@ Function GET_HTTP (sURL, pType, pValue,pCharset)
 
 	GET_HTTP = ""
 
-    'XMLHTTP를 이용하여 전송
+
     With CreateObject("Msxml2.ServerXMLHTTP")
 	If vType = "GET" then
 			.Open "GET", sURL&"?"&pValue, False
@@ -213,7 +213,7 @@ Function GET_HTTP (sURL, pType, pValue,pCharset)
     End With
 
 	If Len(lsResult) =0 then Exit Function
-    '받은 결과값을 한글 인코딩 처리
+
     With CreateObject("ADODB.Recordset")
         .Fields.Append "txt", adVarChar, LenB(lsResult), adFldLong
         .Open
