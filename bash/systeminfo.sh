@@ -20,8 +20,10 @@ if [ -f '/etc/os-release' ] ; then
   os_release=`cat /etc/os-release  | grep PRETTY_NAME | cut -d'"' -f2`
 elif [ -f '/etc/redhat-release' ] ; then
   os_release=`cat /etc/redhat-release | head -n 1`
-else
+elif [ -f '/etc/issue' ] ; then
   os_release=`cat /etc/issue | head -n 1`
+else
+  os_release="Unknown"
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
 os_arch=`arch`
@@ -72,7 +74,6 @@ ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= rea
   oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
   oracle_lib="${oracle_home}/lib/libclntsh.so";
   if [ -f "${oracle_lib}" ]; then
-#    oracle_version=`${oracle_opatch} lsinventory | head -n 1 | awk '{print$3}'`
     oracle_version=`strings ${oracle_lib} | grep '^Version [0-9]' | awk '{print$2}'`;
     echo "type=oracle_version;value=oracle/${oracle_version};value2=${oracle_home};";
   fi
@@ -99,7 +100,6 @@ else
     bbname=`cat /home/bb/bb17b4/etc/bbaliasname | head -n 1`
   fi
 fi
-
 echo "type=monitoring_bb;value=${bbcheck};value2=${bbproc};value3=${bbname}";
 
 ## Monitoring - zenius
@@ -112,6 +112,7 @@ fi
 echo "type=monitoring_zenius;value=${zeniuscheck};";
 
 
+## Monitoring - consignClient
 icheck=`cat /etc/crontab | grep -i consignClient | wc -l`
 if [ $icheck -eq "0" ]; then
   consigncheck="X";
@@ -120,9 +121,9 @@ else
 fi
 echo "type=monitoring_consign;value=${consigncheck};";
 
-
+## config - arp
 ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
-icheck=`arp -a | grep " ${ip_gateway} " | wc -l`
+icheck=`arp -a | grep "(${ip_gateway})" | wc -l`
 if [ $icheck -eq "0" ]; then
   arpcheck="X";
 else
@@ -130,38 +131,43 @@ else
 fi
 echo "type=arp_static;value=${arpcheck};value2=${ip_gateway}";
 
+
+
 ## Hardware - disk
 if [ "$hw_vendor" == "HP" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
   if [ "${HP_CMD}" == "" ]; then
-    disk_raid="Unkonwn/HP";
-    disk_raid_size="Unkonwn";
-    echo "type=disk_array;value=${disk_raid};value2=${disk_raid_size};"
+    raidcheck="-";
+    echo "type=disk_array;value=${raidcheck};"
   else
     hp_slot_no=`$HP_CMD ctrl all show status | grep -i slot | awk -F'Slot' '{print$2}' | awk '{print$1}'`;
-    $HP_CMD ctrl slot=$hp_slot_no show config | grep .
+    if [ -n ${hp_slot_no} ]; then
+      icheck=`$HP_CMD ctrl slot=$hp_slot_no show config | grep . | egrep "(logical|physical)" | grep -v "OK)" | wc -l`
+      if [ $icheck -eq "0" ]; then
+        raidcheck="O";
+      else
+        raidcheck="X";
+      fi
+      echo "type=disk_array;value=${raidcheck};"
+    else
+      raidcheck="-";
+      echo "type=disk_array;value=${raidcheck};"  
+    fi
   fi
 elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
   [ -f '/opt/MegaRAID/MegaCli/MegaCli' ] && IBM_CMD='/opt/MegaRAID/MegaCli/MegaCli'
   [ -f '/opt/MegaRAID/MegaCli/MegaCli64' ] && IBM_CMD='/opt/MegaRAID/MegaCli/MegaCli64'
 
   if [ "${IBM_CMD}" == "" ]; then
-    disk_raid="Unkonwn/IBM";
-    disk_raid_size="Unkonwn";
-    echo "type=disk_array;value=${disk_raid};value2=${disk_raid_size};"
+    raidcheck="-";
+    echo "type=disk_array;value=${raidcheck};"
   else
     ${IBM_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size" | sed -e 's/\,/\:/g' -e 's/\[/\:/g' |  awk -F':' '{gsub(/[ \t]+/, "", $2);print $1":"$2}' | sed ':a;N;$!ba;s/\n/ /g' | sed -e 's/RAID/\nRAID/g' | grep .
   fi
 else
-  disk_raid="Unkonwn/$hw_vendor";
-  disk_raid_size="Unkonwn";
-  echo "type=disk_array;value=${disk_raid};value2=${disk_raid_size};"
+  raidcheck="-";
+  echo "type=disk_array;value=${raidcheck};"
 fi
 
 
-T_TERMINAL_PORT=`cat /etc/ssh/sshd_config | grep -v "^#" | grep Port | grep -v GatewayPorts | awk '{print$2}'`
-if [ "${T_TERMINAL_PORT}" == "" ]; then
-  T_TERMINAL_PORT="22"
-fi
-echo "type=sshd;value=${T_TERMINAL_PORT};";
