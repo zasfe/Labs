@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# sudo bash -c "curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/Systeminfo.sh | bash -"
+# sudo bash -c "curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -"
 LANG=C
-
-if [ -f '/etc/os-release' ] ; then
 
 
 # system status
