@@ -39,7 +39,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
 
   if [ -f "${apache_bin}" ]; then
     apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo -e "type=apache_version;value=\033[32m${apache_version}\033[0m"
+    echo -e "type=apache_version;value=\033[32m${apache_version}\033[0m;";
   fi
 done
     
