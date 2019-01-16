@@ -7,15 +7,14 @@ LANG=C
 # system status
 ## Os - info
 os_hostname=`hostname`
-echo "type=os_name;value=${os_hostname}";
+echo -e "type=os_hostname;value=\033[32m${os_hostname}\033[0m;";
 
-## Hardware - model
+## Hardware
 hw_vendor=`dmidecode | grep Vendor | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'  | awk '{gsub(/^[ \t]+/, "", $1);print $1}'`
-echo "type=hw_vendor;value=${hw_vendor};";
 hw_model=`dmidecode | grep "Product\ Name" | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); gsub(/[ \t]+$/, "", $2);print $2} '`
-echo "type=hw_model;value=${hw_model};";
+echo -e "type=hw_model;value=\033[32m${hw_vendor} ${hw_model}\033[0m;";
 
-
+## OS
 if [ -f '/etc/os-release' ] ; then
   os_release=`cat /etc/os-release  | grep PRETTY_NAME | cut -d'"' -f2`
 elif [ -f '/etc/redhat-release' ] ; then
@@ -27,7 +26,7 @@ else
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
 os_arch=`arch`
-echo "type=os;value=${os_release} (${os_arch});";
+echo "type=os;value=\033[32m${os_release} (${os_arch})\033[0m;";
 
 
 
@@ -40,7 +39,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
 
   if [ -f "${apache_bin}" ]; then
     apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo "type=apache_version;value=${apache_version}"
+    echo "type=apache_version;value=\033[32m${apache_version}\033[0m"
   fi
 done
     
@@ -52,10 +51,10 @@ ps aufxww | grep java | grep -v grep | while read line; do
     tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
     if [ -n "${tomcat_base}" ]; then
       tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo "type=tomcat_version;value=${tomcat_version};value2=${tomcat_base};";
+      echo "type=tomcat_version;value=\033[32mtomcat/${tomcat_version}\033[0m;value2=${tomcat_base};";
       
       java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo "type=java_version;value=java/${java_version};value2=${java_bin};";
+      echo "type=java_version;value=\033[32mjava/${java_version}\033[0m;value2=${java_bin};";
     fi
   fi
 done
@@ -66,7 +65,7 @@ ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | 
   if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
     mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
   fi
-  echo "type=mysql_version;value=${mysql_version};value2=${mysql_bin};";
+  echo "type=mysql_version;value=\033[32m${mysql_version}\033[0m;value2=${mysql_bin};";
 done
 
 ## DBMS - oracle
@@ -78,7 +77,7 @@ ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= rea
   if [ -f "${oracle_inventory}" ]; then
     oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
   fi
-  echo "type=oracle_version;value=oracle/${oracle_version};value2=${oracle_home};";
+  echo "type=oracle_version;value=\033[32moracle/${oracle_version}\033[0m;value2=${oracle_home};";
 done
 
 
