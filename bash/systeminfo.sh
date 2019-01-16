@@ -72,7 +72,7 @@ tomcat_bin="-"
 icheck=`ps aufxww | grep java | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   tomcatcheck="X";
-  echo -e "  was_tomcat: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+  echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
 else
   tomcatcheck="O";
   ps aufxww | grep java | grep -v grep | while read line; do
