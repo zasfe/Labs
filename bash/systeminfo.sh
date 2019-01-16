@@ -148,7 +148,7 @@ else
   fi
 fi
 
-echo -e "monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
+echo -e "monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}), CentOS4/5/6 only install )";
 
 ## config - arp
 ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
