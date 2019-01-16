@@ -15,6 +15,7 @@ function pretty_result {
   return;
 }
 
+echo ""
 # system status
 ## Os - info
 os_hostname=`hostname`
@@ -45,7 +46,6 @@ echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 
 
 ## WEB - apache
-#ps aufx | egrep "(httpd|apache)" | grep -v grep | awk '{print$11" "$2}' | grep -v '^\\_' | while IFS= read LINE ; do
 ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{print$11" "$2}' | while IFS= read LINE ; do
   apache_bin=`echo $LINE | awk '{print$1}'`;
   apachectl_bin=`echo $LINE | awk '{print$1}' | sed -e 's/apache2/apachectl/g' -e 's/httpd/apachectl/g'`;
@@ -53,7 +53,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
 
   if [ -f "${apache_bin}" ]; then
     apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo -e "  apache: \033[32m${apache_version}\033[0m";
+    echo -e "  apache: \033[32m${apache_version}\033[0m ( ${apache_bin} )";
   fi
 done
 
@@ -176,23 +176,25 @@ fi
 
 
 ## Hardware - array
+raidapp_exist="-";
+raidresult="-";
+
 if [ "$hw_vendor" == "HP" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
   if [ "${HP_CMD}" == "" ]; then
-    raidcheck="-";
+    raidapp_exist="X";
   else
+    raidapp_exist="O";
     hp_slot_no=`$HP_CMD ctrl all show status | grep -i slot | awk -F'Slot' '{print$2}' | awk '{print$1}'`;
     if [ -n ${hp_slot_no} ]; then
       raidlog=`$HP_CMD ctrl slot=$hp_slot_no show config | grep . | egrep "(logical|physical)"`
       icheck=`$HP_CMD ctrl slot=$hp_slot_no show config | grep . | egrep "(logical|physical)" | grep -v "OK)" | wc -l`
       if [ $icheck -eq "0" ]; then
-        raidcheck="O";
+        raidresult="O";
       else
-        raidcheck="X";
+        raidresult="X";
       fi
-    else
-      raidcheck="-";
     fi
   fi
 elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
@@ -200,15 +202,17 @@ elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
   [ -f '/opt/MegaRAID/MegaCli/MegaCli64' ] && IBM_CMD='/opt/MegaRAID/MegaCli/MegaCli64'
 
   if [ "${IBM_CMD}" == "" ]; then
-    raidcheck="-";
+    raidapp_exist="X";
   else
+    raidapp_exist="O";
     ${IBM_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size" | sed -e 's/\,/\:/g' -e 's/\[/\:/g' |  awk -F':' '{gsub(/[ \t]+/, "", $2);print $1":"$2}' | sed ':a;N;$!ba;s/\n/ /g' | sed -e 's/RAID/\nRAID/g' | grep .
   fi
-else
-  raidcheck="-";
-
 fi
-echo -e "  disk_array: $(pretty_result ${raidcheck})";
-if [ "${raidcheck}" == "X" ]; then
+
+echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_result ${raidapp_exist}) ) ";
+if [ "${raidresult}" == "X" ]; then
   echo -e "  \033[31m${raidlog}\033[0m"
 fi
+
+
+echo ""
