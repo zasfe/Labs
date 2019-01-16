@@ -1,8 +1,19 @@
 #!/bin/bash
 
 # sudo bash -c "curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -"
+# curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -
 LANG=C
 
+function pretty_result {
+  if [ "$1" == "O" ]; then
+    echo -e "\033[32mO\033[0m";
+  elif  [ "$1" == "X" ]; then
+    echo -e "\033[31mX\033[0m";
+  else
+    echo -e "\033[30m-\033[0m";
+  fi
+  return;
+}
 
 # system status
 ## Os - info
@@ -42,8 +53,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
     echo -e "apache: \033[32m${apache_version}\033[0m";
   fi
 done
-    
-    
+
 ## WAS - tomcat
 ps aufxww | grep java | grep -v grep | while read line; do
   java_bin=`echo "$line" | sed -e 's/\ /\n/g' | grep "java$"`;
@@ -52,7 +62,7 @@ ps aufxww | grep java | grep -v grep | while read line; do
     if [ -n "${tomcat_base}" ]; then
       tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "tomcat: \033[32mtomcat/${tomcat_version}\033[0m ( ${tomcat_base} )";
-      
+
       java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "java: \033[32mjava/${java_version}\033[0m ( ${java_bin} )";
     fi
@@ -71,7 +81,7 @@ done
 ## DBMS - oracle
 ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= read tnslsnr_bin ; do
   oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
-  
+
 # https://docs.oracle.com/cd/E11857_01/em.111/e12255/oui2_manage_oracle_homes.htm
   oracle_inventory="${oracle_home}/inventory/ContentsXML/comps.xml";
   if [ -f "${oracle_inventory}" ]; then
@@ -79,8 +89,6 @@ ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= rea
   fi
   echo -e "oracle: \033[32moracle/${oracle_version}\033[0m ( ${oracle_home} )";
 done
-
-
 
 ## Monitoring - BB
 icheck=`ps aufx | grep runbb | grep -v grep | wc -l`
@@ -101,7 +109,8 @@ else
     bbname=`cat /home/bb/bb17b4/etc/bbaliasname | head -n 1`
   fi
 fi
-echo -e "monitoring_bb: \033[32m${bbcheck}\033[0m ( proc config: \033[32m${bbproc}\033[0m , bbhostname: ${bbname} )";
+echo -e "monitoring_bb: $(pretty_result ${bbcheck}) ( proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
+
 
 ## Monitoring - zenius
 icheck=`ps aufxww | grep zagent | grep -v grep | wc -l`
@@ -110,17 +119,28 @@ if [ $icheck -eq "0" ]; then
 else
   zeniuscheck="O";
 fi
-echo -e "monitoring_zenius: \033[32m${zeniuscheck}\033[0m";
+echo -e "monitoring_zenius: $(pretty_result ${zeniuscheck})";
 
 
 ## Monitoring - consignClient
 icheck=`cat /etc/crontab | grep -i consignClient | wc -l`
 if [ $icheck -eq "0" ]; then
-  consigncheck="X";
+  consigncron="X";
 else
-  consigncheck="O";
+  consigncron="O";
 fi
-echo -e "monitoring_consign: 033[32m${consigncheck}\033[0m";
+if [ -f /home/gabia/src/consignClient ]; then
+  consignexist="O";
+else
+  consignexist="X";
+fi
+
+if [ "${consigncron}" == "O" ] && [ "${consignexist}" == "O" ]; then
+  consigncheck="O";
+else
+  consigncheck="X";
+fi
+echo -e "monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
 
 ## config - arp
 ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
@@ -130,11 +150,24 @@ if [ $icheck -eq "0" ]; then
 else
   arpcheck="O";
 fi
-echo -e "cfg_arpstatic: 033[32m${arpcheck}\033[0m ( gateway ip: ${ip_gateway} )";
+echo -e "cfg_arpstatic: $(pretty_result {arpcheck}) ( gateway ip: ${ip_gateway} )";
 
 
+## Hardware - partition
+disk_partition=`df -lh | awk '0+$5 >= 70 {print}'`
+icheck=`echo ${disk_partition} | wc -l`
+if [ $icheck -eq "0" ]; then
+  diskcheck="X";
+else
+  diskcheck="O";
+fi
+echo -e "disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
+if [ "${diskcheck}" == "X" ]; then
+  echo -e "\033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
+fi
 
-## Hardware - disk
+
+## Hardware - array
 if [ "$hw_vendor" == "HP" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
@@ -143,6 +176,7 @@ if [ "$hw_vendor" == "HP" ]; then
   else
     hp_slot_no=`$HP_CMD ctrl all show status | grep -i slot | awk -F'Slot' '{print$2}' | awk '{print$1}'`;
     if [ -n ${hp_slot_no} ]; then
+      raidlog=`$HP_CMD ctrl slot=$hp_slot_no show config | grep . | egrep "(logical|physical)"`
       icheck=`$HP_CMD ctrl slot=$hp_slot_no show config | grep . | egrep "(logical|physical)" | grep -v "OK)" | wc -l`
       if [ $icheck -eq "0" ]; then
         raidcheck="O";
@@ -166,5 +200,7 @@ else
   raidcheck="-";
 
 fi
-echo -e "disk_array: 033[32m${raidcheck}\033[0m"
-
+echo -e "disk_array: $(pretty_result ${raidcheck})";
+if [ "${raidcheck}" == "X" ]; then
+  echo -e "\033[31m${raidlog}\033[0m"
+fi
