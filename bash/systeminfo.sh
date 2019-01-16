@@ -258,5 +258,22 @@ fi
 
 ## DBMS - backup
 
+dbms_backup_check="-";
+dbms_backup_cron="-";
+dbms_backup_log="-";
+icheck=`cat /etc/crontab | egrep "(mysql|backup)" | wc -l`
+if [ $icheck -eq "0" ]; then
+  dbms_backup_check="X";
+  dbms_backup_cron="X";
+else
+  dbms_backup_check="O";
+  dbms_backup_cron="O";
+  dbms_backup_log =`cat /etc/crontab | egrep "(mysql|backup)"`
+fi
+echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( cron exist: $(pretty_result ${dbms_backup_cron}) )";
+if [ "${dbms_backup_check}" == "X" ]; then
+  echo -e "  ${dbms_backup_log}"
+fi
+
 
 echo ""
