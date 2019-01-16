@@ -158,7 +158,7 @@ if [ $icheck -eq "0" ]; then
 else
   arpcheck="O";
 fi
-echo -e "cfg_arpstatic: $(pretty_result {arpcheck}) ( gateway ip: ${ip_gateway} )";
+echo -e "cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gateway} )";
 
 
 ## Hardware - partition
