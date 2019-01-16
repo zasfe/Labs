@@ -214,7 +214,7 @@ fi
 ## Hardware - array
 raidapp_exist="-";
 raidresult="-";
-
+raidlog="";
 if [ "$hw_vendor" == "HP" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
@@ -241,7 +241,13 @@ elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
     raidapp_exist="X";
   else
     raidapp_exist="O";
-    ${IBM_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size" | sed -e 's/\,/\:/g' -e 's/\[/\:/g' |  awk -F':' '{gsub(/[ \t]+/, "", $2);print $1":"$2}' | sed ':a;N;$!ba;s/\n/ /g' | sed -e 's/RAID/\nRAID/g' | grep .
+    icheck=`${IBM_CMD} -LDPDinfo -aALL -NoLog | grep "Count:" | awk '0+$4 > 0 {print}' | wc -l`
+    raidlog=`${IBM_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size|^Media\ Error|^Other\ Error|^Predictive\ Failure"`
+    if [ $icheck -eq "0" ]; then
+      raidresult="O";
+    else
+      raidresult="X";
+    fi
   fi
 fi
 
