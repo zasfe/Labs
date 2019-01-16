@@ -26,7 +26,7 @@ else
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
 os_arch=`arch`
-echo "type=os;value=\033[32m${os_release} (${os_arch})\033[0m;";
+echo -e "type=os;value=\033[32m${os_release} (${os_arch})\033[0m;";
 
 
 
@@ -39,7 +39,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
 
   if [ -f "${apache_bin}" ]; then
     apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo "type=apache_version;value=\033[32m${apache_version}\033[0m"
+    echo -e "type=apache_version;value=\033[32m${apache_version}\033[0m"
   fi
 done
     
@@ -51,10 +51,10 @@ ps aufxww | grep java | grep -v grep | while read line; do
     tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
     if [ -n "${tomcat_base}" ]; then
       tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo "type=tomcat_version;value=\033[32mtomcat/${tomcat_version}\033[0m;value2=${tomcat_base};";
+      echo -e "type=tomcat_version;value=\033[32mtomcat/${tomcat_version}\033[0m;value2=${tomcat_base};";
       
       java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo "type=java_version;value=\033[32mjava/${java_version}\033[0m;value2=${java_bin};";
+      echo -e "type=java_version;value=\033[32mjava/${java_version}\033[0m;value2=${java_bin};";
     fi
   fi
 done
@@ -65,7 +65,7 @@ ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | 
   if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
     mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
   fi
-  echo "type=mysql_version;value=\033[32m${mysql_version}\033[0m;value2=${mysql_bin};";
+  echo -e "type=mysql_version;value=\033[32m${mysql_version}\033[0m;value2=${mysql_bin};";
 done
 
 ## DBMS - oracle
@@ -77,7 +77,7 @@ ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= rea
   if [ -f "${oracle_inventory}" ]; then
     oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
   fi
-  echo "type=oracle_version;value=\033[32moracle/${oracle_version}\033[0m;value2=${oracle_home};";
+  echo -e "type=oracle_version;value=\033[32moracle/${oracle_version}\033[0m;value2=${oracle_home};";
 done
 
 
