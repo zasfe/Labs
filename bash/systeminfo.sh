@@ -18,12 +18,12 @@ function pretty_result {
 # system status
 ## Os - info
 os_hostname=`hostname`
-echo -e "hostname: \033[32m${os_hostname}\033[0m";
+echo -e "  hostname: \033[32m${os_hostname}\033[0m";
 
 ## Hardware
 hw_vendor=`dmidecode | grep Vendor | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'  | awk '{gsub(/^[ \t]+/, "", $1);print $1}'`
 hw_model=`dmidecode | grep "Product\ Name" | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); gsub(/[ \t]+$/, "", $2);print $2} '`
-echo -e "hw: \033[32m${hw_vendor} ${hw_model}\033[0m";
+echo -e "  hw: \033[32m${hw_vendor} ${hw_model}\033[0m";
 
 ## OS
 if [ -f '/etc/os-release' ] ; then
@@ -40,7 +40,7 @@ else
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
 os_arch=`arch`
-echo -e "os: \033[32m${os_release} (${os_arch})\033[0m";
+echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 
 
 
@@ -53,7 +53,7 @@ ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{
 
   if [ -f "${apache_bin}" ]; then
     apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo -e "apache: \033[32m${apache_version}\033[0m";
+    echo -e "  apache: \033[32m${apache_version}\033[0m";
   fi
 done
 
@@ -64,10 +64,10 @@ ps aufxww | grep java | grep -v grep | while read line; do
     tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
     if [ -n "${tomcat_base}" ]; then
       tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo -e "tomcat: \033[32mtomcat/${tomcat_version}\033[0m ( ${tomcat_base} )";
+      echo -e "  tomcat: \033[32mtomcat/${tomcat_version}\033[0m ( ${tomcat_base} )";
 
       java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo -e "java: \033[32mjava/${java_version}\033[0m ( ${java_bin} )";
+      echo -e "  java: \033[32mjava/${java_version}\033[0m ( ${java_bin} )";
     fi
   fi
 done
@@ -78,7 +78,7 @@ ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | 
   if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
     mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
   fi
-  echo -e "mysql: \033[32m${mysql_version}\033[0m ( ${mysql_bin} )";
+  echo -e "  mysql: \033[32m${mysql_version}\033[0m ( ${mysql_bin} )";
 done
 
 ## DBMS - oracle
@@ -90,7 +90,7 @@ ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= rea
   if [ -f "${oracle_inventory}" ]; then
     oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
   fi
-  echo -e "oracle: \033[32moracle/${oracle_version}\033[0m ( ${oracle_home} )";
+  echo -e "  oracle: \033[32moracle/${oracle_version}\033[0m ( ${oracle_home} )";
 done
 
 ## Monitoring - BB
@@ -112,7 +112,7 @@ else
     bbname=`cat /home/bb/bb17b4/etc/bbaliasname | head -n 1`
   fi
 fi
-echo -e "monitoring_bb: $(pretty_result ${bbcheck}) ( proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
+echo -e "  monitoring_bb: $(pretty_result ${bbcheck}) ( proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
 
 
 ## Monitoring - zenius
@@ -122,7 +122,7 @@ if [ $icheck -eq "0" ]; then
 else
   zeniuscheck="O";
 fi
-echo -e "monitoring_zenius: $(pretty_result ${zeniuscheck})";
+echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
 
 
 ## Monitoring - consignClient
@@ -148,7 +148,7 @@ else
   fi
 fi
 
-echo -e "monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}), CentOS4/5/6 only install )";
+echo -e "  monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}), CentOS4/5/6 only install )";
 
 ## config - arp
 ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
@@ -158,7 +158,7 @@ if [ $icheck -eq "0" ]; then
 else
   arpcheck="O";
 fi
-echo -e "cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gateway} )";
+echo -e "  cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gateway} )";
 
 
 ## Hardware - partition
@@ -169,9 +169,9 @@ if [ $icheck -eq "0" ]; then
 else
   diskcheck="O";
 fi
-echo -e "disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
+echo -e "  disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
 if [ "${diskcheck}" == "X" ]; then
-  echo -e "\033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
+  echo -e "  \033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
 fi
 
 
@@ -208,7 +208,7 @@ else
   raidcheck="-";
 
 fi
-echo -e "disk_array: $(pretty_result ${raidcheck})";
+echo -e "  disk_array: $(pretty_result ${raidcheck})";
 if [ "${raidcheck}" == "X" ]; then
-  echo -e "\033[31m${raidlog}\033[0m"
+  echo -e "  \033[31m${raidlog}\033[0m"
 fi
