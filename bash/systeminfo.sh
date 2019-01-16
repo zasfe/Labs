@@ -72,11 +72,13 @@ done
 ## DBMS - oracle
 ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= read tnslsnr_bin ; do
   oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
-  oracle_lib="${oracle_home}/lib/libclntsh.so";
-  if [ -f "${oracle_lib}" ]; then
-    oracle_version=`strings ${oracle_lib} | grep '^Version [0-9]' | awk '{print$2}'`;
-    echo "type=oracle_version;value=oracle/${oracle_version};value2=${oracle_home};";
+  
+# https://docs.oracle.com/cd/E11857_01/em.111/e12255/oui2_manage_oracle_homes.htm
+  oracle_inventory="${oracle_home}/inventory/ContentsXML/comps.xml";
+  if [ -f "${oracle_inventory}" ]; then
+    oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
   fi
+  echo "type=oracle_version;value=oracle/${oracle_version};value2=${oracle_home};";
 done
 
 
