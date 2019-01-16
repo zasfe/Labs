@@ -10,7 +10,7 @@ function pretty_result {
   elif  [ "$1" == "X" ]; then
     echo -e "\033[31mX\033[0m";
   else
-    echo -e "\033[30m-\033[0m";
+    echo -e "\033[33m-\033[0m";
   fi
   return;
 }
@@ -28,10 +28,13 @@ echo -e "hw: \033[32m${hw_vendor} ${hw_model}\033[0m";
 ## OS
 if [ -f '/etc/os-release' ] ; then
   os_release=`cat /etc/os-release  | grep PRETTY_NAME | cut -d'"' -f2`
+  os_namefile="/etc/os-release";
 elif [ -f '/etc/redhat-release' ] ; then
   os_release=`cat /etc/redhat-release | head -n 1`
+  os_namefile="/etc/redhat-release";
 elif [ -f '/etc/issue' ] ; then
   os_release=`cat /etc/issue | head -n 1`
+  os_namefile="/etc/issue";
 else
   os_release="Unknown"
 fi
@@ -139,7 +142,12 @@ if [ "${consigncron}" == "O" ] && [ "${consignexist}" == "O" ]; then
   consigncheck="O";
 else
   consigncheck="X";
+  icheck=`cat ${os_namefile}  | grep PRETTY_NAME | cut -d'"' -f2 | egrep -i "(centos|redhat)" | egrep "(4|5|6)"| wc -l`
+  if [ $icheck -eq "0" ]; then
+    consigncheck="-";
+  fi
 fi
+
 echo -e "monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
 
 ## config - arp
