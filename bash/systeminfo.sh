@@ -256,7 +256,7 @@ if [ "${raidresult}" == "X" ]; then
   echo -e "  \033[31m${raidlog}\033[0m"
 fi
 
-## DBMS - backup
+## DBMS - backup Exist
 
 dbms_backup_check="-";
 dbms_backup_cron="-";
@@ -274,6 +274,3 @@ echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( cron exist: $(pr
 if [ "${dbms_backup_check}" == "X" ]; then
   echo -e "  ${dbms_backup_log}"
 fi
-
-
-echo ""
