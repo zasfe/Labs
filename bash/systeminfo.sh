@@ -46,52 +46,88 @@ echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 
 
 ## WEB - apache
-ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{print$11" "$2}' | while IFS= read LINE ; do
-  apache_bin=`echo $LINE | awk '{print$1}'`;
-  apachectl_bin=`echo $LINE | awk '{print$1}' | sed -e 's/apache2/apachectl/g' -e 's/httpd/apachectl/g'`;
-  apache_pid=`echo $LINE | awk '{print$2}'`;
-
-  if [ -f "${apache_bin}" ]; then
-    apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-    echo -e "  apache: \033[32m${apache_version}\033[0m ( ${apache_bin} )";
-  fi
-done
+apache_version="-"
+apache_bin="-"
+icheck=`ps aufx | egrep "(httpd|apache)" | grep -v "org.apache" | grep -v grep | wc -l`
+if [ $icheck -eq "0" ]; then
+  apachecheck="X";
+  echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+else
+  apachecheck="O";
+  ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{print$11" "$2}' | while IFS= read LINE ; do
+    apache_bin=`echo $LINE | awk '{print$1}'`;
+    apachectl_bin=`echo $LINE | awk '{print$1}' | sed -e 's/apache2/apachectl/g' -e 's/httpd/apachectl/g'`;
+    apache_pid=`echo $LINE | awk '{print$2}'`;
+  
+    if [ -f "${apache_bin}" ]; then
+      apache_version=`${apache_bin} -V | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+      echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+    fi
+  done
+fi
 
 ## WAS - tomcat
-ps aufxww | grep java | grep -v grep | while read line; do
-  java_bin=`echo "$line" | sed -e 's/\ /\n/g' | grep "java$"`;
-  if [ -f "${java_bin}" ]; then
-    tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
-    if [ -n "${tomcat_base}" ]; then
-      tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo -e "  tomcat: \033[32mtomcat/${tomcat_version}\033[0m ( ${tomcat_base} )";
-
-      java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-      echo -e "  java: \033[32mjava/${java_version}\033[0m ( ${java_bin} )";
+tomcat_version="-"
+tomcat_bin="-"
+icheck=`ps aufxww | grep java | grep -v grep | wc -l`
+if [ $icheck -eq "0" ]; then
+  tomcatcheck="X";
+  echo -e "  was_tomcat: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+else
+  tomcatcheck="O";
+  ps aufxww | grep java | grep -v grep | while read line; do
+    java_bin=`echo "$line" | sed -e 's/\ /\n/g' | grep "java$"`;
+    if [ -f "${java_bin}" ]; then
+      tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
+      if [ -n "${tomcat_base}" ]; then
+        tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+        echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , base: ${tomcat_base} )";
+        java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+        echo -e "  -- java: java/${java_version} ( bin: ${java_bin} )";
+      fi
     fi
-  fi
-done
+  done
+fi
+
 
 ## DBMS - mysql
-ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | uniq | while IFS= read mysql_bin ; do
-  mysql_version=`strings ${mysql_bin} | grep "^mysqld\-" | sed -e 's/\-/\//g'`
-  if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
-    mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
-  fi
-  echo -e "  mysql: \033[32m${mysql_version}\033[0m ( ${mysql_bin} )";
-done
+mysql_version="-"
+mysql_bin="-"
+icheck=`ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | wc -l`
+if [ $icheck -eq "0" ]; then
+  mysqlcheck="X";
+  echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
+else
+  mysqlcheck="O";
+  ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | uniq | while IFS= read mysql_bin ; do
+    mysql_version=`strings ${mysql_bin} | grep "^mysqld\-" | sed -e 's/\-/\//g'`
+    if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
+      mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
+    fi
+    echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
+  done
+fi
+
 
 ## DBMS - oracle
-ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= read tnslsnr_bin ; do
-  oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
-
-# https://docs.oracle.com/cd/E11857_01/em.111/e12255/oui2_manage_oracle_homes.htm
-  oracle_inventory="${oracle_home}/inventory/ContentsXML/comps.xml";
-  if [ -f "${oracle_inventory}" ]; then
-    oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
-  fi
-  echo -e "  oracle: \033[32moracle/${oracle_version}\033[0m ( ${oracle_home} )";
-done
+oracle_version="-"
+oracle_bin="-"
+icheck=`ps aufx | grep tnslsnr | grep -v grep | wc -l`
+if [ $icheck -eq "0" ]; then
+  oraclecheck="X";
+  echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: ${oracle_version} , home: ${oracle_home} )";
+else
+  oraclecheck="O";
+  ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= read tnslsnr_bin ; do
+    oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
+  # https://docs.oracle.com/cd/E11857_01/em.111/e12255/oui2_manage_oracle_homes.htm
+    oracle_inventory="${oracle_home}/inventory/ContentsXML/comps.xml";
+    if [ -f "${oracle_inventory}" ]; then
+      oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
+    fi
+    echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: oracle/${oracle_version} , home: ${oracle_home} )";
+  done
+fi
 
 ## Monitoring - BB
 icheck=`ps aufx | grep runbb | grep -v grep | wc -l`
@@ -213,6 +249,8 @@ echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_res
 if [ "${raidresult}" == "X" ]; then
   echo -e "  \033[31m${raidlog}\033[0m"
 fi
+
+## DBMS - backup
 
 
 echo ""
