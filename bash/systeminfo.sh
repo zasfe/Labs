@@ -241,7 +241,7 @@ fi
 raidapp_exist="-";
 raidresult="-";
 raidlog="";
-if [ "$hw_vendor" == "HP" ]; then
+if [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "hp" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
   if [ "${HP_CMD}" == "" ]; then
@@ -259,7 +259,7 @@ if [ "$hw_vendor" == "HP" ]; then
       fi
     fi
   fi
-elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ] || [ "$hw_vendor" == "LENOVO" ]; then
+elif [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "ibm" ] || [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "dell" ] || [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "lenovo" ]; then
   [ -f '/opt/MegaRAID/MegaCli/MegaCli' ] && MEGACLI_CMD='/opt/MegaRAID/MegaCli/MegaCli'
   [ -f '/opt/MegaRAID/MegaCli/MegaCli64' ] && MEGACLI_CMD='/opt/MegaRAID/MegaCli/MegaCli64'
 
