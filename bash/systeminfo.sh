@@ -41,7 +41,6 @@ else
   os_release="Unknown"
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
-os_release=`echo ${os_release} | `
 
 os_arch=`arch`
 echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
