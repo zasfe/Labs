@@ -163,8 +163,8 @@ else
 fi
 echo -e "  monitoring_bb: $(pretty_result ${bbcheck}) ( exist:$(pretty_result ${bbexist}) ,proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
 if [ "${bbcheck}" != "O" ]; then
-  echo -e "  \033[31m/home/bb/bb17b4/runbb.sh exist: ${bbexist}\033[0m"
-  echo -e "  \033[31m/home/bb/bb17b4/etc/bb-proctab config: ${bbproc}\033[0m"
+  echo -e "    - /home/bb/bb17b4/runbb.sh exist: $(pretty_result ${bbexist})"
+  echo -e "    - /home/bb/bb17b4/etc/bb-proctab config: $(pretty_result ${bbproc})"
 fi
 
 ## Monitoring - zenius
@@ -202,10 +202,10 @@ else
 fi
 echo -e "  monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
 if [ "${consigncheck}" != "O" ]; then
-  echo -e "  \033[31m  - /etc/crontab, find consign\033[0m"
-  echo -e "  \033[31m  ${cronlog}\033[0m"
-  echo -e "  \033[31m  - file exist : ${consignexist}\033[0m"
-  echo -e "  \033[31m  - CentOS4/5/6 only support: ${osverlog}\033[0m"
+  echo -e "    - /etc/crontab, find consign: $(pretty_result ${consigncron})"
+  echo -e "      \033[31m${cronlog}\033[0m"
+  echo -e "    - file exist : $(pretty_result ${consignexist})"
+  echo -e "    - CentOS4/5/6 only support: \033[31m${osverlog}\033[0m"
 fi
 
 ## config - arp
