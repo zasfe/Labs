@@ -210,9 +210,9 @@ if [ "${consigncheck}" != "O" ]; then
 fi
 
 ## config - arp
-ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
-icheck=`arp -a | grep "(${ip_gateway})" | wc -l`
-arplog=`arp -a | grep "(${ip_gateway})"`
+ip_gateway=`ip r | grep "^default" | cut -d' ' -f3 | head -n 1`
+icheck=`arp -an | grep "(${ip_gateway})" | wc -l`
+arplog=`arp -an | grep "(${ip_gateway})"`
 if [ $icheck -eq "0" ]; then
   arpcheck="X";
 else
