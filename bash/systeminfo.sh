@@ -4,6 +4,7 @@
 # curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -
 LANG=C
 
+
 function pretty_result {
   if [ "$1" == "O" ]; then
     echo -e "\033[32mO\033[0m";
@@ -136,9 +137,15 @@ if [ $icheck -eq "0" ]; then
   bbproc="X";
   bbname="X";
 else
-  bbcheck="O";
-  pcheck=`cat /home/bb/bb17b4/etc/bb-proctab | grep -v "^#" | wc -l`
-  if [ $icheck -eq "0" ]; then
+  bbexist="X";
+  if [ -f '/home/bb/bb17b4/runbb.sh' ]; then
+    bbexist="O";
+  fi
+  pcheck=0;
+  if [ -f '/home/bb/bb17b4/etc/bb-proctab' ]; then
+    pcheck=`cat /home/bb/bb17b4/etc/bb-proctab | grep -v "^#" | wc -l`
+  fi
+  if [ $pcheck -eq "0" ]; then
     bbproc="X";
   else
     bbproc="O";
@@ -148,8 +155,17 @@ else
     bbname=`cat /home/bb/bb17b4/etc/bbaliasname | head -n 1`
   fi
 fi
-echo -e "  monitoring_bb: $(pretty_result ${bbcheck}) ( proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
 
+if [ "${bbexist}" == "X" ] || [ "${bbproc}" == "X" ] ; then
+  bbcheck="X";
+else
+  bbcheck="O";
+fi
+echo -e "  monitoring_bb: $(pretty_result ${bbcheck}) ( exist:$(pretty_result ${bbexist}) ,proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
+if [ "${bbcheck}" != "O" ]; then
+  echo -e "  \033[31m/home/bb/bb17b4/runbb.sh exist: ${bbexist}\033[0m"
+  echo -e "  \033[31m/home/bb/bb17b4/etc/bb-proctab config: ${bbproc}\033[0m"
+fi
 
 ## Monitoring - zenius
 icheck=`ps aufxww | grep zagent | grep -v grep | wc -l`
@@ -163,6 +179,7 @@ echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
 
 ## Monitoring - consignClient
 icheck=`cat /etc/crontab | grep -i consignClient | wc -l`
+cronlog=`cat /etc/crontab | grep -i consignClient`
 if [ $icheck -eq "0" ]; then
   consigncron="X";
 else
@@ -173,29 +190,37 @@ if [ -f /home/gabia/src/consignClient ]; then
 else
   consignexist="X";
 fi
-
 if [ "${consigncron}" == "O" ] && [ "${consignexist}" == "O" ]; then
   consigncheck="O";
 else
   consigncheck="X";
-  icheck=`cat ${os_namefile}  | grep PRETTY_NAME | cut -d'"' -f2 | egrep -i "(centos|redhat)" | egrep "(4|5|6)"| wc -l`
+  icheck=`echo ${os_release} |egrep -i "(centos|redhat)" | egrep "(4|5|6)"| wc -l`
+  osverlog="${os_release}"
   if [ $icheck -eq "0" ]; then
     consigncheck="-";
   fi
 fi
-
-echo -e "  monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}), CentOS4/5/6 only install )";
+echo -e "  monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
+if [ "${consigncheck}" != "O" ]; then
+  echo -e "  \033[31m  - /etc/crontab, find consign\033[0m"
+  echo -e "  \033[31m  ${cronlog}\033[0m"
+  echo -e "  \033[31m  - file exist : ${consignexist}\033[0m"
+  echo -e "  \033[31m  - CentOS4/5/6 only support: ${osverlog}\033[0m"
+fi
 
 ## config - arp
 ip_gateway=`ip r | grep default | cut -d' ' -f3 | head -n 1`
 icheck=`arp -a | grep "(${ip_gateway})" | wc -l`
+arplog=`arp -a | grep "(${ip_gateway})"`
 if [ $icheck -eq "0" ]; then
   arpcheck="X";
 else
   arpcheck="O";
 fi
 echo -e "  cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gateway} )";
-
+if [ "${arpcheck}" == "X" ]; then
+  echo -e "  \033[31m${arplog}\033[0m"
+fi
 
 ## Hardware - partition
 disk_partition=`df -lh | awk '0+$5 >= 70 {print}'`
@@ -206,7 +231,7 @@ else
   diskcheck="O";
 fi
 echo -e "  disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
-if [ "${diskcheck}" == "X" ]; then
+if [ "${diskcheck}" != "O" ]; then
   echo -e "  \033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
 fi
 
@@ -233,16 +258,16 @@ if [ "$hw_vendor" == "HP" ]; then
       fi
     fi
   fi
-elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
-  [ -f '/opt/MegaRAID/MegaCli/MegaCli' ] && IBM_CMD='/opt/MegaRAID/MegaCli/MegaCli'
-  [ -f '/opt/MegaRAID/MegaCli/MegaCli64' ] && IBM_CMD='/opt/MegaRAID/MegaCli/MegaCli64'
+elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ] || [ "$hw_vendor" == "LENOVO" ]; then
+  [ -f '/opt/MegaRAID/MegaCli/MegaCli' ] && MEGACLI_CMD='/opt/MegaRAID/MegaCli/MegaCli'
+  [ -f '/opt/MegaRAID/MegaCli/MegaCli64' ] && MEGACLI_CMD='/opt/MegaRAID/MegaCli/MegaCli64'
 
-  if [ "${IBM_CMD}" == "" ]; then
+  if [ "${MEGACLI_CMD}" == "" ]; then
     raidapp_exist="X";
   else
     raidapp_exist="O";
-    icheck=`${IBM_CMD} -LDPDinfo -aALL -NoLog | grep "Count:" | awk '0+$4 > 0 {print}' | wc -l`
-    raidlog=`${IBM_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size|^Media\ Error|^Other\ Error|^Predictive\ Failure"`
+    icheck=`${MEGACLI_CMD} -LDPDinfo -aALL -NoLog | grep "Count:" | awk '0+$4 > 0 {print}' | wc -l`
+    raidlog=`${MEGACLI_CMD} -LDPDinfo -aALL -NoLog | grep . | sed -e "s/^[\t ]*//g" | egrep "^RAID\ Level|^PD|^Raw\ Size|^Media\ Error|^Other\ Error|^Predictive\ Failure"`
     if [ $icheck -eq "0" ]; then
       raidresult="O";
     else
@@ -252,7 +277,7 @@ elif [ "$hw_vendor" == "IBM" ] || [ "$hw_vendor" == "Dell" ]; then
 fi
 
 echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_result ${raidapp_exist}) ) ";
-if [ "${raidresult}" == "X" ]; then
+if [ "${raidresult}" != "O" ]; then
   echo -e "  \033[31m${raidlog}\033[0m"
 fi
 
@@ -270,9 +295,10 @@ else
   dbms_backup_cron="O";
 fi
 echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( cron exist: $(pretty_result ${dbms_backup_cron}) )";
+echo -e "  ================================================================== "
 echo -e "    - /etc/crontab, find mysql/backup"
-echo -e "      $(cat /etc/crontab | egrep "(mysql|backup)")"
-
+echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")"
+echo -e "  ================================================================== "
 
 echo ""
 
