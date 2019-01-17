@@ -24,7 +24,7 @@ echo -e "  hostname: \033[32m${os_hostname}\033[0m";
 
 ## Hardware
 hw_vendor=`dmidecode | grep Vendor | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'  | awk '{gsub(/^[ \t]+/, "", $1);print $1}'`
-hw_model=`dmidecode | grep "Product\ Name" | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); gsub(/[ \t]+$/, "", $2);print $2} '`
+hw_model=`dmidecode | grep "Product\ Name" | head -n 1 | awk -F':' '{gsub(/^[ \t]+/, "", $2); gsub(/[ \t]+$/, "", $2);print $2} ' | sed -e 's/^IBM //g'`
 echo -e "  hw: \033[32m${hw_vendor} ${hw_model}\033[0m";
 
 ## OS
@@ -41,6 +41,8 @@ else
   os_release="Unknown"
 fi
 [ "$os_release" == "" ] && os_release="Unknown"
+os_release=`echo ${os_release} | `
+
 os_arch=`arch`
 echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 
