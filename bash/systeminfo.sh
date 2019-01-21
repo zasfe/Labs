@@ -68,6 +68,25 @@ else
   done
 fi
 
+## WEB - nginx
+nginxcheck="-";
+nginx_version="-"
+nginx_bin="-"
+icheck=`ps aufx | egrep "(nginx)" | grep -v grep | grep master | wc -l`
+if [ $icheck -eq "0" ]; then
+  nginxcheck="X";
+  echo -e "  http_nginx: $(pretty_result ${nginxcheck}) ( ver: ${nginx_version} , bin: ${nginx_bin} )";
+else
+  nginxcheck="O";
+  ps aufx | egrep "(nginx)" | grep -v grep | grep master | while IFS= read LINE ; do
+    nginx_bin=`echo $LINE | awk '{print$14}'`;
+    if [ -f "${nginx_bin}" ]; then
+      nginx_version=`${nginx_bin} -V 2>&1 | grep -i "^nginx version" | awk '{print$3}'`
+      echo -e "  http_nginx: $(pretty_result ${nginxcheck}) ( ver: ${nginx_version} , bin: ${nginx_bin} )";
+    fi
+  done
+fi
+
 ## WAS - tomcat
 tomcat_version="-"
 tomcat_bin="-"
