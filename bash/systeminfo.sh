@@ -87,6 +87,7 @@ else
   done
 fi
 
+
 ## WAS - tomcat
 tomcat_version="-"
 tomcat_bin="-"
@@ -111,6 +112,9 @@ else
 fi
 
 
+## DBMS - general
+dbms_exist="X"
+
 ## DBMS - mysql
 mysql_version="-"
 mysql_bin="-"
@@ -125,6 +129,7 @@ else
     if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
       mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
     fi
+    dbms_exist="O"
     echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
   done
 fi
@@ -146,6 +151,7 @@ else
     if [ -f "${oracle_inventory}" ]; then
       oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
     fi
+    dbms_exist="O"
     echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: oracle/${oracle_version} , home: ${oracle_home} )";
   done
 fi
@@ -314,7 +320,7 @@ else
   dbms_backup_check="O";
   dbms_backup_cron="O";
 fi
-echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( cron exist: $(pretty_result ${dbms_backup_cron}) )";
+echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}, cron exist: $(pretty_result ${dbms_backup_cron}) )";
 echo -e "  ================================================================== "
 echo -e "    - /etc/crontab, find mysql/backup"
 echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")"
