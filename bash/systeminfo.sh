@@ -320,7 +320,7 @@ else
   dbms_backup_check="O";
   dbms_backup_cron="O";
 fi
-echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}, cron exist: $(pretty_result ${dbms_backup_cron}) )";
+echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
 echo -e "  ================================================================== "
 echo -e "    - /etc/crontab, find mysql/backup"
 echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")"
