@@ -310,6 +310,41 @@ if [ "${raidresult}" != "O" ]; then
 fi
 
 
+## Log - message
+logcheck_message="-";
+file_log="/var/log/message"
+if [ -f "${file_log}" ]; then
+  log_info=`egrep -i "(fail|error)" ${file_log}`
+fi
+icheck=`echo ${log_info} | wc -l`
+if [ $icheck -eq "0" ]; then
+  logcheck_message="X";
+else
+  logcheck_message="O";
+fi
+echo -e "  log_message: $(pretty_result ${logcheck_message}) ( find fail/error, file: ${file_log} )";
+if [ "${logcheck_message}" != "O" ]; then
+  echo -e "  \033[31m${log_info} \033[0m"
+fi
+
+## Log - secure
+logcheck_sec="-";
+file_log="/var/log/secure"
+if [ -f "${file_log}" ]; then
+  log_info=`egrep -i "(fail|error)" ${file_log}`
+fi
+icheck=`echo ${log_info} | wc -l`
+if [ $icheck -eq "0" ]; then
+  logcheck_sec="X";
+else
+  logcheck_sec="O";
+fi
+echo -e "  log_secure: $(pretty_result ${logcheck_sec}) ( find fail/error, file: ${file_log} )";
+if [ "${logcheck_sec}" != "O" ]; then
+  echo -e "  \033[31m${log_info} \033[0m"
+fi
+
+
 ## DBMS - backup Exist
 
 dbms_backup_check="-";
