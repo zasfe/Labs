@@ -94,17 +94,19 @@ tomcat_bin="-"
 icheck=`ps aufxww | grep java | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   tomcatcheck="X";
-  echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+  echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , bin: ${tomcat_bin} )";
 else
   tomcatcheck="O";
   ps aufxww | grep java | grep -v grep | while read line; do
     java_bin=`echo "$line" | sed -e 's/\ /\n/g' | grep "java$"`;
     if [ -f "${java_bin}" ]; then
-      tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.home" | awk -F\= '{print$2}'`
-      if [ -n "${tomcat_base}" ]; then
-        tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
-        echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , base: ${tomcat_base} )";
-        java_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+      tomcat_home=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.home" | awk -F\= '{print$2}'`
+      tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
+      if [ -n "${tomcat_home}" ]; then
+        tomcat_info=`exec ${java_bin} -cp ${tomcat_home}/lib/catalina.jar org.apache.catalina.util.ServerInfo`
+        tomcat_version=`echo ${tomcat_info} | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+        echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , home: ${tomcat_home}  , base: ${tomcat_base} )";
+        java_version=`echo ${tomcat_info} | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
         echo -e "  -- java: java/${java_version} ( bin: ${java_bin} )";
       fi
     fi
