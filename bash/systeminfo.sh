@@ -100,7 +100,7 @@ else
   ps aufxww | grep java | grep -v grep | while read line; do
     java_bin=`echo "$line" | sed -e 's/\ /\n/g' | grep "java$"`;
     if [ -f "${java_bin}" ]; then
-      tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
+      tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.home" | awk -F\= '{print$2}'`
       if [ -n "${tomcat_base}" ]; then
         tomcat_version=`exec ${java_bin} -cp ${tomcat_base}/lib/catalina.jar org.apache.catalina.util.ServerInfo | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
         echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , base: ${tomcat_base} )";
