@@ -38,9 +38,9 @@ elif [ -f '/etc/issue' ] ; then
   os_release=`cat /etc/issue | head -n 1`
   os_namefile="/etc/issue";
 else
-  os_release="Unknown"
+  os_release="Unknown";
 fi
-[ "$os_release" == "" ] && os_release="Unknown"
+[ "$os_release" == "" ] && os_release="Unknown";
 
 os_arch=`arch`
 echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
@@ -48,8 +48,8 @@ echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 
 
 ## WEB - apache
-apache_version="-"
-apache_bin="-"
+apache_version="-";
+apache_bin="-";
 icheck=`ps aufx | egrep "(httpd|apache)" | grep -v "org.apache" | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   apachecheck="X";
@@ -70,8 +70,8 @@ fi
 
 ## WEB - nginx
 nginxcheck="-";
-nginx_version="-"
-nginx_bin="-"
+nginx_version="-";
+nginx_bin="-";
 icheck=`ps aufx | egrep "(nginx)" | grep -v grep | grep master | wc -l`
 if [ $icheck -eq "0" ]; then
   nginxcheck="X";
@@ -89,8 +89,8 @@ fi
 
 
 ## WAS - tomcat
-tomcat_version="-"
-tomcat_bin="-"
+tomcat_version="-";
+tomcat_bin="-";
 icheck=`ps aufxww | grep java | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   tomcatcheck="X";
@@ -115,37 +115,38 @@ fi
 
 
 ## DBMS - general
-dbms_exist="X"
+dbms_exist="X";
 
 ## DBMS - mysql
-mysql_version="-"
-mysql_bin="-"
+mysql_version="-";
+mysql_bin="-";
 icheck=`ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | wc -l`
 if [ $icheck -eq "0" ]; then
   mysqlcheck="X";
   echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
 else
   mysqlcheck="O";
+  dbms_exist="O";
   ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | uniq | while IFS= read mysql_bin ; do
     mysql_version=`strings ${mysql_bin} | grep "^mysqld\-" | sed -e 's/\-/\//g'`
     if [ `strings ${mysql_bin} | grep  "\-MariaDB$" | wc -l` -eq 1 ]; then
       mysql_version=`strings ${mysql_bin} | grep  "\-MariaDB$" | awk -F'-' '{print "MariaDB/"$1}'`
     fi
-    dbms_exist="O"
     echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
   done
 fi
 
 
 ## DBMS - oracle
-oracle_version="-"
-oracle_bin="-"
+oracle_version="-";
+oracle_bin="-";
 icheck=`ps aufx | grep tnslsnr | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   oraclecheck="X";
   echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: ${oracle_version} , home: ${oracle_home} )";
 else
   oraclecheck="O";
+  dbms_exist="O";
   ps aufx | grep tnslsnr | grep -v grep | awk '{print$11}' | uniq | while IFS= read tnslsnr_bin ; do
     oracle_home=`echo $tnslsnr_bin | sed -e 's/\/bin\/tnslsnr//g' | grep "^/"`;
   # https://docs.oracle.com/cd/E11857_01/em.111/e12255/oui2_manage_oracle_homes.htm
@@ -153,7 +154,6 @@ else
     if [ -f "${oracle_inventory}" ]; then
       oracle_version=`cat ${oracle_home}/inventory/ContentsXML/comps.xml | grep oracle.server | head -n 1 | cut -d'"' -f4`;
     fi
-    dbms_exist="O"
     echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: oracle/${oracle_version} , home: ${oracle_home} )";
   done
 fi
@@ -229,13 +229,13 @@ fi
 
 echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_result ${raidapp_exist}) ) ";
 if [ "${raidresult}" != "O" ]; then
-  echo -e "  \033[31m${raidlog}\033[0m"
+  echo -e "  \033[31m${raidlog}\033[0m";
 fi
 
 
 ## Log - message
 logcheck_message="-";
-file_log="/var/log/message"
+file_log="/var/log/message";
 if [ -f "${file_log}" ]; then
   log_info=`egrep -i "(fail|error)" ${file_log}`
 fi
@@ -247,12 +247,12 @@ else
 fi
 echo -e "  log_message: $(pretty_result ${logcheck_message}) ( find fail/error, file: ${file_log} )";
 if [ "${logcheck_message}" != "O" ]; then
-  echo -e "  \033[31m${log_info} \033[0m"
+  echo -e "  \033[31m${log_info} \033[0m";
 fi
 
 ## Log - secure
 logcheck_sec="-";
-file_log="/var/log/secure"
+file_log="/var/log/secure";
 if [ -f "${file_log}" ]; then
   log_info=`egrep -i "(fail|error)" ${file_log}`
 fi
@@ -264,7 +264,7 @@ else
 fi
 echo -e "  log_secure: $(pretty_result ${logcheck_sec}) ( find fail/error, file: ${file_log} )";
 if [ "${logcheck_sec}" != "O" ]; then
-  echo -e "  \033[31m${log_info} \033[0m"
+  echo -e "  \033[31m${log_info} \033[0m";
 fi
 
 
@@ -274,19 +274,24 @@ dbms_backup_check="-";
 dbms_backup_cron="-";
 icheck=`cat /etc/crontab | egrep "(mysql|backup)" | wc -l`
 if [ $icheck -eq "0" ]; then
-  dbms_backup_check="X";
   dbms_backup_cron="X";
 else
-  dbms_backup_check="O";
   dbms_backup_cron="O";
 fi
-echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
-echo -e "  ================================================================== "
-echo -e "    - /etc/crontab, find mysql/backup"
-echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")"
-echo -e "  ================================================================== "
 
-echo ""
+if [ "${dbms_exist}"=="O" ] && [ "${dbms_exist}"=="O" ]; then
+  dbms_backup_check="O";
+else
+  dbms_backup_check="X";
+fi
+
+echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
+echo -e "  ================================================================== ";
+echo -e "    - /etc/crontab, find mysql/backup";
+echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")";
+echo -e "  ================================================================== ";
+
+echo "";
 
 # vi all delete
 ## gg    첫줄로 이동
