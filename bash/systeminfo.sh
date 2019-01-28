@@ -278,7 +278,7 @@ else
   dbms_backup_cron="O";
 fi
 
-if [ "${dbms_exist}"=="O" ] && [ "${dbms_backup_cron}"=="O" ]; then
+if [ "${dbms_exist}" == "O" ] && [ "${dbms_backup_cron}" == "O" ]; then
   dbms_backup_check="O";
 else
   dbms_backup_check="X";
