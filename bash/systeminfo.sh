@@ -130,7 +130,7 @@ else
   ps ax | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$5}' | uniq | while IFS= read mysql_bin ; do
     mysql_version_full=`${mysql_bin} -V`
     mysql_version=`echo ${mysql_version_full}| awk '{print $3}' | cut -d"-" -f1`
-    echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
+    echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: mysql/${mysql_version} , bin: ${mysql_bin} )";
   done
   
 #  ps aufx | grep mysqld | grep -v grep | grep -v mysqld_safe | awk '{print$12}' | uniq | while IFS= read mysql_bin ; do
