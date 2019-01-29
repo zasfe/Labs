@@ -294,7 +294,9 @@ fi
 echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
 echo -e "  ================================================================== ";
 echo -e "    - /etc/crontab, find mysql/backup";
-echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)")";
+echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)" 2>/dev/null )";
+echo -e "    - each user crontab, find mysql/backup";
+echo -e "  $(egrep -Ri "(mysql|backup)" /var/spool 2>/dev/null )";
 echo -e "  ================================================================== ";
 
 echo "";
