@@ -402,7 +402,7 @@ fi
 echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackupcheck}) , policy exist : $(pretty_result ${netbackupcheck}) )";
 echo -e "  ================================================================== ";
 echo -e "    - path list only netbackup policy  ";
-echo -e "    $(cat ${netbackup_path}/exclude* | sort | uniq)";
+echo -e "    $(cat ${netbackup_path}/exclude* 2>/dev/null | sort | uniq)";
 echo -e "  ================================================================== ";
 
 echo "";
