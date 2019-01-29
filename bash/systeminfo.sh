@@ -180,8 +180,7 @@ if [ "${arpcheck}" == "X" ]; then
 fi
 
 ## Hardware - partition
-disk_partition=`df -lh | awk '0+$5 >= 70 {print}'`
-icheck=`echo ${disk_partition} | wc -l`
+icheck=`df -lh | awk '0+$5 >= 70 {print}' | wc -l`
 if [ $icheck -eq "0" ]; then
   diskcheck="X";
 else
