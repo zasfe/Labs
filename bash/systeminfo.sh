@@ -169,7 +169,7 @@ else
 fi
 echo -e "  cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gateway} )";
 if [ "${arpcheck}" == "X" ]; then
-  echo -e "  \033[31m${arplog}\033[0m"
+  echo -e "    - \033[31m${arplog}\033[0m"
 fi
 
 ## Hardware - partition
