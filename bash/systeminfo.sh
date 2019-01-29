@@ -160,7 +160,7 @@ fi
 
 ## config - arp
 ip_gateway=`ip r | grep "^default" | cut -d' ' -f3 | head -n 1`
-icheck=`arp -an | grep "(${ip_gateway})" | wc -l`
+icheck=`arp -an | grep "(${ip_gateway})" | grep PERM | wc -l`
 arplog=`arp -an | grep "(${ip_gateway})"`
 if [ $icheck -eq "0" ]; then
   arpcheck="X";
