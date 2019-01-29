@@ -371,6 +371,30 @@ if [ "${consigncheck}" != "O" ]; then
   echo -e "    - CentOS4/5/6 only support: \033[31m${osverlog}\033[0m"
 fi
 echo "";
+
+
+
+## app - netbackup
+netbackupcheck="X";
+netbackup_dirs="-";
+netbackup_path="/usr/openv/netbackup";
+netbackup_policy="-";
+
+icheck=`ls -al ${netbackup_path} 2>/dev/null | wc -l`
+if [ $icheck -eq "0" ]; then
+  netbackupcheck="X";
+  echo -e "  app_netbackup: $(pretty_result ${netbackupcheck})";
+else
+  netbackupcheck="O";
+  echo -e "  app_netbackup: $(pretty_result ${netbackupcheck})";
+  echo -e "  ================================================================== ";
+  echo -e "    - netbackup backup policy pathchk list ";
+  echo -e "    $(cat ${netbackup_path}/exclude* | sort | uniq)";
+  echo -e "  ================================================================== ";
+fi
+
+echo "";
+
 # vi all delete
 ## gg    첫줄로 이동
 ## dG    현재 줄부터 마지막 줄 까지 삭제
