@@ -376,22 +376,37 @@ echo "";
 
 ## app - netbackup
 netbackupcheck="X";
-netbackup_dirs="-";
 netbackup_path="/usr/openv/netbackup";
-netbackup_policy="-";
+netbackup_policyexist="-";
+netbackup_appexist="-";
 
 icheck=`ls -al ${netbackup_path} 2>/dev/null | wc -l`
 if [ $icheck -eq "0" ]; then
-  netbackupcheck="X";
-  echo -e "  app_netbackup: $(pretty_result ${netbackupcheck})";
+  netbackup_appexist="X";
 else
+  netbackup_appexist="O";
+  icheck=`ls -al ${netbackup_path}/exclude* 2>/dev/null | wc -l`
+  if [ $icheck -eq "0" ]; then
+    netbackup_policyexist="X"
+  else
+    netbackup_policyexist="O"
+  fi
+fi
+
+if [ "${netbackup_appexist}" == "O" ] && [ "${netbackup_policyexist}" == "O" ]; then
   netbackupcheck="O";
-  echo -e "  app_netbackup: $(pretty_result ${netbackupcheck})";
+else
+  netbackupcheck="X"
+fi
+
+echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackupcheck}) , policy exist : $(pretty_result ${netbackupcheck}) )";
+if [ "${netbackupcheck}" != "O" ]; then
   echo -e "  ================================================================== ";
-  echo -e "    - netbackup backup policy pathchk list ";
+  echo -e "    - path list only netbackup policy  ";
   echo -e "    $(cat ${netbackup_path}/exclude* | sort | uniq)";
   echo -e "  ================================================================== ";
 fi
+
 
 echo "";
 
