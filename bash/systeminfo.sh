@@ -182,9 +182,9 @@ fi
 ## Hardware - partition
 icheck=`df -lh | awk '0+$5 >= 70 {print}' | wc -l`
 if [ $icheck -eq "0" ]; then
-  diskcheck="X";
-else
   diskcheck="O";
+else
+  diskcheck="X";
 fi
 echo -e "  disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
 if [ "${diskcheck}" != "O" ]; then
