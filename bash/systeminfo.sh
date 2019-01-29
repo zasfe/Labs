@@ -387,16 +387,16 @@ else
   netbackup_appexist="O";
   icheck=`ls -al ${netbackup_path}/exclude* 2>/dev/null | wc -l`
   if [ $icheck -eq "0" ]; then
-    netbackup_policyexist="X"
+    netbackup_policyexist="X";
   else
-    netbackup_policyexist="O"
+    netbackup_policyexist="O";
   fi
 fi
 
 if [ "${netbackup_appexist}" == "O" ] && [ "${netbackup_policyexist}" == "O" ]; then
   netbackupcheck="O";
 else
-  netbackupcheck="X"
+  netbackupcheck="X";
 fi
 
 echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackupcheck}) , policy exist : $(pretty_result ${netbackupcheck}) )";
