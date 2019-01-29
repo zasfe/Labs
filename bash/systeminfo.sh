@@ -400,13 +400,10 @@ else
 fi
 
 echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackupcheck}) , policy exist : $(pretty_result ${netbackupcheck}) )";
-if [ "${netbackupcheck}" != "O" ]; then
-  echo -e "  ================================================================== ";
-  echo -e "    - path list only netbackup policy  ";
-  echo -e "    $(cat ${netbackup_path}/exclude* | sort | uniq)";
-  echo -e "  ================================================================== ";
-fi
-
+echo -e "  ================================================================== ";
+echo -e "    - path list only netbackup policy  ";
+echo -e "    $(cat ${netbackup_path}/exclude* | sort | uniq)";
+echo -e "  ================================================================== ";
 
 echo "";
 
