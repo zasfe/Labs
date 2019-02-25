@@ -295,7 +295,7 @@ echo -e "  ================================================================== ";
 echo -e "    - /etc/crontab, find mysql/backup";
 echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)" 2>/dev/null )";
 echo -e "    - each user crontab, find mysql/backup";
-echo -e "  $(egrep -Ri "(mysql|backup)" /var/spool 2>/dev/null )";
+echo -e "  $(egrep -Ri "(mysql|backup)" /var/spool/cron/*.* 2>/dev/null )";
 echo -e "  ================================================================== ";
 
 echo "";
