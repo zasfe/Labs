@@ -196,6 +196,7 @@ fi
 raidapp_exist="-";
 raidresult="-";
 raidlog="";
+raidsummary="-";
 if [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "hp" ]; then
   [ -f '/usr/sbin/hpssacli' ] && HP_CMD='/usr/sbin/hpssacli'
   [ -f '/usr/sbin/hpacucli' ] && HP_CMD='/usr/sbin/hpacucli'
@@ -228,13 +229,15 @@ elif [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "ibm" ] || [ "$(echo $
       raidresult="O";
     else
       raidresult="X";
+      raidsummary=`${MEGACLI_CMD} -ShowSummary -aALL-NoLog`
     fi
   fi
 fi
 
 echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_result ${raidapp_exist}) ) ";
 if [ "${raidresult}" != "O" ]; then
-  echo -e "  \033[31m${raidlog}\033[0m";
+  echo -e "\033[31m${raidlog}\033[0m";
+  echo -e "${raidsummary}"
 fi
 
 
