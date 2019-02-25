@@ -407,10 +407,11 @@ else
   netbackupcheck="X";
 fi
 
-echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackupcheck}) , policy exist : $(pretty_result ${netbackupcheck}) )";
+echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackup_appexist}) , policy exist : $(pretty_result ${netbackup_policyexist}) )";
 echo -e "  ================================================================== ";
 echo -e "    - path list only netbackup policy  ";
-echo -e "    $(cat ${netbackup_path}/exclude* 2>/dev/null | sort | uniq)";
+echo -e "$(cat ${netbackup_path}/exclude* 2>/dev/null | sort | uniq)";
+echo -e "$(find ${netbackup_path}/tir_info -type f | sed -e 's/tir_info/=/g' -e 's/\/NetBackup_file_info\./=/g' | awk -F'=' '{print$2}')";
 echo -e "  ================================================================== ";
 
 echo "";
