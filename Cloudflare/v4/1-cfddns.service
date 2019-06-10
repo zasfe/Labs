@@ -1,0 +1,16 @@
+[Unit]
+Description=Cloudflare DDNS Service
+After=network.target
+
+[Service]
+Type=oneshot
+StandardOutput=null    # journalctl will not output debug message
+StandardError=journal  # journalctl will only output error message
+ExecStart=/location/cfddns.sh
+#If you want to add more script to one service then just add more ExecStart
+#ExecStart=/location/a.sh
+#ExecStart=/location/b.sh
+#ExecStart=/location/c.sh
+
+[Install]
+WantedBy=multi-user.target
