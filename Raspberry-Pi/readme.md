@@ -9,6 +9,13 @@
   - /boot/ssh 파일생성
   - 확장자 없이 빈 파일로 만들것
 
+3. WiFi, Bluetooth 비활성 설정
+  - /boot/config.txt 설정 추가
+# Disable WiFi and Bluetooth
+dtoverlay=pi3-disable-wifi
+dtoverlay=pi3-disable-bt
+
+
 ```bash
 # package update
 apt-get update && apt-get -y upgrade
@@ -24,6 +31,10 @@ cp -f /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
 
 # Unused Service disable
+
+## - WiFi -
+systemctl stop wpa_supplicant
+systemctl disable wpa_supplicant
 
 ## - bluetooth -
 systemctl stop bluetooth
@@ -48,6 +59,7 @@ echo "syntax off" >> ~/.vimrc
 echo "" >> /etc/crontab
 echo "# TimeServer Sync" >> /etc/crontab
 echo " * 00,12 * * * /usr/bin/rdate -s time.bora.net" >> /etc/crontab
+
 ```
 
 
