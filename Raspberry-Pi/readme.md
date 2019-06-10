@@ -11,11 +11,13 @@
 
 3. WiFi, Bluetooth 비활성 설정
   - /boot/config.txt 설정 추가
+```bash
 # Disable WiFi and Bluetooth
 dtoverlay=pi3-disable-wifi
 dtoverlay=pi3-disable-bt
+```
 
-
+4. 설치후 
 ```bash
 # package update
 apt-get update && apt-get -y upgrade
