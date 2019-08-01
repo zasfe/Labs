@@ -17,21 +17,38 @@ dtoverlay=pi3-disable-wifi
 dtoverlay=pi3-disable-bt
 ```
 
-4. 설치후 
+
+# first boot after..
+
+1. default setting 
 ```bash
+# hostname change
+echo "raspberrypi2-web" > /etc/hostname
+sudo reboot
+
+# timezone change
+cp -f /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+
 # package update
 apt-get update && apt-get -y upgrade
 
 # default package install
 apt-get -y install vim rdate htop
 
-# timezone change
-cp -f /usr/share/zoneinfo/Asia/Seoul /etc/localtime
-
 # Time Sync
  rdate -s time.bora.net
 
+# /etc/crontab edit Time Server Sync
 
+echo "" >> /etc/crontab
+echo "# TimeServer Sync" >> /etc/crontab
+echo " * 00,12 * * * /usr/bin/rdate -s time.bora.net" >> /etc/crontab
+
+```
+
+
+2. Optimization setting 
+```bash
 # Unused Service disable
 
 ## - WiFi -
@@ -56,11 +73,6 @@ echo "set nu" >> ~/.vimrc
 echo "set hlsearch" >> ~/.vimrc
 echo "syntax off" >> ~/.vimrc
 
-# /etc/crontab edit Time Server Sync
-
-echo "" >> /etc/crontab
-echo "# TimeServer Sync" >> /etc/crontab
-echo " * 00,12 * * * /usr/bin/rdate -s time.bora.net" >> /etc/crontab
 
 ```
 
