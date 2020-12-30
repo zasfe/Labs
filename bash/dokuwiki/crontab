@@ -1,0 +1,2 @@
+# m h  dom mon dow   command
+0 * * * * /path/to/backup-dokuwiki.sh >> /var/log/backup-dokuwiki.log
