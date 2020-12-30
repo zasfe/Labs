@@ -61,6 +61,14 @@ https://github.com/unosquare/passcore
 * 참고
    * 설치 버전 확인 `dir "C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App"`
 
+### HTTP Error 500.30 - ANCM In-Process Start Failure
+
+* 증상: 웹페이지 접속할때 HTTP Error 500.30 오류가 표시되고, 로그에 `Unhandled exception. System.FormatException: Could not parse the JSON file.` 메세지가 표시된다
+* 원인: appsettings.json 파일이 오타로 인해 JSON 형식으로 저장되지 않았음
+* 해결 방법: JSON 파일 형식으로 오타 수정
+* 참고
+   * JSON Fix 사이트: https://jsonformatter.curiousconcept.com/
+
 ### Response Message - Unknown error (0x80005000)
 
 * 증상: 패스워드 변경할 때 `Unknown error (0x80005000)`가 발생하며 변경이 되지 않음
