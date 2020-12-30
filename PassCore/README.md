@@ -1,4 +1,8 @@
-# PassCore 
+# PassCore
+
+Active Directory 환경에서 스스로 비밀번호를 변경할 수 있는 단일 페이지 웹서비스를 생성할 수 있는 패키지 입니다.
+
+https://github.com/unosquare/passcore
 
 ## 설치 - Install
 
