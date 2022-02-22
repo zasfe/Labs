@@ -19,6 +19,7 @@
 - 테스트 구축(Open Source 에디션)
    * 구성 환경
       * 가상 서버: AWS EC2 t2.micro(루트볼륨:30GB, 월 9.70 USD, 서울 리전)
+      * 이미지: Amazon Linux 2
       * 설치 버전: discourse, 2.9.0.beta2, Docker Version
       * 메일링 시스템: [Mailjet](https://www.mailjet.com/pricing) (mail send service)을 사용
    * 설치(Docker based): [https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md](https://github.com/discourse/discourse/blob/main/docs/INSTALL-cloud.md)
@@ -33,6 +34,11 @@
 
 > 여기에서는 discourse.zasfe.com을 사용하였습니다.  
 
+### git 설치
+
+```bash
+sudo yum install git
+```
 
 ### Install Discourse (official Dopcker setup guide)
 
