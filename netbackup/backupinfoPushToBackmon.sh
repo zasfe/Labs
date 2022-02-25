@@ -242,8 +242,7 @@ done
 echo "# Delete Information File"
 [ -f ${INFO_BPPLLIST} ] && rm -f ${INFO_BPPLLIST};
 [ -f ${INFO_BPDBJOBS} ] && rm -f ${INFO_BPDBJOBS};
-[ -f ${INFO_BPPL_SUMMARY} ] && rm -f ${INFO_BPPL_SUMMARY}
 [ -f ${INFO_BPPL_TMP} ] && rm -f ${INFO_BPPL_TMP}
-[ -f ${INFO_BPPL_SUMMARY_ERROR} ] && rm -f ${INFO_BPPL_SUMMARY_ERROR}
+
 
 
