@@ -379,11 +379,11 @@ systemctl restart openstack-glance-api.service openstack-glance-registry.service
 
 # Step:12 glance Installation - Verify operation
 
-. admin-openrc
+. admin-openrc  
 
-`# openstack-glance-api.service port tcp 9292`
+`# openstack-glance-api.service port tcp 9292`  
 lsof -i tcp:9292  
-`# openstack-glance-registry.service port tcp 9191`
+`# openstack-glance-registry.service port tcp 9191`  
 lsof -i tcp:9191  
 
 wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img  
@@ -808,8 +808,8 @@ EOF
 chown root.nova /etc/nova/nova.conf  
 chmod 640 /etc/nova/nova.conf  
 
-systemctl enable libvirtd.service openstack-nova-compute.service
-systemctl start libvirtd.service openstack-nova-compute.service
+systemctl enable libvirtd.service openstack-nova-compute.service  
+systemctl start libvirtd.service openstack-nova-compute.service  
 
 ```
 [root@compute1 ~]#  systemctl status libvirtd.service
@@ -848,9 +848,9 @@ Connection to compute1 closed.
 [root@controller ~]#
 ```
 
-. admin-openrc
+. admin-openrc  
 
-openstack compute service list --service nova-compute
+openstack compute service list --service nova-compute  
 
 ```
 [root@controller ~]# openstack compute service list --service nova-compute
@@ -861,7 +861,7 @@ openstack compute service list --service nova-compute
 +----+--------------+----------+------+---------+-------+----------------------------+
 ```
 
-su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova  
 
 ```
 [root@controller ~]# su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
@@ -891,7 +891,7 @@ openstack compute service list
 +----+----------------+------------+----------+---------+-------+----------------------------+
 ```
 
-openstack catalog list
+openstack catalog list  
 
 ```
 [root@controller ~]# openstack catalog list
@@ -942,7 +942,7 @@ openstack image list
 ```
 
 
-nova-status upgrade check
+nova-status upgrade check  
 ```
 [root@controller ~]# nova-status upgrade check
 Error:
@@ -963,6 +963,8 @@ Traceback (most recent call last):
     raise exceptions.from_response(resp, method, url)
 Forbidden: Forbidden (HTTP 403)
 ```
+
+
 
 
 # Step:19 Networking service(neutron) - on controller node.
@@ -1006,9 +1008,9 @@ openstack service create --name neutron --description "OpenStack Networking" net
 ```
 
 
-openstack endpoint create --region RegionOne network public http://controller:9696
-openstack endpoint create --region RegionOne network internal http://controller:9696
-openstack endpoint create --region RegionOne network admin http://controller:9696
+openstack endpoint create --region RegionOne network public http://controller:9696  
+openstack endpoint create --region RegionOne network internal http://controller:9696  
+openstack endpoint create --region RegionOne network admin http://controller:9696  
 
 ```
 [root@controller ~]# openstack endpoint create --region RegionOne network public http://controller:9696
@@ -1053,8 +1055,16 @@ openstack endpoint create --region RegionOne network admin http://controller:969
 | service_type | network                          |
 | url          | http://controller:9696           |
 +--------------+----------------------------------+
-
 ```
+
+
+https://docs.openstack.org/neutron/stein/install/controller-install-obs.html  
+
+
+
+
+
+
 
 
 
