@@ -456,17 +456,605 @@ placement-status upgrade check
 # Step:15 Compute service(nova) Installation
 
 
+mysql -u root   
+
+mysql> CREATE DATABASE nova_api;  
+mysql> CREATE DATABASE nova;  
+mysql> CREATE DATABASE nova_cell0;  
+mysql> GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' IDENTIFIED BY 'NOVA_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' IDENTIFIED BY 'NOVA_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'NOVA_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'NOVA_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost' IDENTIFIED BY 'NOVA_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%' IDENTIFIED BY 'NOVA_DBPASS';  
+
+## admin credentials
+. admin-openrc  
+
+openstack user create --domain default --password NOVA_DBPASS nova  
+openstack role add --project service --user nova admin  
+openstack service create --name nova --description "OpenStack Compute" compute  
+
+openstack endpoint create --region RegionOne compute public http://controller:8774/v2.1
+openstack endpoint create --region RegionOne compute internal http://controller:8774/v2.1
+openstack endpoint create --region RegionOne compute admin http://controller:8774/v2.1
+
+openstack endpoint list  
+
+yum -y install openstack-nova-api openstack-nova-conductor openstack-nova-novncproxy openstack-nova-scheduler  
+
+```
+Installed:
+  openstack-nova-api.noarch 1:19.3.2-1.el7                 openstack-nova-conductor.noarch 1:19.3.2-1.el7           openstack-nova-novncproxy.noarch 1:19.3.2-1.el7
+  openstack-nova-scheduler.noarch 1:19.3.2-1.el7
+
+Dependency Installed:
+  dpdk.x86_64 0:18.11.8-1.el7_8                              libsodium.x86_64 0:1.0.18-0.el7                                novnc.noarch 0:0.5.1-2.el7
+  openstack-nova-common.noarch 1:19.3.2-1.el7                openvswitch.x86_64 1:2.11.0-4.el7                              python-kazoo.noarch 0:2.2.1-1.el7
+  python-openvswitch.x86_64 1:2.11.0-4.el7                   python-oslo-versionedobjects-lang.noarch 0:1.35.1-1.el7        python-websockify.noarch 0:0.8.0-1.el7
+  python2-nova.noarch 1:19.3.2-1.el7                         python2-os-vif.noarch 0:1.15.2-1.el7                           python2-oslo-reports.noarch 0:1.29.2-1.el7
+  python2-oslo-versionedobjects.noarch 0:1.35.1-1.el7        python2-ovsdbapp.noarch 0:0.15.1-1.el7                         python2-paramiko.noarch 0:2.4.2-2.el7
+  python2-psutil.x86_64 0:5.5.1-1.el7                        python2-pynacl.x86_64 0:1.3.0-1.el7                            python2-pyroute2.noarch 0:0.5.6-1.el7
+  python2-redis.noarch 0:3.1.0-1.el7                         python2-tooz.noarch 0:1.64.3-1.el7                             python2-voluptuous.noarch 0:0.10.5-2.el7
+  python2-zake.noarch 0:0.2.2-2.el7                          unbound-libs.x86_64 0:1.6.6-5.el7_8
+
+Complete!
+[root@controller ~]# egrep -v "^#|^$" /etc/nova/nova.conf
+[DEFAULT]
+[api]
+[api_database]
+[barbican]
+[cache]
+[cells]
+[cinder]
+[compute]
+[conductor]
+[console]
+[consoleauth]
+[cors]
+[database]
+[devices]
+[ephemeral_storage_encryption]
+[filter_scheduler]
+[glance]
+[guestfs]
+[healthcheck]
+[hyperv]
+[ironic]
+[key_manager]
+[keystone]
+[keystone_authtoken]
+[libvirt]
+[metrics]
+[mks]
+[neutron]
+[notifications]
+[osapi_v21]
+[oslo_concurrency]
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_middleware]
+[oslo_policy]
+[pci]
+[placement]
+[placement_database]
+[powervm]
+[privsep]
+[profiler]
+[quota]
+[rdp]
+[remote_debug]
+[scheduler]
+[serial_console]
+[service_user]
+[spice]
+[upgrade_levels]
+[vault]
+[vendordata_dynamic_auth]
+[vmware]
+[vnc]
+[workarounds]
+[wsgi]
+[xenserver]
+[xvp]
+[zvm]
+[root@controller ~]#
+```
+
+
+mv /etc/nova/nova.conf /etc/nova/nova.conf.original  
+
+cat <<EOF > /etc/nova/nova.conf  
+[DEFAULT]  
+enabled_apis = osapi_compute,metadata  
+transport_url = rabbit://openstack:RABBIT_PASS@controller:5672/  
+use_neutron = true  
+firewall_driver = nova.virt.firewall.NoopFirewallDriver  
+[api]  
+auth_strategy=keystone  
+[api_database]  
+connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova_api  
+[barbican]  
+[cache]  
+[cells]  
+[cinder]  
+[compute]  
+[conductor]  
+[console]  
+[consoleauth]  
+[cors]  
+[database]  
+connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova  
+[devices]  
+[ephemeral_storage_encryption]  
+[filter_scheduler]  
+[glance]  
+api_servers = http://controller:9292  
+[guestfs]  
+[healthcheck]  
+[hyperv]  
+[ironic]  
+[key_manager]  
+[keystone]    
+[keystone_authtoken]  
+www_authenticate_uri = http://controller:5000/  
+auth_url = http://controller:5000/  
+memcached_servers = controller:11211  
+auth_type = password  
+project_domain_name = Default  
+user_domain_name = Default  
+project_name = service  
+username = nova  
+password = NOVA_DBPASS  
+[libvirt]  
+[metrics]  
+[mks]  
+[neutron]  
+[notifications]  
+[osapi_v21]  
+[oslo_concurrency]  
+lock_path = /var/lib/nova/tmp  
+[oslo_messaging_amqp]  
+[oslo_messaging_kafka]  
+[oslo_messaging_notifications]  
+[oslo_messaging_rabbit]  
+[oslo_middleware]  
+[oslo_policy]  
+[pci]  
+[placement]  
+region_name = RegionOne  
+project_domain_name = Default  
+project_name = service  
+auth_type = password  
+user_domain_name = Default  
+auth_url = http://controller:5000/v3  
+username = placement  
+password = PLACEMENT_DBPASS  
+[placement_database]  
+[powervm]  
+[privsep]  
+[profiler]  
+[quota]  
+[rdp]  
+[remote_debug]  
+[scheduler]  
+[serial_console]  
+[service_user]  
+[spice]  
+[upgrade_levels]  
+[vault]  
+[vendordata_dynamic_auth]  
+[vmware]  
+[vnc]  
+enabled = true  
+server_listen = 192.168.137.11  
+server_proxyclient_address = 192.168.137.11  
+[workarounds]  
+[wsgi]  
+[xenserver]  
+[xvp]  
+[zvm]  
+EOF  
+
+chown root.nova /etc/nova/nova.conf  
+chmod 640 /etc/nova/nova.conf  
+
+su -s /bin/sh -c "nova-manage api_db sync" nova  
+su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova  
+su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova  
+su -s /bin/sh -c "nova-manage cell_v2 list_cells" nova  
+
+systemctl enable \  
+    openstack-nova-api.service \  
+    openstack-nova-scheduler.service \  
+    openstack-nova-conductor.service \  
+    openstack-nova-novncproxy.service  
+
+systemctl start \  
+    openstack-nova-api.service \  
+    openstack-nova-scheduler.service \  
+    openstack-nova-conductor.service \  
+    openstack-nova-novncproxy.service  
 
 
 
 
+# Step:16 Compute service(nova) Installation Verify
+
+openstack server list  
+
+nova service-list  
+```
+[root@controller ~]# nova service-list
++--------------------------------------+----------------+------------+----------+---------+-------+----------------------------+-----------------+-------------+
+| Id                                   | Binary         | Host       | Zone     | Status  | State | Updated_at                 | Disabled Reason | Forced down |
++--------------------------------------+----------------+------------+----------+---------+-------+----------------------------+-----------------+-------------+
+| 842923b7-4c69-43f9-802d-cf74d141da5b | nova-scheduler | controller | internal | enabled | up    | 2022-03-18T12:41:18.000000 | -               | False       |
+| 30431175-3624-486c-92ee-151b11ce6784 | nova-conductor | controller | internal | enabled | up    | 2022-03-18T12:41:18.000000 | -               | False       |
++--------------------------------------+----------------+------------+----------+---------+-------+----------------------------+-----------------+-------------+
+[root@controller ~]#
+```
+
+ 
+# Step:17 Compute service(nova) add Installation - on compute1
+
+ssh compute1  
+```
+[root@controller ~]# ssh compute1
+Last login: Fri Mar 18 10:59:17 2022 from controller.zasfe.local
+[root@compute1 ~]#
+```
 
 
+yum -y install openstack-nova-compute  
 
 
+mv /etc/nova/nova.conf /etc/nova/nova.conf.original  
+
+cat <<EOF > /etc/nova/nova.conf
+[DEFAULT]  
+enabled_apis = osapi_compute,metadata  
+transport_url = rabbit://openstack:RABBIT_PASS@controller:5672/  
+use_neutron = true  
+firewall_driver = nova.virt.firewall.NoopFirewallDriver  
+[api]  
+auth_strategy=keystone  
+[api_database]  
+[barbican]  
+[cache]  
+[cells]  
+[cinder]  
+[compute]  
+[conductor]  
+[console]  
+[consoleauth]  
+[cors]  
+[database]  
+[devices]  
+[ephemeral_storage_encryption]  
+[filter_scheduler]  
+[glance]  
+api_servers = http://controller:9292  
+[guestfs]  
+[healthcheck]  
+[hyperv]  
+[ironic]  
+[key_manager]  
+[keystone]    
+[keystone_authtoken]  
+www_authenticate_uri = http://controller:5000/  
+auth_url = http://controller:5000/  
+memcached_servers = controller:11211  
+auth_type = password  
+project_domain_name = Default  
+user_domain_name = Default  
+project_name = service  
+username = nova  
+password = NOVA_DBPASS  
+[libvirt]  
+virt_type = qemu  
+[metrics]  
+[mks]  
+[neutron]  
+[notifications]  
+[osapi_v21]  
+[oslo_concurrency]  
+lock_path = /var/lib/nova/tmp  
+[oslo_messaging_amqp]  
+[oslo_messaging_kafka]  
+[oslo_messaging_notifications]  
+[oslo_messaging_rabbit]  
+[oslo_middleware]  
+[oslo_policy]  
+[pci]  
+[placement]  
+region_name = RegionOne  
+project_domain_name = Default  
+project_name = service  
+auth_type = password  
+user_domain_name = Default  
+auth_url = http://controller:5000/v3  
+username = placement  
+password = PLACEMENT_DBPASS  
+[placement_database]  
+[powervm]  
+[privsep]  
+[profiler]  
+[quota]  
+[rdp]  
+[remote_debug]  
+[scheduler]  
+[serial_console]  
+[service_user]  
+[spice]  
+[upgrade_levels]  
+[vault]  
+[vendordata_dynamic_auth]  
+[vmware]  
+[vnc]  
+enabled = true  
+server_listen = 0.0.0.0  
+server_proxyclient_address = 192.168.137.11  
+novncproxy_base_url = http://controller:6080/vnc_auto.html  
+[workarounds]  
+[wsgi]  
+[xenserver]  
+[xvp]  
+[zvm]  
+EOF
+
+chown root.nova /etc/nova/nova.conf  
+chmod 640 /etc/nova/nova.conf  
+
+systemctl enable libvirtd.service openstack-nova-compute.service
+systemctl start libvirtd.service openstack-nova-compute.service
+
+```
+[root@compute1 ~]#  systemctl status libvirtd.service
+● libvirtd.service - Virtualization daemon
+   Loaded: loaded (/usr/lib/systemd/system/libvirtd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Fri 2022-03-18 21:52:56 KST; 59s ago
+     Docs: man:libvirtd(8)
+           https://libvirt.org
+ Main PID: 14308 (libvirtd)
+    Tasks: 17 (limit: 32768)
+   CGroup: /system.slice/libvirtd.service
+           └─14308 /usr/sbin/libvirtd
+
+Mar 18 21:52:56 compute1 systemd[1]: Starting Virtualization daemon...
+Mar 18 21:52:56 compute1 systemd[1]: Started Virtualization daemon.
+[root@compute1 ~]# systemctl status openstack-nova-compute.service
+● openstack-nova-compute.service - OpenStack Nova Compute Server
+   Loaded: loaded (/usr/lib/systemd/system/openstack-nova-compute.service; enabled; vendor preset: disabled)
+   Active: active (running) since Fri 2022-03-18 21:53:01 KST; 1min 2s ago
+ Main PID: 14325 (nova-compute)
+    Tasks: 22
+   CGroup: /system.slice/openstack-nova-compute.service
+           └─14325 /usr/bin/python2 /usr/bin/nova-compute
+
+Mar 18 21:52:56 compute1 systemd[1]: Starting OpenStack Nova Compute Server...
+Mar 18 21:53:01 compute1 systemd[1]: Started OpenStack Nova Compute Server.
+[root@compute1 ~]# 
+```
+
+## Change controler node
+
+```
+[root@compute1 ~]# exit
+logout
+Connection to compute1 closed.
+[root@controller ~]#
+```
+
+. admin-openrc
+
+openstack compute service list --service nova-compute
+
+```
+[root@controller ~]# openstack compute service list --service nova-compute
++----+--------------+----------+------+---------+-------+----------------------------+
+| ID | Binary       | Host     | Zone | Status  | State | Updated At                 |
++----+--------------+----------+------+---------+-------+----------------------------+
+|  5 | nova-compute | compute1 | nova | enabled | up    | 2022-03-18T12:55:37.000000 |
++----+--------------+----------+------+---------+-------+----------------------------+
+```
+
+su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+
+```
+[root@controller ~]# su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+Found 2 cell mappings.
+Skipping cell0 since it does not contain hosts.
+Getting computes from cell 'cell1': 91b4f3d5-385c-4e34-8c6b-9b11140359b4
+Checking host mapping for compute host 'compute1': 17a10dcd-3c08-4688-92ce-e208eb619f63
+Creating host mapping for compute host 'compute1': 17a10dcd-3c08-4688-92ce-e208eb619f63
+Found 1 unmapped computes in cell: 91b4f3d5-385c-4e34-8c6b-9b11140359b4
+```
 
 
+# Step:18 Compute service(nova) Verify operation - on controller node.
 
+. admin-openrc  
+
+openstack compute service list  
+
+```
+[root@controller ~]# openstack compute service list
++----+----------------+------------+----------+---------+-------+----------------------------+
+| ID | Binary         | Host       | Zone     | Status  | State | Updated At                 |
++----+----------------+------------+----------+---------+-------+----------------------------+
+|  1 | nova-scheduler | controller | internal | enabled | up    | 2022-03-18T13:08:08.000000 |
+|  2 | nova-conductor | controller | internal | enabled | up    | 2022-03-18T13:08:08.000000 |
+|  5 | nova-compute   | compute1   | nova     | enabled | up    | 2022-03-18T13:08:08.000000 |
++----+----------------+------------+----------+---------+-------+----------------------------+
+```
+
+openstack catalog list
+
+```
+[root@controller ~]# openstack catalog list
++-----------+-----------+-----------------------------------------+
+| Name      | Type      | Endpoints                               |
++-----------+-----------+-----------------------------------------+
+| nova      | compute   | RegionOne                               |
+|           |           |   admin: http://controller:8774/v2.1    |
+|           |           | RegionOne                               |
+|           |           |   internal: http://controller:8774/v2.1 |
+|           |           | RegionOne                               |
+|           |           |   public: http://controller:8774/v2.1   |
+|           |           |                                         |
+| placement | placement | RegionOne                               |
+|           |           |   internal: http://controller:8778      |
+|           |           | RegionOne                               |
+|           |           |   public: http://controller:8778        |
+|           |           | RegionOne                               |
+|           |           |   admin: http://controller:8778         |
+|           |           |                                         |
+| keystone  | identity  | RegionOne                               |
+|           |           |   internal: http://controller:5000/v3/  |
+|           |           | RegionOne                               |
+|           |           |   public: http://controller:5000/v3/    |
+|           |           | RegionOne                               |
+|           |           |   admin: http://controller:5000/v3/     |
+|           |           |                                         |
+| glance    | image     | RegionOne                               |
+|           |           |   admin: http://controller:9292         |
+|           |           | RegionOne                               |
+|           |           |   public: http://controller:9292        |
+|           |           | RegionOne                               |
+|           |           |   internal: http://controller:9292      |
+|           |           |                                         |
++-----------+-----------+-----------------------------------------+
+```
+
+
+openstack image list  
+
+```
+[root@controller ~]# openstack image list
++--------------------------------------+--------+--------+
+| ID                                   | Name   | Status |
++--------------------------------------+--------+--------+
+| a7fb9dc2-8a39-44ae-9583-bb3a055547d6 | cirros | active |
++--------------------------------------+--------+--------+
+```
+
+
+nova-status upgrade check
+```
+[root@controller ~]# nova-status upgrade check
+Error:
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/site-packages/nova/cmd/status.py", line 515, in main
+    ret = fn(*fn_args, **fn_kwargs)
+  File "/usr/lib/python2.7/site-packages/oslo_upgradecheck/upgradecheck.py", line 99, in check
+    result = func(self)
+  File "/usr/lib/python2.7/site-packages/nova/cmd/status.py", line 160, in _check_placement
+    versions = self._placement_get("/")
+  File "/usr/lib/python2.7/site-packages/nova/cmd/status.py", line 150, in _placement_get
+    return client.get(path, raise_exc=True).json()
+  File "/usr/lib/python2.7/site-packages/keystoneauth1/adapter.py", line 375, in get
+    return self.request(url, 'GET', **kwargs)
+  File "/usr/lib/python2.7/site-packages/keystoneauth1/adapter.py", line 237, in request
+    return self.session.request(url, method, **kwargs)
+  File "/usr/lib/python2.7/site-packages/keystoneauth1/session.py", line 890, in request
+    raise exceptions.from_response(resp, method, url)
+Forbidden: Forbidden (HTTP 403)
+```
+
+
+# Step:19 Networking service(neutron) - on controller node.
+
+mysql -u root  
+
+mysql> CREATE DATABASE neutron;  
+mysql> GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'NEUTRON_DBPASS';  
+mysql> GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'NEUTRON_DBPASS';  
+mysql> exit  
+
+. admin-openrc  
+
+openstack user create --domain default --password NEUTRON_DBPASS neutron  
+openstack role add --project service --user neutron admin  
+openstack service create --name neutron --description "OpenStack Networking" network  
+
+```
+[root@controller ~]# openstack user create --domain default --password NEUTRON_DBPASS neutron
++---------------------+----------------------------------+
+| Field               | Value                            |
++---------------------+----------------------------------+
+| domain_id           | default                          |
+| enabled             | True                             |
+| id                  | 437174860bfa441dbb89ec82bfde89e3 |
+| name                | neutron                          |
+| options             | {}                               |
+| password_expires_at | None                             |
++---------------------+----------------------------------+
+[root@controller ~]# openstack role add --project service --user neutron admin
+[root@controller ~]# openstack service create --name neutron --description "OpenStack Networking" network
++-------------+----------------------------------+
+| Field       | Value                            |
++-------------+----------------------------------+
+| description | OpenStack Networking             |
+| enabled     | True                             |
+| id          | 2a1df2ae9cc64fdebcfc2800910922ec |
+| name        | neutron                          |
+| type        | network                          |
++-------------+----------------------------------+
+```
+
+
+openstack endpoint create --region RegionOne network public http://controller:9696
+openstack endpoint create --region RegionOne network internal http://controller:9696
+openstack endpoint create --region RegionOne network admin http://controller:9696
+
+```
+[root@controller ~]# openstack endpoint create --region RegionOne network public http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | 2b49ea8a12b94f4089e385ddd29f0fd2 |
+| interface    | public                           |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 2a1df2ae9cc64fdebcfc2800910922ec |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+[root@controller ~]# openstack endpoint create --region RegionOne network internal http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | 9b12f44343594a638897cbad0bc0de6d |
+| interface    | internal                         |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 2a1df2ae9cc64fdebcfc2800910922ec |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+[root@controller ~]# openstack endpoint create --region RegionOne network admin http://controller:9696
++--------------+----------------------------------+
+| Field        | Value                            |
++--------------+----------------------------------+
+| enabled      | True                             |
+| id           | 4cb63440cf75438e840192d523903eaf |
+| interface    | admin                            |
+| region       | RegionOne                        |
+| region_id    | RegionOne                        |
+| service_id   | 2a1df2ae9cc64fdebcfc2800910922ec |
+| service_name | neutron                          |
+| service_type | network                          |
+| url          | http://controller:9696           |
++--------------+----------------------------------+
+
+```
 
 
 
@@ -483,9 +1071,9 @@ Minimal deployment for Stein
 
 Identity service – keystone installation for Stein -- ok
 Image service – glance installation for Stein  -- ok
-Placement service – placement installation for Stein
-Compute service – nova installation for Stein
-Networking service – neutron installation for Stein
+Placement service – placement installation for Stein  -- ok
+Compute service – nova installation for Stein -- ok
+Networking service – neutron installation for Stein -- ing
 Dashboard – horizon installation for Stein
 Block Storage service – cinder installation for Stein
 
@@ -596,5 +1184,4 @@ ERROR 1045 (28000): Access denied for user 'glance'@'localhost' (using password:
 ```
 * 원인: mysql glance 디비 접속을 위한 password로 접속되지 않음
 * 조치: /etc/glance/glance-api.conf 파일에서 password를 GLANCE_DBPASS로 수정
-
 
