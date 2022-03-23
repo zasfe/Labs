@@ -252,10 +252,10 @@ su -s /bin/sh -c "keystone-manage db_sync" keystone
 keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone  
 keystone-manage credential_setup --keystone-user keystone --keystone-group keystone  
 
-keystone-manage bootstrap --bootstrap-password ADMIN_PASS \  
-  --bootstrap-admin-url http://controller:5000/v3/ \  
-  --bootstrap-internal-url http://controller:5000/v3/ \  
-  --bootstrap-public-url http://controller:5000/v3/ \  
+keystone-manage bootstrap --bootstrap-password ADMIN_PASS \
+  --bootstrap-admin-url http://controller:5000/v3/ \
+  --bootstrap-internal-url http://controller:5000/v3/ \
+  --bootstrap-public-url http://controller:5000/v3/ \
   --bootstrap-region-id RegionOne  
 
 
@@ -732,6 +732,8 @@ nova service-list
 [root@controller ~]#
 ```
 
+
+
  
 # Step:17 Compute service(nova) add Installation - on compute1
 
@@ -1050,6 +1052,9 @@ Listen 8778
 
 # Step:19 Networking service(neutron) - on controller node.
 
+
+
+
 mysql -u root  
 
 mysql> CREATE DATABASE neutron;  
@@ -1137,6 +1142,16 @@ openstack endpoint create --region RegionOne network admin http://controller:969
 | url          | http://controller:9696           |
 +--------------+----------------------------------+
 ```
+
+echo "# controller" | sudo tee --append /etc/hosts 
+echo "10.0.0.11       controller" | sudo tee --append /etc/hosts 
+echo "" | sudo tee --append /etc/hosts 
+echo "# compute1" | sudo tee --append /etc/hosts 
+echo "10.0.0.31       compute1" | sudo tee --append /etc/hosts 
+echo "" | sudo tee --append /etc/hosts 
+echo "# block1" | sudo tee --append /etc/hosts 
+echo "10.0.0.41       block1" | sudo tee --append /etc/hosts 
+
 
 
 # Step:20 Networking service(neutron) - Networking Option 2: Self-service networks on controller node.
@@ -1341,6 +1356,16 @@ chmod 640 /etc/neutron/dhcp_agent.ini
 ## https://docs.openstack.org/neutron/stein/install/compute-install-rdo.html
 ssh compute1
 
+echo "# controller" | sudo tee --append /etc/hosts 
+echo "10.0.0.11       controller" | sudo tee --append /etc/hosts 
+echo "" | sudo tee --append /etc/hosts 
+echo "# compute1" | sudo tee --append /etc/hosts 
+echo "10.0.0.31       compute1" | sudo tee --append /etc/hosts 
+echo "" | sudo tee --append /etc/hosts 
+echo "# block1" | sudo tee --append /etc/hosts 
+echo "10.0.0.41       block1" | sudo tee --append /etc/hosts 
+
+
 yum -y install openstack-neutron-linuxbridge ebtables ipset
 ```
 [root@controller ~]# ssh compute1
@@ -1374,7 +1399,10 @@ Complete!
 [oslo_policy]
 [privsep]
 [ssl]
+[root@compute1 ~]# egrep -v "^#|^$" /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+[DEFAULT]
 [root@compute1 ~]#
+
 ```
 
 ## (compute node) Configure the common component
@@ -1411,14 +1439,13 @@ EOF
 chown root.neutron /etc/neutron/neutron.conf
 chmod 640 /etc/neutron/neutron.conf
 
-
-
 ## (compute node) Configure the Compute service to use the Networking service
 
 sed -i 's/^\[neutron\]/\# \[neutron\]/' /etc/nova/nova.conf
 
 echo "[neutron]" | sudo tee --append /etc/nova/nova.conf
 echo "url = http://controller:9696" | sudo tee --append /etc/nova/nova.conf
+echo "auth_uri = http://controller:5000" | sudo tee --append /etc/nova/nova.conf
 echo "auth_url = http://controller:5000" | sudo tee --append /etc/nova/nova.conf
 echo "auth_type = password" | sudo tee --append /etc/nova/nova.conf
 echo "project_domain_name = default" | sudo tee --append /etc/nova/nova.conf
@@ -1429,6 +1456,16 @@ echo "username = neutron" | sudo tee --append /etc/nova/nova.conf
 echo "password = NEUTRON_DBPASS" | sudo tee --append /etc/nova/nova.conf
 echo "service_metadata_proxy = true" | sudo tee --append /etc/nova/nova.conf
 echo "metadata_proxy_shared_secret = METADATA_SECRET" | sudo tee --append /etc/nova/nova.conf
+
+cp -pa /etc/neutron/plugins/ml2/linuxbridge_agent.ini /etc/neutron/plugins/ml2/linuxbridge_agent.ini.original
+cat <<EOF > /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+[DEFAULT]
+[linux_bridge]
+physical_interface_mappings = provider:eth1
+[vxlan]
+local_ip=10.0.0.31
+EOF
+
 
 ## (compute node)  Finalize installation
 
@@ -1453,6 +1490,12 @@ EOF
 
 chown root.neutron /etc/neutron/metadata_agent.ini
 chmod 640 /etc/neutron/metadata_agent.ini
+
+
+
+
+
+
 
 ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini
 
@@ -2624,7 +2667,7 @@ openstack volume service list
 
 
 
-# Step:30 launch-instance
+# Step:30 launch-instance - Create virtual networks, m1.nano flavor, Generate a key pair, Add security group rules
 ## https://docs.openstack.org/install-guide/launch-instance.html#create-virtual-networks
 
 . admin-openrc
@@ -2643,14 +2686,19 @@ openstack router set router --external-gateway provider
 . admin-openrc
 ip netns
 openstack port list --router router
-
-
-
-
-
-
-
 openstack flavor create --id 0 --vcpus 1 --ram 64 --disk 1 m1.nano
+openstack flavor list
+```
+[root@controller ~]# openstack flavor list
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+| ID                                   | Name    | RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+| 0                                    | m1.nano |  64 |    1 |         0 |     1 | True      |
+| daad92b0-3867-48e7-8bae-07c588106e86 | C1R1D50 |   1 |   50 |         0 |     1 | True      |
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+[root@controller ~]#
+```
+
 . demo-openrc
 ssh-keygen -q -N ""
 openstack keypair create --public-key ~/.ssh/id_rsa.pub mykey
@@ -2667,29 +2715,47 @@ openstack security group rule create --proto icmp default
 openstack security group rule create --proto tcp --dst-port 22 default
 
 
+# Step:31 launch-instance - Launch an instance on the provider network
+## https://docs.openstack.org/install-guide/launch-instance-provider.html
 
+. demo-openrc
 openstack flavor list
+openstack image list
+openstack network list
+openstack security group list
 
-
-openstack server create --flavor m1.nano --image cirros --nic net-id=PROVIDER_NET_ID --security-group default --key-name mykey provider-instance
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
+[root@controller ~]# openstack flavor list
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+| ID                                   | Name    | RAM | Disk | Ephemeral | VCPUs | Is Public |
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+| 0                                    | m1.nano |  64 |    1 |         0 |     1 | True      |
+| daad92b0-3867-48e7-8bae-07c588106e86 | C1R1D50 |   1 |   50 |         0 |     1 | True      |
++--------------------------------------+---------+-----+------+-----------+-------+-----------+
+[root@controller ~]# openstack image list
++--------------------------------------+--------+--------+
+| ID                                   | Name   | Status |
++--------------------------------------+--------+--------+
+| a7fb9dc2-8a39-44ae-9583-bb3a055547d6 | cirros | active |
++--------------------------------------+--------+--------+
+[root@controller ~]# openstack network list
++--------------------------------------+-------------+--------------------------------------+
+| ID                                   | Name        | Subnets                              |
++--------------------------------------+-------------+--------------------------------------+
+| 163c6532-1576-4fc4-b527-0d0443c4a3ba | provider    | 4a58a1b9-02fe-4771-844f-4b0f93d73878 |
+| 494ecb7c-8153-4835-bdfe-411df939efa6 | selfservice | 6a713f14-62bf-4d74-ba4f-fe875203103d |
++--------------------------------------+-------------+--------------------------------------+
+[root@controller ~]# openstack security group list
++--------------------------------------+---------+------------------------+----------------------------------+------+
+| ID                                   | Name    | Description            | Project                          | Tags |
++--------------------------------------+---------+------------------------+----------------------------------+------+
+| 7db0a045-c512-40cb-8ccd-518e849b1936 | default | Default security group | fdd6efd656374844a7d4a095736e21dd | []   |
++--------------------------------------+---------+------------------------+----------------------------------+------+
+[root@controller ~]#
+```
+. demo-openrc
+openstack server create --flavor m1.nano --image cirros --nic net-id=163c6532-1576-4fc4-b527-0d0443c4a3ba --security-group default --key-name mykey provider-instance
+openstack console url show provider-instance
 
 
 
@@ -3300,6 +3366,474 @@ Failed to discover available identity versions when contacting http://controller
 +--------------------------------+
 ```
 
+### (compute node) Networking service(neutron) Verify nova.log Error
+
+* 증상: compute 노드에서 neutron-linuxbridge-agent.service 서비스가 중단된다
+```
+[root@compute1 ~]# systemctl status neutron-linuxbridge-agent.service
+â— neutron-linuxbridge-agent.service - OpenStack Neutron Linux Bridge Agent
+   Loaded: loaded (/usr/lib/systemd/system/neutron-linuxbridge-agent.service; enabled; vendor preset: disabled)
+   Active: failed (Result: start-limit) since Tue 2022-03-22 11:01:18 KST; 8h ago
+  Process: 3136 ExecStart=/usr/bin/neutron-linuxbridge-agent --config-file /usr/share/neutron/neutron-dist.conf --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/linuxbridge_agent.ini --config-dir /etc/neutron/conf.d/common --config-dir /etc/neutron/conf.d/neutron-linuxbridge-agent --log-file /var/log/neutron/linuxbridge-agent.log (code=exited, status=1/FAILURE)
+  Process: 3131 ExecStartPre=/usr/bin/neutron-enable-bridge-firewall.sh (code=exited, status=0/SUCCESS)
+ Main PID: 3136 (code=exited, status=1/FAILURE)
+
+Mar 22 11:01:18 compute1 systemd[1]: neutron-linuxbridge-agent.service: main process exited, code=exited, status=1/FAILURE
+Mar 22 11:01:18 compute1 systemd[1]: Unit neutron-linuxbridge-agent.service entered failed state.
+Mar 22 11:01:18 compute1 systemd[1]: neutron-linuxbridge-agent.service failed.
+Mar 22 11:01:18 compute1 systemd[1]: neutron-linuxbridge-agent.service holdoff time over, scheduling restart.
+Mar 22 11:01:18 compute1 systemd[1]: Stopped OpenStack Neutron Linux Bridge Agent.
+Mar 22 11:01:18 compute1 systemd[1]: start request repeated too quickly for neutron-linuxbridge-agent.service
+Mar 22 11:01:18 compute1 systemd[1]: Failed to start OpenStack Neutron Linux Bridge Agent.
+Mar 22 11:01:18 compute1 systemd[1]: Unit neutron-linuxbridge-agent.service entered failed state.
+Mar 22 11:01:18 compute1 systemd[1]: neutron-linuxbridge-agent.service failed.
+[root@compute1 ~]# 
+```
+* 원인: /etc/neutron/plugins/ml2/linuxbridge_agent.ini 에 vxlan 설정이 없음
+* 조치:
+```
+echo "[vxlan]" | sudo tee --append /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+echo "local_ip=192.168.137.31" | sudo tee --append /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+```
+* 확인
+```
+[root@compute1 ~]# systemctl status neutron-linuxbridge-agent.service
+â— neutron-linuxbridge-agent.service - OpenStack Neutron Linux Bridge Agent
+   Loaded: loaded (/usr/lib/systemd/system/neutron-linuxbridge-agent.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2022-03-22 19:18:33 KST; 5min ago
+  Process: 8798 ExecStartPre=/usr/bin/neutron-enable-bridge-firewall.sh (code=exited, status=0/SUCCESS)
+ Main PID: 8803 (/usr/bin/python)
+    Tasks: 1
+   CGroup: /system.slice/neutron-linuxbridge-agent.service
+           â””â”€8803 /usr/bin/python2 /usr/bin/neutron-linuxbridge-agent --config-file /usr/share/neutron/neutron-dist.conf --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/linuxbri...
+
+Mar 22 19:18:33 compute1 systemd[1]: Starting OpenStack Neutron Linux Bridge Agent...
+Mar 22 19:18:33 compute1 neutron-enable-bridge-firewall.sh[8798]: net.bridge.bridge-nf-call-iptables = 1
+Mar 22 19:18:33 compute1 neutron-enable-bridge-firewall.sh[8798]: net.bridge.bridge-nf-call-ip6tables = 1
+Mar 22 19:18:33 compute1 systemd[1]: Started OpenStack Neutron Linux Bridge Agent.
+Mar 22 19:18:35 compute1 sudo[8817]:  neutron : TTY=unknown ; PWD=/ ; USER=root ; COMMAND=/bin/neutron-rootwrap /etc/neutron/rootwrap.conf privsep-helper --config-file /usr/share/neutron/neutron-dist.conf --c...
+Mar 22 19:18:38 compute1 sudo[8846]:  neutron : TTY=unknown ; PWD=/ ; USER=root ; COMMAND=/bin/neutron-rootwrap-daemon /etc/neutron/rootwrap.conf
+Hint: Some lines were ellipsized, use -l to show in full.
+[root@compute1 ~]#
+```
+
+
+### (control node) openstack server create, <class 'neutronclient.common.exceptions.Unauthorized'> (HTTP 500)
+
+* 증상: server를 생성할 때 HTTP 500에러가 발생한다.
+```
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros --nic net-id=494ecb7c-8153-4835-bdfe-411df939efa6 --security-group default --key-name mykey provider-instance
+Unexpected API Error. Please report this at http://bugs.launchpad.net/nova/ and attach the Nova API log if possible.
+<class 'neutronclient.common.exceptions.Unauthorized'> (HTTP 500) (Request-ID: req-d8bb1060-35f7-40fe-8946-ecd51156585e)
+[root@controller ~]# grep ERROR  /var/log/nova/nova-api.log
+2022-03-22 19:19:10.936 533 ERROR nova.network.neutronv2.api [req-d8bb1060-35f7-40fe-8946-ecd51156585e 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] The [neutron] section of your nova configuration file must be configured for authentication with the networking service endpoint. See the networking service install guide for details: https://docs.openstack.org/neutron/latest/install/
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi [req-d8bb1060-35f7-40fe-8946-ecd51156585e 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] Unexpected exception in API method: Unauthorized: Unknown auth type: None
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi Traceback (most recent call last):
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/openstack/wsgi.py", line 671, in wrapped
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return f(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/validation/__init__.py", line 110, in wrapper
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     return func(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/api/openstack/compute/servers.py", line 687, in create
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     **create_kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/hooks.py", line 154, in inner
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     rv = f(*args, **kwargs)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/compute/api.py", line 1883, in create
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     supports_port_resource_request=supports_port_resource_request)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/compute/api.py", line 1303, in _create_instance
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     reservation_id, max_count, supports_port_resource_request)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/compute/api.py", line 929, in _validate_and_build_base_options
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     context, requested_networks, pci_request_info)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/network/neutronv2/api.py", line 2085, in create_resource_requests
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     neutron = get_client(context, admin=True)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/network/neutronv2/api.py", line 180, in get_client
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     auth_plugin = _get_auth_plugin(context, admin=admin)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/network/neutronv2/api.py", line 160, in _get_auth_plugin
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     _ADMIN_AUTH = _load_auth_plugin(CONF)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi   File "/usr/lib/python2.7/site-packages/nova/network/neutronv2/api.py", line 91, in _load_auth_plugin
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi     raise neutron_client_exc.Unauthorized(message=err_msg)
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi Unauthorized: Unknown auth type: None
+2022-03-22 19:19:10.936 533 ERROR nova.api.openstack.wsgi
+
+```
+* 원인: `/etc/nova/nova.conf`에 `[neutron]` endpoint 설정이 없음
+```
+[root@controller ~]# grep -A4 "^\[neutron\]" /etc/nova/nova.conf
+[neutron]
+[notifications]
+[osapi_v21]
+[oslo_concurrency]
+[root@controller ~]#
+```
+* 조치
+   1. `/etc/nova/nova.conf`에 `[neutron]` endpoint 설정 추가
+   2. `systemctl restart openstack-nova-*` 
+```
+[neutron]
+url = http://controller:9696
+auth_url = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = NEUTRON_DBPASS
+service_metadata_proxy = true
+metadata_proxy_shared_secret = METADATA_SECRET
+```
+* 확인
+   * `openstack server create --flavor m1.nano --image cirros --nic net-id=494ecb7c-8153-4835-bdfe-411df939efa6 --security-group default --key-name mykey provider-instance`
+   * `openstack server list`
+```
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros --nic net-id=494ecb7c-8153-4835-bdfe-411df939efa6 --security-group default --key-name mykey provider-instance
+HTTP 500 Internal Server Error: The server has either erred or is incapable of performing the requested operation.
+[root@controller ~]# 
+```
+
+
+### (control node) openstack server create, status ERROR, Build of instance 14c8f79e-4436-4ad9-9e5f-07de34b47247 aborted: Auth plugin requires parameters which were not given: auth_url
+
+* 증상: server를 생성할 때 status가 ERROR 이다.
+```
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros   --nic net-id=494ecb7c-8153-4835-bdfe-411df939efa6 --security-group default   --key-name mykey selfservice-instance
++-----------------------------+-----------------------------------------------+
+| Field                       | Value                                         |
++-----------------------------+-----------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                        |
+| OS-EXT-AZ:availability_zone |                                               |
+| OS-EXT-STS:power_state      | NOSTATE                                       |
+| OS-EXT-STS:task_state       | scheduling                                    |
+| OS-EXT-STS:vm_state         | building                                      |
+| OS-SRV-USG:launched_at      | None                                          |
+| OS-SRV-USG:terminated_at    | None                                          |
+| accessIPv4                  |                                               |
+| accessIPv6                  |                                               |
+| addresses                   |                                               |
+| adminPass                   | JBQ99gtBeZFm                                  |
+| config_drive                |                                               |
+| created                     | 2022-03-23T02:02:13Z                          |
+| flavor                      | m1.nano (0)                                   |
+| hostId                      |                                               |
+| id                          | 77ef07bc-62e9-4d49-884e-98fbf2b5cf71          |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6) |
+| key_name                    | mykey                                         |
+| name                        | selfservice-instance                          |
+| progress                    | 0                                             |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd              |
+| properties                  |                                               |
+| security_groups             | name='7db0a045-c512-40cb-8ccd-518e849b1936'   |
+| status                      | BUILD                                         |
+| updated                     | 2022-03-23T02:02:14Z                          |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af              |
+| volumes_attached            |                                               |
++-----------------------------+-----------------------------------------------+
+clean_up CreateServer:
+END return value: 0
+[root@controller ~]# openstack server list
++--------------------------------------+----------------------+--------+----------+--------+---------+
+| ID                                   | Name                 | Status | Networks | Image  | Flavor  |
++--------------------------------------+----------------------+--------+----------+--------+---------+
+| 14c8f79e-4436-4ad9-9e5f-07de34b47247 | selfservice-instance | ERROR  |          | cirros | m1.nano |
++--------------------------------------+----------------------+--------+----------+--------+---------+
+[root@controller ~]#  openstack server show selfservice-instance
++-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Field                       | Value
++-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| OS-DCF:diskConfig           | MANUAL
+| OS-EXT-AZ:availability_zone |
+| OS-EXT-STS:power_state      | NOSTATE
+| OS-EXT-STS:task_state       | None
+| OS-EXT-STS:vm_state         | error
+| OS-SRV-USG:launched_at      | None
+| OS-SRV-USG:terminated_at    | None
+| accessIPv4                  |
+| accessIPv6                  |
+| addresses                   |
+| config_drive                |
+| created                     | 2022-03-23T01:33:59Z
+| fault                       | {u'message': u'Build of instance 14c8f79e-4436-4ad9-9e5f-07de34b47247 aborted: Auth plugin requires parameters which were not given: auth_url', u'code': 500, u'created': u'2022-03
+| flavor                      | m1.nano (0)
+| hostId                      |
+| id                          | 14c8f79e-4436-4ad9-9e5f-07de34b47247
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6)
+| key_name                    | mykey
+| name                        | selfservice-instance
+| project_id                  | fdd6efd656374844a7d4a095736e21dd
+| properties                  |
+| status                      | ERROR
+| updated                     | 2022-03-23T01:34:11Z
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af
+| volumes_attached            |
++-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+...
+[root@compute1 ~]# grep -i error /var/log/nova/*
+/var/log/nova/nova-compute.log:2022-03-23 11:02:16.336 970 WARNING nova.compute.manager [req-8f7d61d1-be71-418a-be39-baa5dc7dcf5f 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] Could not clean up failed build, not rescheduling. Error: Auth plugin requires parameters which were not given: auth_url: MissingRequiredOptions: Auth plugin requires parameters which were not given: auth_url
+/var/log/nova/nova-compute.log:2022-03-23 11:02:16.467 970 ERROR nova.compute.manager [req-8f7d61d1-be71-418a-be39-baa5dc7dcf5f 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] [instance: 77ef07bc-62e9-4d49-884e-98fbf2b5cf71] Build of instance 77ef07bc-62e9-4d49-884e-98fbf2b5cf71 aborted: Auth plugin requires parameters which were not given: auth_url: BuildAbortException: Build of instance 77ef07bc-62e9-4d49-884e-98fbf2b5cf71 aborted: Auth plugin requires parameters which were not given: auth_url
+/var/log/nova/nova-compute.log:2022-03-23 11:02:16.481 970 WARNING nova.compute.manager [req-8f7d61d1-be71-418a-be39-baa5dc7dcf5f 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] Failed to update network info cache when cleaning up allocated networks. Stale VIFs may be left on this host.Error: Auth plugin requires parameters which were not given: auth_url: MissingRequiredOptions: Auth plugin requires parameters which were not given: auth_url
+
+```
+* 원인
+   * compute 노드 `/etc/nova/nova.conf`에서 `[neutron]` 항목에 auth_url 설정이 없음
+* 조치: compute 노드 `/etc/nova/nova.conf`에서 `[neutron]` 항목에 auth_url 설정 추가
+```
+[neutron]
+url = http://controller:9696
+auth_uri = http://controller:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+```
+* 확인
+```
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros   --nic net-id=494ecb7c-8153-4835-bdfe-411df939efa6 --security-group default   --key-name mykey selfservice-instance
++-----------------------------+-----------------------------------------------+
+| Field                       | Value                                         |
++-----------------------------+-----------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                        |
+| OS-EXT-AZ:availability_zone |                                               |
+| OS-EXT-STS:power_state      | NOSTATE                                       |
+| OS-EXT-STS:task_state       | scheduling                                    |
+| OS-EXT-STS:vm_state         | building                                      |
+| OS-SRV-USG:launched_at      | None                                          |
+| OS-SRV-USG:terminated_at    | None                                          |
+| accessIPv4                  |                                               |
+| accessIPv6                  |                                               |
+| addresses                   |                                               |
+| adminPass                   | uVoYGWnBn3Qp                                  |
+| config_drive                |                                               |
+| created                     | 2022-03-23T03:18:41Z                          |
+| flavor                      | m1.nano (0)                                   |
+| hostId                      |                                               |
+| id                          | 26994e1e-54ac-4208-bd65-0d9637fd0d2e          |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6) |
+| key_name                    | mykey                                         |
+| name                        | selfservice-instance                          |
+| progress                    | 0                                             |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd              |
+| properties                  |                                               |
+| security_groups             | name='7db0a045-c512-40cb-8ccd-518e849b1936'   |
+| status                      | BUILD                                         |
+| updated                     | 2022-03-23T03:18:41Z                          |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af              |
+| volumes_attached            |                                               |
++-----------------------------+-----------------------------------------------+
+[root@controller ~]# openstack server list
++--------------------------------------+----------------------+--------+--------------------------+--------+---------+
+| ID                                   | Name                 | Status | Networks                 | Image  | Flavor  |
++--------------------------------------+----------------------+--------+--------------------------+--------+---------+
+| 26994e1e-54ac-4208-bd65-0d9637fd0d2e | selfservice-instance | ACTIVE | selfservice=172.16.1.135 | cirros | m1.nano |
++--------------------------------------+----------------------+--------+--------------------------+--------+---------+
+[root@controller ~]#
+```
+
+
+### (control node) openstack server create, status ERROR, Exceeded maximum number of retries. Exhausted all hosts available for retrying build failures for instance
+
+* 증상: 인스턴스에 IP를 추가할 때 ResourceNotFound 404 오류가 발생한다.
+```
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros --nic net-id=163c6532-1576-4fc4-b527-0d0443c4a3ba --security-group default --key-name mykey provider-instance
++-----------------------------+-----------------------------------------------+
+| Field                       | Value                                         |
++-----------------------------+-----------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                        |
+| OS-EXT-AZ:availability_zone |                                               |
+| OS-EXT-STS:power_state      | NOSTATE                                       |
+| OS-EXT-STS:task_state       | scheduling                                    |
+| OS-EXT-STS:vm_state         | building                                      |
+| OS-SRV-USG:launched_at      | None                                          |
+| OS-SRV-USG:terminated_at    | None                                          |
+| accessIPv4                  |                                               |
+| accessIPv6                  |                                               |
+| addresses                   |                                               |
+| adminPass                   | ckCPVgDLe2VH                                  |
+| config_drive                |                                               |
+| created                     | 2022-03-23T03:55:36Z                          |
+| flavor                      | m1.nano (0)                                   |
+| hostId                      |                                               |
+| id                          | eb4ab6f8-42cb-4d14-befc-96d5db70e357          |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6) |
+| key_name                    | mykey                                         |
+| name                        | provider-instance                             |
+| progress                    | 0                                             |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd              |
+| properties                  |                                               |
+| security_groups             | name='7db0a045-c512-40cb-8ccd-518e849b1936'   |
+| status                      | BUILD                                         |
+| updated                     | 2022-03-23T03:55:36Z                          |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af              |
+| volumes_attached            |                                               |
++-----------------------------+-----------------------------------------------+
+[root@controller ~]# openstack server show provider-instance
++-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Field                       | Value                                                                                                                                                                                                                |
++-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                                                                                                                                                                                               |
+| OS-EXT-AZ:availability_zone |                                                                                                                                                                                                                      |
+| OS-EXT-STS:power_state      | NOSTATE                                                                                                                                                                                                              |
+| OS-EXT-STS:task_state       | None                                                                                                                                                                                                                 |
+| OS-EXT-STS:vm_state         | error                                                                                                                                                                                                                |
+| OS-SRV-USG:launched_at      | None                                                                                                                                                                                                                 |
+| OS-SRV-USG:terminated_at    | None                                                                                                                                                                                                                 |
+| accessIPv4                  |                                                                                                                                                                                                                      |
+| accessIPv6                  |                                                                                                                                                                                                                      |
+| addresses                   |                                                                                                                                                                                                                      |
+| config_drive                |                                                                                                                                                                                                                      |
+| created                     | 2022-03-23T04:02:16Z                                                                                                                                                                                                 |
+| fault                       | {u'message': u'Exceeded maximum number of retries. Exhausted all hosts available for retrying build failures for instance 3b055932-43f0-4dbe-be72-b02dd3cde75c.', u'code': 500, u'created': u'2022-03-23T04:02:24Z'} |
+| flavor                      | m1.nano (0)                                                                                                                                                                                                          |
+| hostId                      |                                                                                                                                                                                                                      |
+| id                          | 3b055932-43f0-4dbe-be72-b02dd3cde75c                                                                                                                                                                                 |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6)                                                                                                                                                                        |
+| key_name                    | mykey                                                                                                                                                                                                                |
+| name                        | provider-instance                                                                                                                                                                                                    |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd                                                                                                                                                                                     |
+| properties                  |                                                                                                                                                                                                                      |
+| status                      | ERROR                                                                                                                                                                                                                |
+| updated                     | 2022-03-23T04:02:24Z                                                                                                                                                                                                 |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af                                                                                                                                                                                     |
+| volumes_attached            |                                                                                                                                                                                                                      |
++-----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+[root@controller ~]#
+[root@compute1 ~]# ssh compute1
+[root@compute1 ~]# grep -i error /var/log/nova/*
+...생략...
+/var/log/nova/nova-compute.log:2022-03-23 13:02:22.993 4099 ERROR nova.compute.manager [req-ad8cc578-f4d3-435b-b781-173adfb4521b 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] Instance failed network setup after 1 attempt(s): PortBindingFailed: Binding failed for port 46812e80-9ed3-4ee0-910c-24716997b0d4, please check neutron logs for more information.
+...생략...
+[root@compute1 ~]# exit
+[root@controller ~]# grep -i error /var/log/neutron/*
+...생략...
+/var/log/neutron/server.log:2022-03-23 13:02:13.607 20156 INFO neutron.api.v2.resource [req-161b3e9c-4017-4eb7-b164-1d7b0b9df117 8e9813079f73476b9ba29a6b8c3cf4af fdd6efd656374844a7d4a095736e21dd - default default] show failed (client error): The resource could not be found.
+/var/log/neutron/server.log:2022-03-23 13:02:20.737 20156 ERROR neutron.plugins.ml2.managers [req-2ffb7f01-d456-4092-bf3e-67ba2c031f80 437174860bfa441dbb89ec82bfde89e3 b55d89a2f4f94c348417aabbd603c8b3 - default default] Failed to bind port 46812e80-9ed3-4ee0-910c-24716997b0d4 on host compute1 for vnic_type normal using segments [{'network_id': '163c6532-1576-4fc4-b527-0d0443c4a3ba', 'segmentation_id': None, 'physical_network': u'provider', 'id': 'ae319ffc-c127-4402-8582-82ff753b9aa4', 'network_type': u'flat'}]
+...생략...
+[root@controller ~]# ssh compute1
+[root@compute1 ~]# cat /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+[DEFAULT]
+local_ip=10.0.0.31
+```
+* 원인: compute 노드에 `[linux_bridge]` 항목이 설정되어 있지 않음
+* 조치
+```
+[root@compute1 ~]# cat /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+[DEFAULT]
+[linux_bridge]
+physical_interface_mappings = provider:eth1
+[vxlan]
+local_ip=10.0.0.31
+[root@compute1 ~]#
+```
+* 확인
+```
+[root@controller ~]# openstack server delete provider-instance
+[root@controller ~]# openstack server create --flavor m1.nano --image cirros --nic net-id=163c6532-1576-4fc4-b527-0d0443c4a3ba --security-group default --key-name mykey provider-instance
++-----------------------------+-----------------------------------------------+
+| Field                       | Value                                         |
++-----------------------------+-----------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                        |
+| OS-EXT-AZ:availability_zone |                                               |
+| OS-EXT-STS:power_state      | NOSTATE                                       |
+| OS-EXT-STS:task_state       | scheduling                                    |
+| OS-EXT-STS:vm_state         | building                                      |
+| OS-SRV-USG:launched_at      | None                                          |
+| OS-SRV-USG:terminated_at    | None                                          |
+| accessIPv4                  |                                               |
+| accessIPv6                  |                                               |
+| addresses                   |                                               |
+| adminPass                   | N5WkDewkpF6k                                  |
+| config_drive                |                                               |
+| created                     | 2022-03-23T05:05:12Z                          |
+| flavor                      | m1.nano (0)                                   |
+| hostId                      |                                               |
+| id                          | 13ee677c-0045-4a21-904d-24ce02926467          |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6) |
+| key_name                    | mykey                                         |
+| name                        | provider-instance                             |
+| progress                    | 0                                             |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd              |
+| properties                  |                                               |
+| security_groups             | name='7db0a045-c512-40cb-8ccd-518e849b1936'   |
+| status                      | BUILD                                         |
+| updated                     | 2022-03-23T05:05:12Z                          |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af              |
+| volumes_attached            |                                               |
++-----------------------------+-----------------------------------------------+
+[root@controller ~]# openstack server show provider-instance
++-----------------------------+----------------------------------------------------------+
+| Field                       | Value                                                    |
++-----------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig           | MANUAL                                                   |
+| OS-EXT-AZ:availability_zone | nova                                                     |
+| OS-EXT-STS:power_state      | Running                                                  |
+| OS-EXT-STS:task_state       | None                                                     |
+| OS-EXT-STS:vm_state         | active                                                   |
+| OS-SRV-USG:launched_at      | 2022-03-23T05:05:22.000000                               |
+| OS-SRV-USG:terminated_at    | None                                                     |
+| accessIPv4                  |                                                          |
+| accessIPv6                  |                                                          |
+| addresses                   | provider=192.168.137.242                                 |
+| config_drive                |                                                          |
+| created                     | 2022-03-23T05:05:12Z                                     |
+| flavor                      | m1.nano (0)                                              |
+| hostId                      | f5e70d240a781b940fc202032cb2f3fbbe6ae3ce1e3eb7bc10694ee7 |
+| id                          | 13ee677c-0045-4a21-904d-24ce02926467                     |
+| image                       | cirros (a7fb9dc2-8a39-44ae-9583-bb3a055547d6)            |
+| key_name                    | mykey                                                    |
+| name                        | provider-instance                                        |
+| progress                    | 0                                                        |
+| project_id                  | fdd6efd656374844a7d4a095736e21dd                         |
+| properties                  |                                                          |
+| security_groups             | name='default'                                           |
+| status                      | ACTIVE                                                   |
+| updated                     | 2022-03-23T05:05:22Z                                     |
+| user_id                     | 8e9813079f73476b9ba29a6b8c3cf4af                         |
+| volumes_attached            |                                                          |
++-----------------------------+----------------------------------------------------------+
+[root@controller ~]#
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3321,13 +3855,15 @@ openstack endpoint list
 ## apache    1133  0.0  0.0 234656  1004 ?        S    08:50   0:00  \_ /usr/sbin/httpd -DFOREGROUND
 ## apache    2155  0.0  0.1 234656  5628 ?        S    09:02   0:00  \_ /usr/sbin/httpd -DFOREGROUND
 lsof -i tcp:5000
+openstack domain list
 
 
 # glance Verify
 ## /usr/bin/python2 /usr/bin/glance-api
 ##  \_ /usr/bin/python2 /usr/bin/glance-api
-openstack image list
 lsof -i tcp:9292
+openstack image list
+
 
 # placement Verify
 ## /etc/httpd/conf.d/00-placement-api.conf
@@ -3345,10 +3881,12 @@ placement-status upgrade check
 ## nova      2720  0.0  3.3 444064 128872 ?       S    09:12   0:00  \_ /usr/bin/python2 /usr/bin/nova-api
 ## nova      2721  0.0  3.3 444052 128552 ?       S    09:12   0:00  \_ /usr/bin/python2 /usr/bin/nova-api
 
+## nova.osapi_compute.wsgi.server
 lsof -i tcp:8774
+## nova.metadata.wsgi.server
+lsof -i tcp:8775
 nova service-list  
 nova-status upgrade check
-openstack compute service list --service nova-compute  
 openstack compute service list  
 
 # neutron
