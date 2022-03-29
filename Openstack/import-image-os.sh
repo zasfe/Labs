@@ -25,7 +25,7 @@ openstack image create "Ubuntu 18.04 LTS (Bionic Beaver)" --file ./bionic-server
 wget https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img
 openstack image create "Ubuntu 20.04 LTS (Focal Fossa)" --file ./focal-server-cloudimg-amd64.img --disk-format qcow2 --container-format bare --public
 
-mkdir -p /home/images/Ubuntu
-cd /home/images/Ubuntu
+mkdir -p /home/images/cirros
+cd /home/images/cirros
 wget http://download.cirros-cloud.net/0.5.2/cirros-0.5.2-x86_64-disk.img
 openstack image create "cirros" --file cirros-0.5.2-x86_64-disk.img --disk-format qcow2 --container-format bare --public
