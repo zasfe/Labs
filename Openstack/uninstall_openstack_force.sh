@@ -1,4 +1,6 @@
 #!/bin/bash
+# Completely removing OpenStack, application data and allpackages
+# url: https://manualzz.com/doc/o/vdrku/red-hat-enterprise-linux-openstack-platform-3-getting-sta...-removing-packstack-deployments
 
 # Warning! Dangerous step! Destroys VMs
 for x in $(virsh list --all | grep instance- | awk '{print $2}') ; do
