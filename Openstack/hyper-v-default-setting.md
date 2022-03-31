@@ -55,4 +55,10 @@ sed -i s/^SELINUX=.*$/SELINUX=disabled/ /etc/selinux/config
 
 yum clean all
 yum -y update
+
+# blk_update_request: i/o error, dev fd0, sector 0
+echo "blacklist floppy" | sudo tee /etc/modprobe.d/blacklist-floppy.conf
+rmmod floppy
+dracut -f -v
+
 ```
