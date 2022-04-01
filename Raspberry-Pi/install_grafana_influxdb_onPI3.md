@@ -1,3 +1,17 @@
+## Step 0: sd 카드 수명 연장하기
+
+```
+$ sudo nano /etc/fstab
+..중략..
+tmpfs /tmp tmpfs defaults,noatime,nosuid,size=10m 0 0
+tmpfs /var/tmp tmpfs defaults,noatime,nosuid,size=10m 0 0
+tmpfs /var/log tmpfs defaults,noatime,nosuid,mode=0755,size=10m 0 0
+
+$sudo reboot
+```
+
+
+
 ## Step 1: Package Update
 
 ```bash
@@ -202,3 +216,7 @@ sudo apt install chromium-browser
 ## 참고
 
 * https://ch-st.de/raspberry-pi-grafana-influxdb-collectd/
+* Raspberry Pi에서 SD 카드의 수명을 연장하는 방법
+   * https://www.magdiblog.fr/divers/comment-prolonger-la-duree-de-vie-de-vos-cartes-sd-sur-raspberry-pi/
+
+
