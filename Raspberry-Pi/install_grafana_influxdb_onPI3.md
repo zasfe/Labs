@@ -44,7 +44,7 @@ sudo reboot
 > 1=90, 2=180, 3=270
 
 ```bash
-sudo echo "display_rotate=2" >> /boot/config.txt 
+echo "lcd_rotate=2" | sudo tee --append /boot/config.txt
 sudo reboot
 ```
 
@@ -84,6 +84,7 @@ typesdb = "/usr/share/collectd/types.db"
 ```bash
 $ sudo systemctl enable influxdb
 $ sudo systemctl start influxdb
+$ echo "CREATE DATABASE collectd_db"
 $ influx
 Connected to http://localhost:8086 version 1.6.4
 InfluxDB shell version: 1.6.4
