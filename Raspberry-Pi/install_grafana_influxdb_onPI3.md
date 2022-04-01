@@ -84,7 +84,6 @@ typesdb = "/usr/share/collectd/types.db"
 ```bash
 $ sudo systemctl enable influxdb
 $ sudo systemctl start influxdb
-$ echo "CREATE DATABASE collectd_db"
 $ influx
 Connected to http://localhost:8086 version 1.6.4
 InfluxDB shell version: 1.6.4
