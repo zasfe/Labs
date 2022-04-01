@@ -218,5 +218,4 @@ sudo apt install chromium-browser
 * https://ch-st.de/raspberry-pi-grafana-influxdb-collectd/
 * Raspberry Pi에서 SD 카드의 수명을 연장하는 방법
    * https://www.magdiblog.fr/divers/comment-prolonger-la-duree-de-vie-de-vos-cartes-sd-sur-raspberry-pi/
-
-
+* https://forums.pimoroni.com/t/official-7-raspberry-pi-touch-screen-faq/959
