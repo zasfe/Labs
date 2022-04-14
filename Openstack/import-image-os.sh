@@ -7,8 +7,8 @@ source /root/admin
 
 mkdir -p /home/images/cirros
 cd /home/images/cirros
-wget http://download.cirros-cloud.net/0.5.2/cirros-0.5.2-x86_64-disk.img
-openstack image create "test-cirros" --file cirros-0.5.2-x86_64-disk.img --disk-format qcow2 --container-format bare --public
+wget http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
+openstack image create "cirros-0.4.0-x86_64" --file cirros-0.4.0-x86_64-disk.img --disk-format qcow2 --container-format bare --public
 
 
 mkdir -p /home/images/CentOS
