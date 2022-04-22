@@ -8,17 +8,6 @@ PMemper=`expr \( ${PUsemem} \* 100 \/ ${PTotmem} \)`
 STotmem=`free -m | grep Swap | awk '{print $2}'`
 SUsemem=`free -m | grep Swap | awk '{print $3}'`
 SMemper=`expr \( ${SUsemem} \* 100 \/ ${STotmem} \)`
-cat /dev/null > /home/gabia/diskuse
-Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' |grep '^/'| awk  '{print $6}'`
-for LIST in $Fsyslist
-do
-        SPACE=`df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -v "Filesystem" | grep '^/'| awk  '{print $5}'| awk -F'%' '{print $1}'`
-        WHERE=`df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -v "Filesystem" | grep '^/'| awk  '{print $6}'`
-        if (("$SPACE" > 70))
-        then
-                df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' >> /home/gabia/diskuse
-        fi
-done
 echo "                                                           "
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo "                                                           "
@@ -29,7 +18,17 @@ echo -e "\033[0m - System Uptime : \033[32m $uptime              "
 echo -e "\033[0m - Phys Memory usage : \033[32m${PUsemem}M / ${PTotmem}M (\033[31m${PMemper}%\033[32m) "
 echo -e "\033[0m - Swap Memory usage : \033[32m${SUsemem}M / ${STotmem}M (\033[31m${SMemper}%\033[32m) "
 echo -e "\033[0m - File System usage (Over 70%)                  "
-echo -e "\033[31m`cat /home/gabia/diskuse | sort -r | uniq`"
+echo -e "\033[31m"
+Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' |grep '^/'| awk  '{print $6}'`
+for LIST in $Fsyslist
+do
+        SPACE=`df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -v "Filesystem" | grep '^/'| awk  '{print $5}'| awk -F'%' '{print $1}'`
+        WHERE=`df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -v "Filesystem" | grep '^/'| awk  '{print $6}'`
+        if (("$SPACE" > 70))
+        then
+                df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' 
+        fi
+done
 echo "                                                           "
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo "                                                           "
