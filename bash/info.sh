@@ -32,5 +32,11 @@ do
         fi
 done
 echo "                                                           "
+echo -e "\033[0m # Important excute command"
+echo ""
+if [ -f ${HOME}/managed ]; then
+        cat ${HOME}/managed
+fi
+echo ""
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo "                                                           "
