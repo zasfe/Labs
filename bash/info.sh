@@ -2,6 +2,7 @@
 Hostname=`hostname`
 uptime=`uptime | awk -F " " '{print $3,$4}'`
 Ipaddr=`ip addr show |grep "inet " |awk -F" " '{print $2}' | grep -v "127.0.0.1" | paste -sd ","`
+gatewayip=`ip route list | egrep "^default" | awk '{print$3" ("$5")"}'`
 PTotmem=`free -m | grep Mem | awk '{print $2}'`
 PUsemem=`free -m | grep Mem | awk '{print $3}'`
 PMemper=`expr \( ${PUsemem} \* 100 \/ ${PTotmem} \)`
@@ -14,6 +15,7 @@ echo "                                                           "
 echo -e "\033[32m     [ $Hostname ]                       \033[0m"
 echo "                                                           "
 echo -e "\033[0m - IP Address : \033[32m $Ipaddr                 "
+echo -e "\033[0m - Gateway IP : \033[32m $gatewayip                 "
 echo -e "\033[0m - System Uptime : \033[32m $uptime              "
 echo -e "\033[0m - Phys Memory usage : \033[32m${PUsemem}M / ${PTotmem}M (\033[31m${PMemper}%\033[32m) "
 echo -e "\033[0m - Swap Memory usage : \033[32m${SUsemem}M / ${STotmem}M (\033[31m${SMemper}%\033[32m) "
