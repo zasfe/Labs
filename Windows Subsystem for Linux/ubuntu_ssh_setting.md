@@ -53,26 +53,27 @@ EOF
 ```bat
 @echo off
 
-REM 기본 사용자를 root로 변경
+@echo  # 참고
+@echo  - url: https://github.com/zasfe/Labs/blob/master/Windows%20Subsystem%20for%20Linux/ubuntu_ssh_setting.md
+@echo.
+
+@echo - 기본 사용자를 root로 변경
 ubuntu config --default-user root
 
-REM sshd: no hostkeys available -- exiting. 에러 방지
+@echo - sshd: no hostkeys available -- exiting. 에러 방지
 "C:\Windows\System32\bash.exe" -c "ssh-keygen -A"
 
-REM ssh 서비스 재시작
+@echo - ssh 서비스 재시작
 "C:\Windows\System32\bash.exe" -c "sudo bash service ssh restart"
 
-REM 기본 사용자를 root로 변경
-ubuntu config --default-user root
+@echo - 부팅할 때 자동으로 SSH 서비스 재시작하도록 스크립트 추가
+SCHTASKS /Create /SC ONSTART /TN WSL_Ubuntu_sshd_restart /TR "%~dpnx0" /RU "" /F /RL HIGHEST
 ```
 
 ## 6. 부팅할 때 자동으로 실행하도록 윈도우 스케줄 등록 (Host PC)
 
-* 5번 스크립트 파일 절대 경로: C:\wsl_sshd_restart.bat
+* 5번 스크립트 파일을 관리자 권한으로 실행
 
-```bat
-SCHTASKS /Create /SC ONSTART /TN WSL_Ubuntu_sshd_restart /TR "C:\wsl_sshd_restart.bat" /RU "" /F /RL HIGHEST
-```
 
 
 ## 참고
