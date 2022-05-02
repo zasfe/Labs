@@ -31,7 +31,7 @@ sudo apt-get install openssh-server;
 
 ## 4. SSH config 수정 (WSL Ubuntu)
 
-```
+```bash
 cp -pa /etc/ssh/sshd_config /etc/ssh/sshd_config_bak
 echo <<EOF > /etc/ssh/sshd_config
 Port 22
@@ -68,8 +68,11 @@ ubuntu config --default-user root
 
 ## 6. 부팅할 때 자동으로 실행하도록 윈도우 스케줄 등록 (Host PC)
 
+* 5번 스크립트 파일 절대 경로: C:\wsl_sshd_restart.bat
 
-
+```bat
+SCHTASKS /Create /SC ONSTART /TN WSL_Ubuntu_sshd_restart /TR "C:\wsl_sshd_restart.bat" /RU "" /F /RL HIGHEST
+```
 
 
 ## 참고
