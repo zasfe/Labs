@@ -13,6 +13,7 @@ if [ ! $1 == "" ]; then
         echo -e "\033[34m # Log file Not Exists \033[0m";
         echo " $1";
         echo "";
+        exit;
     fi
 fi
 
