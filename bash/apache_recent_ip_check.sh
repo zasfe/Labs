@@ -5,9 +5,12 @@ LANG=C
 # Apache Log File
 file_apachelog="/usr/local/apache/logs/access_log"
 
-if [ ! $1 == "" ]; then
+if [ $# -ne 1 ]; then
     if [ -f $1 ]; then
         file_apachelog=$1
+        echo "";
+        echo -e "\033[34m # Log file: ${file_apachelog} \033[0m";
+        echo "";
     else
         echo "";
         echo -e "\033[34m # Log file Not Exists \033[0m";
@@ -16,6 +19,8 @@ if [ ! $1 == "" ]; then
         exit;
     fi
 fi
+
+unset $1
 
 echo "";
 echo -e "\033[34m # Extract the top 10 most accessed IPs out of the last 1000 connections \033[0m";
