@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# sudo bash -c "curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -"
-# curl -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -
+# sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -"
+# curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo.sh | bash -
 LANG=C
 
 
