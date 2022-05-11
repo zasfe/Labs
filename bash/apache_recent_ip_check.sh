@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## How-to
+#
+# wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/apache_recent_ip_check.sh -O apache_recent_ip_check.sh
+# chmod +x apache_recent_ip_check.sh
+# ./apache_recent_ip_check.sh /usr/local/apache/logs/access_log
+#
+
 LANG=C
 
 # Apache Log File
@@ -19,8 +26,6 @@ if [ $# -ne 1 ]; then
         exit;
     fi
 fi
-
-unset $1
 
 echo "";
 echo -e "\033[34m # Extract the top 10 most accessed IPs out of the last 1000 connections \033[0m";
