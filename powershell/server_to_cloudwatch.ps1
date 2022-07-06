@@ -438,10 +438,7 @@ echo "   ""message"": ""$message""" | out-file -encoding ASCII -Append $stream_f
 echo "   }" | out-file -encoding ASCII -Append $stream_file
 echo "]" | out-file -encoding ASCII -Append $stream_file
 
-
-echo "" | out-file -encoding ASCII $result_file
-
-& $aws_path logs create-log-group --region $region --log-group-name "$stream_group" | out-file -encoding ASCII -Append $result_file
-& $aws_path logs create-log-stream --region $region --log-group-name "$stream_group"  --log-stream-name "$stream_name"  | out-file -encoding ASCII -Append $result_file
-& $aws_path logs put-log-events --region $region --log-group-name "$stream_group" --log-stream-name "$stream_name" --log-events file://$stream_file  | out-file -encoding ASCII -Append $result_file
+& $aws_path logs create-log-group --region $region --log-group-name "$stream_group"
+& $aws_path logs create-log-stream --region $region --log-group-name "$stream_group"  --log-stream-name "$stream_name"
+& $aws_path logs put-log-events --region $region --log-group-name "$stream_group" --log-stream-name "$stream_name" --log-events file://$stream_file
 
