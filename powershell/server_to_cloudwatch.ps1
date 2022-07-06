@@ -46,7 +46,18 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 Write-output "============= Users List =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-LocalUser | Select Name, Enabled, Description, SID, LastLogon, PasswordLastSet  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+$OSVersion = (get-itemproperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name ProductName).ProductName
+If($OSVersion -eq "Windows Server 2012 R2 Standard")
+{
+	
+$computerName = "$env:computername"
+$computer = [ADSI]"WinNT://$computerName,computer" 
+$computer.psbase.Children | Where-Object { $_.psbase.schemaclassname -eq 'user' } | Format-List Name, Description, LastLogin, PasswordAge  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+}
+else {
+	Get-LocalUser | Select Name, Enabled, Description, SID, LastLogon, PasswordLastSet  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+}
+
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 <#
@@ -425,7 +436,6 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 #>
 
 
-# (Get-Content $tmp_file) | foreach {$_ +  "\n"} | %{$_ -replace  '"', " "}| %{$_ -replace  ",", " "} | out-file -FilePath $tmp2_file -Force -Encoding ascii
 (Get-Content $tmp_file) | foreach {$_ +  "\n"} | out-file -FilePath $tmp2_file -Force -Encoding ascii
 
 
