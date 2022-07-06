@@ -1,3 +1,4 @@
+
 $aws_path="C:\Program Files\Amazon\AWSCLIV2\aws.exe"
 $gabia_folder="C:\Program Files\gabiaConsignManagement\"
 $exe_folder="C:\Program Files\gabiaConsignManagement\e\"
@@ -7,14 +8,14 @@ $log_folder="C:\Program Files\gabiaConsignManagement\log\"
 $tmp_file=$log_folder + "result.txt"
 $tmp2_file=$log_folder + "result2.txt"
 $stream_file=$log_folder + "logstream.json"
-$result_file=$log_folder + "action_result.txt"
+
 
 $unixtime=[int][double]::Parse($(Get-Date -date (Get-Date).ToUniversalTime()-uformat %s)) * 1000
 
-$instance_id=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/instance-id").Content
-$private_ip=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/local-ipv4").Content
-$public_ip=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/public-ipv4").Content
-$region=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/placement/region").Content
+$instance_id=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/instance-id" -UseBasicParsing).Content
+$private_ip=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/local-ipv4" -UseBasicParsing).Content
+$public_ip=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/public-ipv4" -UseBasicParsing).Content
+$region=(Invoke-WebRequest -uri "http://169.254.169.254/latest/meta-data/placement/region" -UseBasicParsing).Content
 $stream_name="$instance_id (private_ $private_ip  /  public_ $public_ip) - $unixtime"
 $stream_group="EC2_ServerInfo"
 
@@ -443,3 +444,4 @@ echo "" | out-file -encoding ASCII $result_file
 & $aws_path logs create-log-group --region $region --log-group-name "$stream_group" | out-file -encoding ASCII -Append $result_file
 & $aws_path logs create-log-stream --region $region --log-group-name "$stream_group"  --log-stream-name "$stream_name"  | out-file -encoding ASCII -Append $result_file
 & $aws_path logs put-log-events --region $region --log-group-name "$stream_group" --log-stream-name "$stream_name" --log-events file://$stream_file  | out-file -encoding ASCII -Append $result_file
+
