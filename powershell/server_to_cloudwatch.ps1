@@ -1,8 +1,3 @@
-# https://www.ietf.org/rfc/rfc4627.txt
-# https://docs.microsoft.com/ko-kr/sql/relational-databases/json/how-for-json-escapes-special-characters-and-control-characters-sql-server?view=sql-server-ver16
-# | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')}
-
-
 $aws_path="C:\Program Files\Amazon\AWSCLIV2\aws.exe"
 $gabia_folder="C:\temp"
 
