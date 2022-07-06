@@ -1,9 +1,13 @@
-$aws_path="C:\Program Files\Amazon\AWSCLIV2\aws.exe"
-$gabia_folder="C:\temp"
 
-$tmp_file="C:\temp\result.txt"
-$tmp2_file="C:\temp\result2.txt"
-$stream_file="C:\temp\logstream.json"
+$aws_path="C:\Program Files\Amazon\AWSCLIV2\aws.exe"
+$gabia_folder="C:\Program Files\gabiaConsignManagement\"
+$exe_folder="C:\Program Files\gabiaConsignManagement\e\"
+$script_folder="C:\Program Files\gabiaConsignManagement\s\"
+$log_folder="C:\Program Files\gabiaConsignManagement\log\"
+
+$tmp_file=$log_folder + "result.txt"
+$tmp2_file=$log_folder + "result2.txt"
+$stream_file=$log_folder + "logstream.json"
 
 
 $unixtime=[int][double]::Parse($(Get-Date -date (Get-Date).ToUniversalTime()-uformat %s)) * 1000
@@ -16,7 +20,9 @@ $stream_name="$instance_id (private_ $private_ip  /  public_ $public_ip) - $unix
 $stream_group="EC2_ServerInfo"
 
 
-New-Item "$gabia_folder" -ItemType Directory -Force
+New-Item "C:\Program Files\gabiaConsignManagement\s" -ItemType Directory -Force
+New-Item "C:\Program Files\gabiaConsignManagement\e" -ItemType Directory -Force
+New-Item "C:\Program Files\gabiaConsignManagement\log" -ItemType Directory -Force
 
 <#
 1. Operation System
@@ -27,10 +33,10 @@ Write-output "============= Operation System =============" | out-file -encoding
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 
-(Get-CimInstance -Class Win32_OperatingSystem |
-  Select-Object -Property Caption, Version, @{N=’Computername’; E={[string]$_.CSName}}, Manufacturer, CodeSet, MUILanguages, ServicePackMajorVersion, ServicePackMinorVersion, TotalVisibleMemorySize,@{N=’TotalVisibleMemorySize_GB’; E={[math]::Round(($_.TotalVisibleMemorySize / 1024/1024), 2)}},
-  CurrentTimeZone,  LastBootUpTime, @{Label='RebootInLast30Days';
-     Expression={((Get-Date) – $_.lastbootuptime) -ge (New-TimeSpan -Days 30)}} )  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-CimInstance -Class Win32_OperatingSystem |
+  Select-Object -Property Caption,Version,@{Label='Computername'; E={($_.CSName)}},Manufacturer, CodeSet, MUILanguages, ServicePackMajorVersion, ServicePackMinorVersion, TotalVisibleMemorySize,@{N='TotalVisibleMemorySize_GB'; E={[math]::Round(($_.TotalVisibleMemorySize / 1024/1024), 2)}},
+  CurrentTimeZone,  LastBootUpTime,@{Label='RebootInLast30Days';
+     Expression={((Get-Date) - $_.lastbootuptime) -ge (New-TimeSpan -Days 30)}}   | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 <#
@@ -56,13 +62,13 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 Write-output "============= Network Connection - Listen =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-NetTCPConnection | ? {$_.State -eq “Listen”}  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-NetTCPConnection | ? {$_.State -eq "Listen"}  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 Write-output "============= Network Connection - Established =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-NetTCPConnection -State Established |Select-Object -Property LocalAddress, LocalPort,@{name='RemoteHostName';expression={(Resolve-DnsName $_.RemoteAddress).NameHost}},RemoteAddress, RemotePort, State,@{name='ProcessName';expression={(Get-Process -Id $_.OwningProcess). Path}},OffloadState,CreationTime |ft | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-NetTCPConnection -State Established |Select-Object -Property LocalAddress, LocalPort,RemoteAddress, RemotePort, @{name='PID';expression={(Get-Process -Id $_.OwningProcess). Id}},@{name='ProcessName';expression={(Get-Process -Id $_.OwningProcess). Path}},CreationTime | Format-Table -Wrap -AutoSize | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 
@@ -146,27 +152,11 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 5. Service List
 #>
 
-Write-output "============= Service List =============" | out-file -encoding ASCII -Append $tmp_file
+Write-output "============= Service List - running =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-WmiObject Win32_Service -Filter {State = 'Running'} | Format-Table -AutoSize Name, startname, startmode, State, caption, pathname  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-WmiObject Win32_Service -Filter {State = 'Running'} | Format-Table -AutoSize Name, startname, startmode, State, caption, pathname   | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
-
-
-$TrackProcessName = "*"
-$EstablishedConnections = Get-NetTCPConnection -State Established |Select-Object -Property LocalAddress, LocalPort,@{name='RemoteHostName';expression={(Resolve-DnsName $_.RemoteAddress).NameHost}},RemoteAddress, RemotePort, State,@{name='ProcessName';expression={(Get-Process -Id $_.OwningProcess). Path}}, OffloadState,CreationTime
-Foreach ($Connection in $EstablishedConnections)
-{
-If ($Connection.ProcessName -like $TrackProcessName)
-{
-$Connection|ft
-}
-}
-
-
-
-
-
 
 
 
@@ -184,15 +174,12 @@ function get-diskcapacity {
     )
 
     PROCESS {
-#        foreach ($computer in $computername) {
-            Get-CimInstance -ClassName Win32_LogicalDisk -Filter “DriveType = 3”  |
+            Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType = 3"  |
             select Caption,
-            @{N=’Capacity_GB’; E={[math]::Round(($_.Size / 1GB), 2)}},
-            @{N=’FreeSpace_GB’; E={[math]::Round(($_.FreeSpace / 1GB), 2)}},
-            @{N=’PercentUsed’; E={[math]::Round(((($_.Size – $_.FreeSpace) / $_.Size) * 100), 2) }},
-            @{N=’PercentFree’; E={[math]::Round((($_.FreeSpace / $_.Size) * 100), 2) }}
-
-#        } # end foreach
+            @{N='Capacity_GB'; E={[math]::Round(($_.Size / 1GB), 2)}},
+            @{N='FreeSpace_GB'; E={[math]::Round(($_.FreeSpace / 1GB), 2)}},
+            @{N='PercentUsed'; E={[math]::Round(((($_.Size - $_.FreeSpace) / $_.Size) * 100), 2) }},
+            @{N='PercentFree'; E={[math]::Round((($_.FreeSpace / $_.Size) * 100), 2) }}
 
     } # end PROCESS
 }
@@ -375,26 +362,34 @@ Get-EventLog -LogName System -After (Get-Date).AddDays(-31) |
     Where-Object {$_.Source -notlike 'Schannel' -and $_.Source -notlike 'DCOM'}  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-
 <#
-8. App - gabia (Zenius, XMS)
+8. App - amazon (ssm)
+#>
+
+Write-output "============= App - amazon (ssm) =============" | out-file -encoding ASCII -Append $tmp_file
+Write-output "" | out-file -encoding ASCII -Append $tmp_file
+
+Get-WMIObject -Class Win32_Process -Filter {Name = 'amazon-ssm-agent.exe' or Name = 'ssm-agent-worker.exe' } | select SessionId, Name, CreationDate, CommandLine | Format-Table -AutoSize | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+ 
+<#
+9. App - gabia (Zenius, XMS)
 #>
 
 Write-output "============= App - gabia (Zenius, XMS) =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-WMIObject -Class Win32_Process -Filter {Name = 'zagent.exe' or Name = 'gabia_mond.exe'} | select SessionId, Name, CreationDate, CommandLine  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-WMIObject -Class Win32_Process -Filter {Name = 'zagent.exe' or Name = 'gabia_mond.exe'} | select SessionId, Name, CreationDate, CommandLine  | Format-Table -AutoSize | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 
 <#
-9. App - installed Software
+10. App - installed Software
 #>
 
 Write-output "============= App - installed Software =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
-Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table –AutoSize  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table -AutoSize  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
 
 
@@ -402,11 +397,23 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 10. Windows ScheduledTask
 #>
 
-Write-output "============= Windows ScheduledTask =============" | out-file -encoding ASCII -Append $tmp_file
+Write-output "============= Windows ScheduledTask - simple =============" | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
+
+
+Get-ScheduledTask -TaskPath '\' | Get-ScheduledTaskInfo | Select-Object TaskName, LastRunTime, LastTaskResult, NextRunTime, NumberOfMissedRuns | ft -autosize | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
+Write-output "" | out-file -encoding ASCII -Append $tmp_file
+
+
+Write-output "============= Windows ScheduledTask - detailed =============" | out-file -encoding ASCII -Append $tmp_file
+Write-output "" | out-file -encoding ASCII -Append $tmp_file
+
 
 Get-ScheduledTask -TaskName "*" | Select-Object Actions, Author, Date, Description, Documentation, Principal, SecurityDescriptor, Settings, Source, TaskName, TaskPath, Triggers, URI, Version  | Out-String | % {$_.replace('\', '\\')} | %{$_.replace('"','\"')} | %{$_.replace('/','\/')} | out-file -encoding ASCII -Append $tmp_file
 Write-output "" | out-file -encoding ASCII -Append $tmp_file
+
+
+
 
 
 
@@ -418,7 +425,8 @@ Write-output "" | out-file -encoding ASCII -Append $tmp_file
 #>
 
 
-(Get-Content $tmp_file) | foreach {$_ +  "\n"} | %{$_ -replace  '"', " "}| %{$_ -replace  ",", " "} | out-file -FilePath $tmp2_file -Force -Encoding ascii
+# (Get-Content $tmp_file) | foreach {$_ +  "\n"} | %{$_ -replace  '"', " "}| %{$_ -replace  ",", " "} | out-file -FilePath $tmp2_file -Force -Encoding ascii
+(Get-Content $tmp_file) | foreach {$_ +  "\n"} | out-file -FilePath $tmp2_file -Force -Encoding ascii
 
 
 $message = (Get-Content $tmp2_file)
