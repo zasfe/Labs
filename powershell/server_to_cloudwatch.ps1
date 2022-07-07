@@ -222,7 +222,7 @@ function Get-Sessions([STRING]$UserName = "", [STRING]$ComputerName = "$ENV:COMP
                 {
                     $SCRIPT:AnmeldeListe[$Index]
                 } else {
-                    $SCRIPT:AnmeldeListe[$Index] | Select-Object -Property * -ExcludeProperty SessionId, RemoteHost
+                    $SCRIPT:AnmeldeListe[$Index] | Select-Object -Property * -ExcludeProperty SessionId
                 }
             }
         }
