@@ -1,4 +1,4 @@
-$slackChannel = "#knh_test"
+$slackChannel = "#yyyyy_yyyyy"
 $slackBotName = "RDP-login-Alert"
 $slackKey = "xxxxx/xxxxx"
 # example: https://hooks.slack.com/services/$slackKey 
@@ -8,6 +8,7 @@ $MessageSplit = $DataCollected.Message.Split("`n")
 $UserLogged = ($MessageSplit[2].Split(":"))[1].Trim().Split("\")[1].Trim()
 $UserIP = ($MessageSplit[4].Split(":"))[1].Trim()
 
+#TLS
 $public_ip=(Invoke-RestMethod -uri "https://api.ip.pe.kr/json/" -UseBasicParsing).ip
 $private_ip=(Test-Connection -ComputerName $env:computername -count 1).IPv4Address.IPAddressToString
 $region=(Invoke-RestMethod -uri "https://api.ip.pe.kr/json/" -UseBasicParsing).country_name.en
