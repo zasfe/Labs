@@ -1,4 +1,10 @@
-# /etc/logrotate.d/logrotate_catalina_out
+# Tomcat Catalina.out Rotate
+# 
+# - PATH: /etc/logrotate.d/logrotate_catalina_out
+# 
+# - REF
+#   * https://cwiki.apache.org/confluence/display/TOMCAT/Logging#Logging-Q10
+#       1. use SIGUSR1 , 2. logrotate copytruncate, 3. use log pipeapp(aka apache's rogratetelog)
 
 ${CATALINA_HOME}/logs/catalina.out
 {
