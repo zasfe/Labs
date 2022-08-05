@@ -1,0 +1,11 @@
+# /etc/logrotate.d/logrotate_catalina_out
+
+${CATALINA_HOME}/logs/catalina.out
+{
+        copytruncate
+        daily
+        rotate 180
+        missingok
+        notifempty
+        dateext
+}
