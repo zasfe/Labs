@@ -5,7 +5,7 @@
 
 [nonprod1_ad_servers:vars]
 ansible_user=administrator
-ansible_pass=Horse@1234
+ansible_passworrd=Horse@1234
 ansible_port=5986
 ansible_connection=winrm
 # The following is necessary for Python 2.7.9+ when using default WinRM self-signed certificates:
