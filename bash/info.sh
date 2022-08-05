@@ -1,4 +1,4 @@
-##/bin/sh
+#!/bin/sh
 Hostname=`hostname`
 uptime=`uptime | awk -F " " '{print sub(",","",$4);$3,$4}'`
 Ipaddr=`ip addr show |grep "inet " |awk -F" " '{print $2}' | grep -v "127.0.0.1" | paste -sd ","`
