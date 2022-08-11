@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+    ServerName example.com
+    ServerAlias www.example.com
+
+    DocumentRoot /home/public_html/example
+
+    ErrorLog logs/example.com-error.log
+    CustomLog logs/example.com-access.log combined
+</VirtualHost>
+
+#http -> https Redirect RewriteRule
+<VirtualHost *:80>
+
+    ServerName example.com
+    ServerAlias www.example.com
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+</VirtualHost>
