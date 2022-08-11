@@ -3,6 +3,9 @@
 
 # this configuration requires mod_ssl, mod_socache_shmcb, mod_rewrite, and mod_headers
 <VirtualHost *:80>
+    ServerName example.com
+    ServerAlias www.example.com
+    
     RewriteEngine On
     RewriteCond %{REQUEST_URI} !^/\.well\-known/acme\-challenge/
     RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
@@ -10,6 +13,9 @@
 
 <VirtualHost *:443>
     SSLEngine on
+
+    ServerName example.com
+    ServerAlias www.example.com
 
     # curl https://ssl-config.mozilla.org/ffdhe2048.txt >> /path/to/signed_cert_and_intermediate_certs_and_dhparams
     SSLCertificateFile      /path/to/signed_cert_and_intermediate_certs_and_dhparams
