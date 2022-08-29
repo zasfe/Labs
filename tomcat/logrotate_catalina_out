@@ -14,5 +14,5 @@ ${CATALINA_HOME}/logs/catalina.out
         missingok
         notifempty
         dateext
-        dateformat %Y-%m-%d.
+        dateformat .%Y-%m-%d
 }
