@@ -51,6 +51,38 @@ echo "max packet size: $lower, mtu: $((lower + 28))"
 ### git
 
    * git log --pretty="%ad [%ae] %s" --author E_MAIL_ADDRESS <br>-> git 리비전에서 지정한 커미터만 필터링해서 보기
+   * git recent <br> → 최근에 작업한 브랜치 보여주기 <br> https://news.ycombinator.com/item?id=32470619
+
+```bash
+  # Branches
+  2022-08-11 13:26:34 -0700 4 days ago    branch-1
+  2022-07-13 07:49:36 -0700 5 weeks ago   branch-10
+  2022-06-28 23:40:53 +0000 7 weeks ago   branch-8
+  2022-06-28 22:47:31 +0000 7 weeks ago   main
+  2022-06-28 19:24:10 +0000 7 weeks ago   branch-7
+  # Stashes
+  stash@{0}:Thu Aug 11 13:17:11 2022 -0700 WIP on branch-3: afa19e7444a Some changes based on morning sync
+  stash@{1}:Tue Jul 26 13:25:37 2022 -0700 WIP on branch-5: bd6122e2dfa find() bugfix
+  stash@{2}:Tue Jul 12 15:05:31 2022 -0700 WIP on branch-7: 1221d0640c5 linter
+
+
+# Code: git alias
+  recent() 
+  { 
+      echo -e "${PURPLE}# Branches${COLOR_END}";
+      for k in $(git branch | perl -pe 's/^..(.*?)( ->.*)?$/\1/');
+      do
+          echo -e $(git show --pretty=format:"%Cgreen%ci %Cblue%cr%Creset " $k -- | head -n 1)\\\t$k;
+      done | sort -r | head;
+      _num_stashes=$(git stash list | wc -l | while read l; do echo "$l - 1"; done | bc);
+      echo -e "${PURPLE}# Stashes${COLOR_END}";
+      for i in $(seq 0 ${_num_stashes});
+      do
+          echo -en "${CYAN}stash@{${i}}:${GREEN}" && git show --format="%ad%Creset %s" stash@{$i} | head -n 1;
+      done
+  }
+```
+
 
 
 ### ssh
