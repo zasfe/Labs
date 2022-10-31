@@ -49,7 +49,7 @@ function syscheck() {
 }
 
 #function mysql_processlist() {
-#        /usr/local/mariadb/bin/mysqladmin -u backup_gabia -p"gabia_qordjq^^;"  processlist >> $log_file
+#        /usr/local/mariadb/bin/mysqladmin -u backup_user -p"backup_password"  processlist >> $log_file
 #
 #}
 #
