@@ -1,7 +1,7 @@
 #!/bin/sh
 Hostname=`hostname`
 uptime=`uptime | awk -F " " 'sub(",","",$4) {print $3,$4}'`
-Ipaddr=`ip addr show |grep "inet " |awk -F" " '{print $2}' | grep -v "127.0.0.1" | paste -sd ","`
+Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $7 ")"}'`
 gatewayip=`ip route list | egrep "^default" | awk '{print$3" ("$5")"}'`
 PTotmem=`free -m | grep Mem | awk '{print $2}'`
 PUsemem=`free -m | grep Mem | awk '{print $3}'`
