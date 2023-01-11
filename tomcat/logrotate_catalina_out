@@ -10,7 +10,7 @@ ${CATALINA_HOME}/logs/catalina.out
 {
         copytruncate
         daily
-        rotate 180
+        rotate 366
         missingok
         notifempty
         dateext
