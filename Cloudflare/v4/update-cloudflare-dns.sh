@@ -40,8 +40,8 @@ if [ "${proxied}" != "false" ] && [ "${proxied}" != "true" ]; then
 fi
 
 ### Check validity of "what_ip" parameter
-if [ "${what_ip}" != "external" ] && [ "${what_ip}" != "internal" ]; then
-  echo 'Error! Incorrect "what_ip" parameter choose "external" or "internal"'
+if [ "${what_ip}" != "external" ] && [ "${what_ip}" != "internal" ] && [ "${what_ip}" != "api_awsec2" ]; then
+  echo 'Error! Incorrect "what_ip" parameter choose "external" or "internal" or "api_awsec2"'
   exit 0
 fi
 
@@ -51,9 +51,27 @@ if [ "${what_ip}" == "internal" ] && [ "${proxied}" == "true" ]; then
   exit 0
 fi
 
+### Check if set to api_ec2 and instance id
+if [ "${what_ip}" == "api_awsec2" ] && [ "${aws_instance_ids}" == "" ]; then
+  echo 'Error! Missing configuration aws ec2 Instance id'
+  exit 0
+fi
+
+
+### Get API ip from aws cli
+if [ "${what_ip}" == "api_awsec2" ]; then
+  ip=$(aws ec2 describe-instances --instance-ids ${aws_instance_ids} --query "Reservations[*].Instances[*].PublicIpAddress" | egrep -v "\[|\]" | awk -F \" '{print$2}')
+  if [ -z "$ip" ]; then
+    echo "Error! Can't get ec2 public ip from aws cli"
+    exit 0
+  fi
+  echo "==> API IP is: $ip"
+fi
+
+
 ### Get External ip from https://checkip.amazonaws.com
 if [ "${what_ip}" == "external" ]; then
-  ip=$(curl -4 -s -X GET https://checkip.amazonaws.com --max-time 10)
+  ip=$(curl --insecure -4 -s -X GET https://checkip.amazonaws.com --max-time 10)
   if [ -z "$ip" ]; then
     echo "Error! Can't get external ip from https://checkip.amazonaws.com"
     exit 0
@@ -106,7 +124,7 @@ for record in "${dns_records[@]}"; do
 
   ### Get the dns record id and current proxy status from cloudflare's api when proxied is "true"
   if [ "${proxied}" == "true" ]; then
-    dns_record_info=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$record" \
+    dns_record_info=$(curl --insecure -s -X GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$record" \
       -H "Authorization: Bearer $cloudflare_zone_api_token" \
       -H "Content-Type: application/json")
     if [[ ${dns_record_info} == *"\"success\":false"* ]]; then
@@ -127,7 +145,7 @@ for record in "${dns_records[@]}"; do
   echo "==> DNS record of ${record} is: ${dns_record_ip}. Trying to update..."
 
   ### Get the dns record information from cloudflare's api
-  cloudflare_record_info=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$record" \
+  cloudflare_record_info=$(curl --insecure -s -X GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$record" \
     -H "Authorization: Bearer $cloudflare_zone_api_token" \
     -H "Content-Type: application/json")
   if [[ ${cloudflare_record_info} == *"\"success\":false"* ]]; then
@@ -140,7 +158,7 @@ for record in "${dns_records[@]}"; do
   cloudflare_dns_record_id=$(echo ${cloudflare_record_info} | grep -o '"id":"[^"]*' | cut -d'"' -f4)
 
   ### Push new dns record information to cloudflare's api
-  update_dns_record=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$cloudflare_dns_record_id" \
+  update_dns_record=$(curl --insecure -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$cloudflare_dns_record_id" \
     -H "Authorization: Bearer $cloudflare_zone_api_token" \
     -H "Content-Type: application/json" \
     --data "{\"type\":\"A\",\"name\":\"$record\",\"content\":\"$ip\",\"ttl\":$ttl,\"proxied\":$proxied}")
@@ -160,7 +178,7 @@ for record in "${dns_records[@]}"; do
 
   if [ ${notify_me_telegram} == "yes" ]; then
     telegram_notification=$(
-      curl -s -X GET "https://api.telegram.org/bot${telegram_bot_API_Token}/sendMessage?chat_id=${telegram_chat_id}" --data-urlencode "text=${record} DNS record updated to: ${ip}"
+      curl --insecure -s -X GET "https://api.telegram.org/bot${telegram_bot_API_Token}/sendMessage?chat_id=${telegram_chat_id}" --data-urlencode "text=${record} DNS record updated to: ${ip}"
     )
     if [[ ${telegram_notification=} == *"\"ok\":false"* ]]; then
       echo ${telegram_notification=}
