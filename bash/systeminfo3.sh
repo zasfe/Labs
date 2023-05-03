@@ -243,7 +243,7 @@ elif [ "$(echo $hw_vendor| awk '{print tolower($0)}')" == "ibm" ] || [ "$(echo $
 fi
 
 echo -e "  disk_array: $(pretty_result ${raidresult}) ( app exist : $(pretty_result ${raidapp_exist}) ) ";
-if [ "${raidresult}" != "O" ]; then
+if [ "${raidresult}" == "X" ]; then
   echo -e "\033[31m${raidlog}\033[0m";
   echo -e "${raidsummary}"
 fi
@@ -301,14 +301,15 @@ else
   dbms_backup_check="X";
 fi
 
-echo -e "  dbms_backup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
+echo -e "  dbms_mysql_localbacup: $(pretty_result ${dbms_backup_check}) ( dbms exist: $(pretty_result ${dbms_exist}), cron exist: $(pretty_result ${dbms_backup_cron}) )";
+if [ "${dbms_exist}" == "0" ]; then
 echo -e "  ================================================================== ";
 echo -e "    - /etc/crontab, find mysql/backup";
 echo -e "  $(cat /etc/crontab | egrep "(mysql|backup)" 2>/dev/null )";
 echo -e "    - each user crontab, find mysql/backup";
 echo -e "  $(egrep -Ri "(mysql|backup)" /var/spool/cron/*.* 2>/dev/null )";
 echo -e "  ================================================================== ";
-
+fi
 echo "";
 
 
@@ -316,13 +317,21 @@ echo "";
 icheck=`ps aufxww | grep zagent | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   zeniuscheck="X";
+  echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
 else
   zeniuscheck="O";
+  ps aufx | egrep "zagent" | grep -v '\\' |  awk '{print$11" "$2}' | while IFS= read LINE ; do
+    zenius_bin=`echo $LINE | awk '{print$1}'`;
+    zenius_pid=`echo $LINE | awk '{print$2}'`;
+    echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
+    if [ -f "${zenius_bin}" ]; then
+      zenius_version=`${zenius_bin} -v 2>/dev/null | grep "^zagent" | awk -F'-' '{print $2}'`;
+      echo -e "    - info: $(pretty_result ${zeniuscheck}) ( ${zenius_version} , bin: ${zenius_bin} )";
+      echo -e "    - Connection Check";
+      echo -e "$(${zenius_bin} -c 2>/dev/null | grep connected )";
+    fi
+  done
 fi
-echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
-echo -e "    - Connection Check";
-
-
 
 
 ## app - netbackup
