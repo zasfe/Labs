@@ -64,6 +64,8 @@ else
     if [ -f "${apache_bin}" ]; then
       apache_version=`${apache_bin} -V 2>/dev/null | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
+      echo -e "  - Listen Port: netstat -nltp";
+      echo -e "$(netstat -nltp | grep "${apache_pid}/" 2>/dev/null )";
     fi
   done
 fi
@@ -80,9 +82,12 @@ else
   nginxcheck="O";
   ps aufx | egrep "(nginx)" | grep -v grep | grep master | while IFS= read LINE ; do
     nginx_bin=`echo $LINE | awk '{print$14}'`;
+    nginx_pid=`echo $LINE | awk '{print$2}'`;
     if [ -f "${nginx_bin}" ]; then
       nginx_version=`${nginx_bin} -V 2>&1 | grep -i "^nginx version" | awk '{print$3}'`
       echo -e "  http_nginx: $(pretty_result ${nginxcheck}) ( ver: ${nginx_version} , bin: ${nginx_bin} )";
+      echo -e "  - Listen Port: netstat -nltp";
+      echo -e "$(netstat -nltp | grep "${nginx_pid}/" 2>/dev/null )";
     fi
   done
 fi
@@ -102,11 +107,14 @@ else
     if [ -f "${java_bin}" ]; then
       tomcat_home=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.home" | awk -F\= '{print$2}'`
       tomcat_base=`echo "$line" | sed -e 's/\ /\n/g' | grep "^-Dcatalina.base" | awk -F\= '{print$2}'`
+      tomcat_pid=`echo $line | awk '{print$2}'`;
       if [ -n "${tomcat_home}" ]; then
         tomcat_version=`exec ${java_bin} -cp ${tomcat_home}/lib/catalina.jar org.apache.catalina.util.ServerInfo 2>/dev/null | grep "^Server\ version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
         echo -e "  was_tomcat: $(pretty_result ${tomcatcheck}) ( ver: ${tomcat_version} , home: ${tomcat_home}  , base: ${tomcat_base} )";
         java_version=`exec ${java_bin} -cp ${tomcat_home}/lib/catalina.jar org.apache.catalina.util.ServerInfo 2>/dev/null | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
         echo -e "  -- java: java/${java_version} ( bin: ${java_bin} )";
+        echo -e "  -- Listen Port: netstat -nltp";
+        echo -e "$(netstat -nltp | grep "${tomcat_pid}/" 2>/dev/null )";
       fi
     fi
   done
@@ -276,7 +284,7 @@ if [ "${logcheck_sec}" != "O" ]; then
 fi
 
 
-## DBMS - backup Exist
+## backup - DBMS(mysql)
 
 dbms_backup_check="-";
 dbms_backup_cron="-";
@@ -304,43 +312,6 @@ echo -e "  ================================================================== ";
 echo "";
 
 
-## Monitoring - BB
-icheck=`ps aufx | grep runbb | grep -v grep | wc -l`
-if [ $icheck -eq "0" ]; then
-  bbcheck="X";
-  bbproc="X";
-  bbname="X";
-else
-  bbexist="X";
-  if [ -f '/home/bb/bb17b4/runbb.sh' ]; then
-    bbexist="O";
-  fi
-  pcheck=0;
-  if [ -f '/home/bb/bb17b4/etc/bb-proctab' ]; then
-    pcheck=`cat /home/bb/bb17b4/etc/bb-proctab | grep -v "^#" | wc -l`
-  fi
-  if [ $pcheck -eq "0" ]; then
-    bbproc="X";
-  else
-    bbproc="O";
-  fi
-  bbname=`hostname`
-  if [ -f '/home/bb/bb17b4/etc/bbaliasname' ]; then
-    bbname=`cat /home/bb/bb17b4/etc/bbaliasname | head -n 1`
-  fi
-fi
-
-if [ "${bbexist}" == "X" ] || [ "${bbproc}" == "X" ] ; then
-  bbcheck="X";
-else
-  bbcheck="O";
-fi
-echo -e "  monitoring_bb: $(pretty_result ${bbcheck}) ( exist:$(pretty_result ${bbexist}) ,proc config: $(pretty_result ${bbproc}) , bbhostname: ${bbname} )";
-if [ "${bbcheck}" != "O" ]; then
-  echo -e "    - /home/bb/bb17b4/runbb.sh exist: $(pretty_result ${bbexist})"
-  echo -e "    - /home/bb/bb17b4/etc/bb-proctab config: $(pretty_result ${bbproc})"
-fi
-
 ## Monitoring - zenius
 icheck=`ps aufxww | grep zagent | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
@@ -349,39 +320,8 @@ else
   zeniuscheck="O";
 fi
 echo -e "  monitoring_zenius: $(pretty_result ${zeniuscheck})";
+echo -e "    - Connection Check";
 
-
-## Monitoring - consignClient
-icheck=`cat /etc/crontab | grep -i consignClient | wc -l`
-cronlog=`cat /etc/crontab | grep -i consignClient`
-if [ $icheck -eq "0" ]; then
-  consigncron="X";
-else
-  consigncron="O";
-fi
-if [ -f /home/gabia/src/consignClient ]; then
-  consignexist="O";
-else
-  consignexist="X";
-fi
-if [ "${consigncron}" == "O" ] && [ "${consignexist}" == "O" ]; then
-  consigncheck="O";
-else
-  consigncheck="X";
-  icheck=`echo ${os_release} |egrep -i "(centos|redhat)" | egrep "(4|5|6)"| wc -l`
-  osverlog="${os_release}"
-  if [ $icheck -eq "0" ]; then
-    consigncheck="-";
-  fi
-fi
-echo -e "  monitoring_consign: $(pretty_result ${consigncheck}) ( cron: $(pretty_result ${consigncron}), exist: $(pretty_result ${consignexist}) )";
-if [ "${consigncheck}" != "O" ]; then
-  echo -e "    - /etc/crontab, find consign: $(pretty_result ${consigncron})"
-  echo -e "      \033[31m${cronlog}\033[0m"
-  echo -e "    - file exist : $(pretty_result ${consignexist})"
-  echo -e "    - CentOS4/5/6 only support: \033[31m${osverlog}\033[0m"
-fi
-echo "";
 
 
 
@@ -411,18 +351,18 @@ else
 fi
 
 echo -e "  app_netbackup: $(pretty_result ${netbackupcheck}) ( app exist: $(pretty_result ${netbackup_appexist}) , policy exist : $(pretty_result ${netbackup_policyexist}) )";
-echo -e "  ================================================================== ";
-echo -e "    - path list only netbackup policy  ";
-
-if [ "${netbackup_appexist}" == "O" ]; then
-echo -e "$(find ${netbackup_path}/tir_info -type f | sed -e 's/tir_info/=/g' -e 's/\/NetBackup_file_info\./=/g' | awk -F'=' '{print$2}')";
-
-echo -e "    - Exclude path list only netbackup policy  ";
-echo -e "$(cat ${netbackup_path}/exclude* 2>/dev/null | sort | uniq)";
-
+if [ "${netbackupcheck}" == "O" ]; then
+  echo -e "  ================================================================== ";
+  echo -e "    - path list only netbackup policy  ";
+  
+  if [ "${netbackup_appexist}" == "O" ]; then
+    echo -e "$(find ${netbackup_path}/tir_info -type f | sed -e 's/tir_info/=/g' -e 's/\/NetBackup_file_info\./=/g' | awk -F'=' '{print$2}')";
+    
+    echo -e "    - Exclude path list only netbackup policy  ";
+    echo -e "$(cat ${netbackup_path}/exclude* 2>/dev/null | sort | uniq)";
+  fi
+  echo -e "  ================================================================== ";
 fi
-echo -e "  ================================================================== ";
-
 echo "";
 
 # vi all delete
