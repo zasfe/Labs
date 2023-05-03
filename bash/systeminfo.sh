@@ -50,13 +50,13 @@ echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
 ## WEB - apache
 apache_version="-";
 apache_bin="-";
-icheck=`ps aufx | egrep "(httpd|apache)" | grep -v "org.apache" | grep -v grep | wc -l`
+icheck=`ps aufx | egrep "(httpd|apache)" | grep -v "org.apache" | grep -v "rotatelogs" | grep -v grep | wc -l`
 if [ $icheck -eq "0" ]; then
   apachecheck="X";
   echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
 else
   apachecheck="O";
-  ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" |  awk '{print$11" "$2}' | while IFS= read LINE ; do
+  ps aufx | egrep "(httpd|apache)" | grep -v '\\' | grep -v "org.apache" | grep -v "rotatelogs" |  awk '{print$11" "$2}' | while IFS= read LINE ; do
     apache_bin=`echo $LINE | awk '{print$1}'`;
     apachectl_bin=`echo $LINE | awk '{print$1}' | sed -e 's/apache2/apachectl/g' -e 's/httpd/apachectl/g'`;
     apache_pid=`echo $LINE | awk '{print$2}'`;
