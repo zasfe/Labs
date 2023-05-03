@@ -65,7 +65,7 @@ else
       apache_version=`${apache_bin} -V 2>/dev/null | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
       echo -e "  - Listen Port: netstat -nltp";
-      echo -e "$(netstat -nltp | grep "${apache_pid}/" 2>/dev/null )";
+      echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid}/" | sort)";
     fi
   done
 fi
@@ -87,7 +87,7 @@ else
       nginx_version=`${nginx_bin} -V 2>&1 | grep -i "^nginx version" | awk '{print$3}'`
       echo -e "  http_nginx: $(pretty_result ${nginxcheck}) ( ver: ${nginx_version} , bin: ${nginx_bin} )";
       echo -e "  - Listen Port: netstat -nltp";
-      echo -e "$(netstat -nltp | grep "${nginx_pid}/" 2>/dev/null )";
+      echo -e "$(netstat -nltp 2>/dev/null | grep "${nginx_pid}/" | sort )";
     fi
   done
 fi
@@ -114,7 +114,7 @@ else
         java_version=`exec ${java_bin} -cp ${tomcat_home}/lib/catalina.jar org.apache.catalina.util.ServerInfo 2>/dev/null | grep "^JVM\ Version\:" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
         echo -e "  -- java: java/${java_version} ( bin: ${java_bin} )";
         echo -e "  -- Listen Port: netstat -nltp";
-        echo -e "$(netstat -nltp | grep "${tomcat_pid}/" 2>/dev/null )";
+        echo -e "$(netstat -nltp 2>/dev/null | grep "${tomcat_pid}/" | sort )";
       fi
     fi
   done
