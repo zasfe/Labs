@@ -42,8 +42,8 @@ class TestRunner {
 	@BeforeProcess
 	public static void beforeProcess() {
 		// HTTPRequestControl.setConnectionTimeout(300000)
-    // Spring boot - IOException
-    HTTPPluginControl.getConnectionDefaults().timeout = 6000
+    		// Spring boot - IOException
+    		HTTPPluginControl.getConnectionDefaults().timeout = 6000
     
 		java.lang.System.setProperty("https.protocols", "TLSv1.2")
 		java.lang.System.setProperty("jsse.enableSNIExtension", "true")
