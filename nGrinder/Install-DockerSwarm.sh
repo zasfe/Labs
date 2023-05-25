@@ -42,8 +42,12 @@ sudo apt-get -y update
 
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-
-
-
 # Docker Swarm Setting
 docker swarm init
+
+# Docker Swarm Node Add
+# docker swarm join \
+#  --token <docker-swarm-join-token> \
+#  <hostname>
+# 
+# ex) docker swarm join --token SWMTKN-1-0p6o2h2ljg6t5au37e5vs4qxe3ylswlbunbleurpyxjdn1i11w-0fzjcydog6yhjsaes6ssqizap 10.24.25.4:2377
