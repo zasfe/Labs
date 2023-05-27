@@ -2,7 +2,7 @@
 ```bash
 
 # 이전 버전 삭제하기
-sudo yum remove docker \
+sudo yum remove -y docker \
                   docker-client \
                   docker-client-latest \
                   docker-common \
