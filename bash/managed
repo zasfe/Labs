@@ -1,0 +1,5 @@
+ - Apache (/usr/local/httpd)
+    - Restart: /etc/init.d/httpd restart
+ - Tomcat (/usr/local/tomcat)
+    - Stop  : /usr/local/tomcat/bin/shutdown.sh
+    - Start : /usr/local/tomcat/bin/startup.sh
