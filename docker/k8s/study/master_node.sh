@@ -16,5 +16,11 @@ cp -if /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
 # config for kubernetes's network 
-kubectl apply -f \
-https://raw.githubusercontent.com/sysnet4admin/IaC/master/manifests/172.16_net_calico.yaml
+curl -fsSL https://raw.githubusercontent.com/sysnet4admin/IaC/master/manifests/172.16_net_calico.yaml -o 172.16_net_calico.yaml
+
+kubectl apply -f 172.16_net_calico.yaml
+
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+
+ectl apply -f 172.16_net_calico.yaml
+
