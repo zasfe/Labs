@@ -64,4 +64,4 @@ systemctl restart kubelet
 ping -c 3 127.0.0.1 >/dev/null 2>&1
 
 # reset kubernetes cluster 
-kubeadm reset
+kubeadm reset -f
