@@ -4,6 +4,13 @@ echo "####################"
 echo "master_node.sh run.."
 echo "####################"
 
+
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+systemctl restart docker
+
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+systemctl restart kubelet
+
 # init kubernetes 
 kubeadm init --token 123456.1234567890123456 --token-ttl 0 \
 --pod-network-cidr=172.16.0.0/16 --apiserver-advertise-address=192.168.1.10 \
