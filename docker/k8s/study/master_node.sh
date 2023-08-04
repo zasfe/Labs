@@ -25,9 +25,9 @@ chown $(id -u):$(id -g) $HOME/.kube/config
 # config for kubernetes's network 
 curl -fsSL https://raw.githubusercontent.com/sysnet4admin/IaC/master/manifests/172.16_net_calico.yaml -o 172.16_net_calico.yaml
 
-kubectl apply -f 172.16_net_calico.yaml
+kubectl apply -f 172.16_net_calico.yaml --v=5
 ping -c 3 127.0.0.1 >/dev/null 2>&1
 
 
-kubectl apply -f 172.16_net_calico.yaml
+kubectl apply -f 172.16_net_calico.yaml --v=5
 
