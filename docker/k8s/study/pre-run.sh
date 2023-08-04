@@ -41,6 +41,8 @@ nameserver 1.1.1.1 #cloudflare DNS
 nameserver 8.8.8.8 #Google DNS
 EOF
 
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+
 # install packages 
 yum install epel-release -y
 yum install vim-enhanced -y
@@ -49,13 +51,17 @@ yum install git -y
 # install docker 
 yum install docker -y && systemctl enable --now docker
 
+ping -c 3 127.0.0.1 >/dev/null 2>&1
 systemctl restart docker
 
 # install kubernetes cluster 
 yum install kubectl-1.18.4 kubelet-1.18.4 kubeadm-1.18.4 -y
 systemctl enable --now kubelet
 
+ping -c 3 127.0.0.1 >/dev/null 2>&1
 systemctl restart kubelet
+
+ping -c 3 127.0.0.1 >/dev/null 2>&1
 
 # reset kubernetes cluster 
 kubeadm reset
