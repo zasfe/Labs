@@ -54,6 +54,9 @@ yum install docker -y && systemctl enable --now docker
 ping -c 3 127.0.0.1 >/dev/null 2>&1
 systemctl restart docker
 
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+usermod -G docker vagrant
+
 # install kubernetes cluster 
 yum install kubectl-1.18.4 kubelet-1.18.4 kubeadm-1.18.4 -y
 systemctl enable --now kubelet
