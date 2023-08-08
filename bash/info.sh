@@ -15,18 +15,18 @@ if (("${STotmem}" > 0 ))
 then
     SMemper=`expr \( ${SUsemem} \* 100 \/ ${STotmem} \)`
 fi
-echo '                                                           '
-echo -e '\033[34m ========================================================================= \033[0m    '
-echo '                                                           '
-echo -e '\033[32m     [ $Hostname ]                       \033[0m'
-echo '                                                           '
-echo -e '\033[0m - IP Address : \033[32m $Ipaddr                 '
-echo -e '\033[0m - Gateway IP : \033[32m $gatewayip                 '
-echo -e '\033[0m - System Uptime : \033[32m $uptime              '
-echo -e '\033[0m - Phys Memory usage : \033[32m${PUsemem}M / ${PTotmem}M (\033[31m${PMemper}%\033[32m) '
-echo -e '\033[0m - Swap Memory usage : \033[32m${SUsemem}M / ${STotmem}M (\033[31m${SMemper}%\033[32m) '
-echo -e '\033[0m - File System usage (Over 70%)                  '
-echo -e '\033[31m'
+echo "                                                           "
+echo -e "\033[34m ========================================================================= \033[0m    "
+echo "                                                           "
+echo -e "\033[32m     [ $Hostname ]                       \033[0m"
+echo "                                                           "
+echo -e "\033[0m - IP Address : \033[32m $Ipaddr                 "
+echo -e "\033[0m - Gateway IP : \033[32m $gatewayip                 "
+echo -e "\033[0m - System Uptime : \033[32m $uptime              "
+echo -e "\033[0m - Phys Memory usage : \033[32m${PUsemem}M / ${PTotmem}M (\033[31m${PMemper}%\033[32m) "
+echo -e "\033[0m - Swap Memory usage : \033[32m${SUsemem}M / ${STotmem}M (\033[31m${SMemper}%\033[32m) "
+echo -e "\033[0m - File System usage (Over 70%)                  "
+echo -e "\033[31m"
 Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/:" | awk  '{print $6}'`
 if ((`echo $Fsyslist | wc -l` > 0))
 then
@@ -40,12 +40,12 @@ do
                 df -h $LIST |awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -v "Filesystem"
         fi
 done
-echo '                                                           '
-echo -e '\033[32m # Important execute command \033[0m'
-echo ''
+echo "                                                           "
+echo -e "\033[32m # Important execute command \033[0m"
+echo ""
 if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
 fi
-echo ''
-echo -e '\033[34m ========================================================================= \033[0m    '
-echo '                                                           '
+echo ""
+echo -e "\033[34m ========================================================================= \033[0m    "
+echo "                                                           "
