@@ -32,7 +32,7 @@ do
         fi
 done
 echo "                                                           "
-echo -e "\033[32m # Important excute command \033[0m"
+echo -e "\033[32m # Important execute command \033[0m"
 echo ""
 if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
