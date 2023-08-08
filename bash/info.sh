@@ -1,4 +1,6 @@
 #!/bin/sh
+LANG=C
+
 Hostname=`hostname`
 uptime=`uptime | awk -F " " 'sub(",","",$4) {print $3,$4}'`
 Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $7 ")"}'`
@@ -8,7 +10,11 @@ PUsemem=`free -m | grep Mem | awk '{print $3}'`
 PMemper=`expr \( ${PUsemem} \* 100 \/ ${PTotmem} \)`
 STotmem=`free -m | grep Swap | awk '{print $2}'`
 SUsemem=`free -m | grep Swap | awk '{print $3}'`
-SMemper=`expr \( ${SUsemem} \* 100 \/ ${STotmem} \)`
+SMemper="-"
+if (("${STotmem}" > 0 ))
+then
+    SMemper=`expr \( ${SUsemem} \* 100 \/ ${STotmem} \)`
+fi
 echo '                                                           '
 echo -e '\033[34m ========================================================================= \033[0m    '
 echo '                                                           '
