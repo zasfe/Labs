@@ -27,10 +27,10 @@ echo -e "\033[0m - Phys Memory usage : \033[32m${PUsemem}M / ${PTotmem}M (\033[3
 echo -e "\033[0m - Swap Memory usage : \033[32m${SUsemem}M / ${STotmem}M (\033[31m${SMemper}%\033[32m) "
 echo -e "\033[0m - File System usage (Over 70%)                  "
 echo -e "\033[31m"
-Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%"`
-if ((`echo $Fsyslist | wc -l` > 0))
+Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%" | wc -l`
+if (( "${Fsyslist}" > 0 ))
 then
-        df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" -e "Filesystem" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%" -e "Filesystem"
+    df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" -e "Filesystem" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%" -e "Filesystem"
 fi
 
 echo "                                                           "
