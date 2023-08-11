@@ -3,7 +3,8 @@ LANG=C
 
 Hostname=`hostname`
 uptime=`uptime | awk -F " " 'sub(",","",$4) {print $3,$4}'`
-Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $7 ")"}'`
+#Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $7 ")"}'`
+Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $NF ")"}'`
 gatewayip=`ip route list | egrep "^default" | awk '{print$3" ("$5")"}'`
 PTotmem=`free -m | grep Mem | awk '{print $2}'`
 PUsemem=`free -m | grep Mem | awk '{print $3}'`
