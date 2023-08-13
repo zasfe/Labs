@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-systemctl restart kubelet 
+kubeadm reset -f
 ping -c 3 127.0.0.1 >/dev/null 2>&1
 
 systemctl restart docker
 ping -c 3 127.0.0.1 >/dev/null 2>&1
+
+systemctl restart kubelet 
+ping -c 3 127.0.0.1 >/dev/null 2>&1
+
 
 # config for work_nodes only 
 kubeadm join --token 123456.1234567890123456 \
