@@ -12,7 +12,7 @@ sudo sh pre-run.sh
 
 ```
 curl -fsSL https://raw.githubusercontent.com/zasfe/Labs/master/docker/k8s/study/master_node.sh -o master_node.sh 
-sudo sh worker_node.sh
+sudo sh master_node.sh
 ```
 
 ## (worker node) kubelet에 연결 스크립트
