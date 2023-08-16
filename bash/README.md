@@ -1,5 +1,30 @@
 ## TIP
 
+### 완벽한 Bash 스크립트를 위해
+
+```bash
+#!/usr/bin/env bash
+
+set -o pipefail
+set -o nounset
+set -o errexit
+IFS=$'\n\t'
+
+# ...
+# Script Body
+# ...
+
+```
+
+  * set -o errexit
+    * 명령 실행 결과 오류나면 무조건 실행 종료, ''set -e'' 와 같음
+  * set -o nounset
+    * 정의되지 않은 변수 사용 불가, ''set -u''  와 같음
+  * set -o pipefail
+    * 파이프 중 오류가 1개라도 나면 오류 표시
+
+
+
 
 ### gif <-> Video
 
