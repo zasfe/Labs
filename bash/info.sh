@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 LANG=C
 
 Hostname=`hostname`
@@ -42,4 +42,4 @@ if [ -f ${HOME}/managed ]; then
 fi
 echo ""
 echo -e "\033[34m ========================================================================= \033[0m    "
-echo "                                                           "
+echo ""
