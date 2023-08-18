@@ -10,7 +10,7 @@ else
     interface=$(route get 1.1.1.1 | awk '/interface:/ { print $2 }')
     ip=$(ifconfig ${interface} | grep 'inet ' | awk '{print $2}')
 fi
-Ipaddr="${ip} ({interface})"
+Ipaddr="${ip} (${interface})"
 gatewayip=`ip route list | egrep "^default" | awk '{print$3" ("$5")"}'`
 PTotmem=`free -m | grep Mem | awk '{print $2}'`
 PUsemem=`free -m | grep Mem | awk '{print $3}'`
