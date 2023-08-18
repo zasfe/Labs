@@ -38,14 +38,13 @@ Fsyslist=`df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep 
 if (( "${Fsyslist}" > 0 ))
 then
     df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" -e "Filesystem" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%" -e "Filesystem"
+    echo ""
 fi
-
-echo "                                                           "
 echo -e "\033[32m # Important execute command \033[0m"
 echo ""
 if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
+        echo ""
 fi
-echo ""
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo ""
