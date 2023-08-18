@@ -3,8 +3,14 @@ LANG=C
 
 Hostname=`hostname`
 uptime=`uptime | awk -F " " 'sub(",","",$4) {print $3,$4}'`
-#Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $7 ")"}'`
-Ipaddr=`ip addr show | grep "inet " | grep global | awk '{print$2 " (" $NF ")"}'`
+if which ip >/dev/null; then
+    interface=$(ip route get 1.1.1.1 | awk '/dev/ { print $5 }')
+    ip=$(ip -o -4 addr show ${interface} scope global | awk '{print $4;}' | cut -d/ -f 1)
+else
+    interface=$(route get 1.1.1.1 | awk '/interface:/ { print $2 }')
+    ip=$(ifconfig ${interface} | grep 'inet ' | awk '{print $2}')
+fi
+Ipaddr="${ip} ({interface})"
 gatewayip=`ip route list | egrep "^default" | awk '{print$3" ("$5")"}'`
 PTotmem=`free -m | grep Mem | awk '{print $2}'`
 PUsemem=`free -m | grep Mem | awk '{print $3}'`
