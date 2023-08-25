@@ -83,11 +83,12 @@ else
   ps aufx | egrep "(nginx)" | grep -v grep | grep master | while IFS= read LINE ; do
     nginx_bin=`echo $LINE | awk '{print$14}'`;
     nginx_pid=`echo $LINE | awk '{print$2}'`;
+    nginx_pid_worker=`ps aufx | egrep "(nginx)" | grep -v grep | grep -A1 " ${nginx_pid} " | tail -n 1 | awk '{print$2}'`;
     if [ -f "${nginx_bin}" ]; then
       nginx_version=`${nginx_bin} -V 2>&1 | grep -i "^nginx version" | awk '{print$3}'`
       echo -e "  http_nginx: $(pretty_result ${nginxcheck}) ( ver: ${nginx_version} , bin: ${nginx_bin} )";
       echo -e "  - Listen Port: netstat -nltp";
-      echo -e "$(netstat -nltp 2>/dev/null | grep "${nginx_pid}/" | sort )";
+      echo -e "$(netstat -nltp 2>/dev/null | grep "${nginx_pid_worker}/" | sort )";
     fi
   done
 fi
