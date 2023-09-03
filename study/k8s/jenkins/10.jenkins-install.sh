@@ -4,7 +4,7 @@ jkopt2="--sessionEviction=86400"
 jvopt1="-Duser.timezone=Asia/Seoul"
 # jvopt2="-Dcasc.jenkins.config=https://raw.githubusercontent.com/sysnet4admin/_Book_k8sInfra/main/ch5/5.3.1/jenkins-config.yaml"
 # jvopt2="-Dcasc.jenkins.config=/root/_Book_k8sInfra/ch5/5.3.1/jenkins-config.yaml" # local path Not Used!
-jvopt2="-Dcasc.jenkins.config=https://raw.githubusercontent.com/zasfe/Labs/master/study/jenkins-config.yaml"
+jvopt2="-Dcasc.jenkins.config=https://raw.githubusercontent.com/zasfe/Labs/master/study/k8s/jenkins/jenkins-config.yaml"
 jvopt3="-Dhudson.model.DownloadService.noSignatureCheck=true"
 
 helm install jenkins edu/jenkins \
