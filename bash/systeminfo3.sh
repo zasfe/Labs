@@ -341,10 +341,16 @@ else
       echo -e "    - info: $(pretty_result ${zeniuscheck}) ( ${zenius_version} , bin: ${zenius_bin} )";
       echo -e "    - Connection Check";
       echo -e "$(${zenius_bin} -c 2>/dev/null | grep connected )";
+    else
+      zenius_bin=`ls -al /proc/${zenius_pid}/exe | awk '{print$11}'`;
+      zenius_version=`${zenius_bin} -v 2>/dev/null | grep "^zagent" | awk -F'-' '{print $2}'`;
+      echo -e "    - info: $(pretty_result ${zeniuscheck}) ( ${zenius_version} , bin: ${zenius_bin} )";
+      echo -e "    - Connection Check";
+      echo -e "$(${zenius_bin} -c 2>/dev/null | grep connected )";
     fi
   done
 fi
-
+echo "";
 
 ## app - netbackup
 netbackupcheck="X";
