@@ -65,10 +65,15 @@ else
       apache_version=`${apachectl_bin} -V 2>/dev/null | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
       echo -e "  - Listen Port: netstat -nltp";
-      pcheck=`netstat -nltp 2>/dev/null | grep "${apache_pid}/" | grep -v grep | wc -l`
+      pcheck=`netstat -nltp 2>/dev/null | grep "${apache_pid}/" | grep -v grep | wc -l`;
       if [ $pcheck -eq "0" ]; then
-        apache_pid2=`ps aufx | grep -v "grep" | grep -A1 " ${apache_pid} " | tail -n 1 | awk '{print$2}'`
-        echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid2}/" | sort)";
+        ps -e -o ppid,pid,cmd | grep "^${apache_pid} " | egrep "(httpd|apache)" | while IFS= read LINE2 ; do
+          apache_pid2=`echo ${LINE2} | awk '{print$2}'`;
+          apache_pid2_ports=`netstat -nltp 2>/dev/null | grep "${apache_pid2}/" | wc -l`;
+          if [ ${apache_pid2_ports} -ne "0" ]; then
+            echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid2}/" | sort)";
+          fi
+        done
       else
         echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid}/" | sort)";
       fi
