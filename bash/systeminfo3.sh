@@ -16,6 +16,26 @@ function pretty_result {
   return;
 }
 
+function  check_private_ip {
+  local ip="$1"
+  local IFS="."
+
+  # IP 주소를 "."를 구분자로 분리하여 배열에 저장
+  read -ra ip_parts <<< "$ip"
+
+  # IP 주소의 첫 번째 부분 확인
+  if [[ "${ip_parts[0]}" == "10" ]]; then
+    echo 0;
+  elif [[ "${ip_parts[0]}" == "172" && "${ip_parts[1]}" -ge 16 && "${ip_parts[1]}" -le 31 ]]; then
+    echo 0;
+  elif [[ "${ip_parts[0]}" == "192" && "${ip_parts[1]}" == "168" ]]; then
+    echo 0;
+  else
+    echo 1;
+  fi
+}
+
+
 echo ""
 # system status
 ## Os - info
@@ -194,7 +214,11 @@ ip_gateway=`ip r | grep "^default" | cut -d' ' -f3 | head -n 1`
 icheck=`arp -an | grep "(${ip_gateway})" | grep PERM | wc -l`
 arplog=`arp -an | grep "(${ip_gateway})"`
 if [ $icheck -eq "0" ]; then
-  arpcheck="X";
+  if [ "$(check_private_ip ${ip_gateway})" -eq "0" ]; then
+    arpcheck="-";
+  else
+    arpcheck="X";
+  fi
 else
   arpcheck="O";
 fi
