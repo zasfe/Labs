@@ -2,6 +2,10 @@
 
 # sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -"
 # curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -
+
+# TODO: add php(apache module, php-fpm)
+# 
+
 LANG=C
 
 
