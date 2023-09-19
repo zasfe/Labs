@@ -62,10 +62,16 @@ else
     apache_pid=`echo $LINE | awk '{print$2}'`;
   
     if [ -f "${apache_bin}" ]; then
-      apache_version=`${apache_bin} -V 2>/dev/null | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
+      apache_version=`${apachectl_bin} -V 2>/dev/null | grep "^Server\ version" | awk -F':' '{gsub(/^[ \t]+/, "", $2); print $2}'`;
       echo -e "  http_apache: $(pretty_result ${apachecheck}) ( ver: ${apache_version} , bin: ${apache_bin} )";
       echo -e "  - Listen Port: netstat -nltp";
-      echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid}/" | sort)";
+      pcheck=`netstat -nltp 2>/dev/null | grep "${apache_pid}/" | grep -v grep | wc -l`
+      if [ $pcheck -eq "0" ]; then
+        apache_pid2=`ps aufx | grep -v "grep" | grep -A1 " ${apache_pid} " | tail -n 1 | awk '{print$2}'`
+        echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid2}/" | sort)";
+      else
+        echo -e "$(netstat -nltp 2>/dev/null | grep "${apache_pid}/" | sort)";
+      fi
     fi
   done
 fi
@@ -92,6 +98,9 @@ else
     fi
   done
 fi
+
+
+
 
 
 ## WAS - tomcat
