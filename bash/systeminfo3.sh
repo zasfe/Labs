@@ -44,7 +44,7 @@ fi
 
 os_arch=`arch`
 echo -e "  os: \033[32m${os_release} (${os_arch})\033[0m";
-
+echo "";
 
 
 ## WEB - apache
