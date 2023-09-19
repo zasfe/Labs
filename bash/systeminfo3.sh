@@ -75,6 +75,7 @@ else
     fi
   done
 fi
+echo "";
 
 ## WEB - nginx
 nginxcheck="-";
@@ -98,7 +99,7 @@ else
     fi
   done
 fi
-
+echo "";
 
 
 
@@ -129,7 +130,7 @@ else
     fi
   done
 fi
-
+echo "";
 
 ## DBMS - general
 dbms_exist="X";
@@ -159,7 +160,7 @@ else
 #    echo -e "  dbms_mysql: $(pretty_result ${mysqlcheck}) ( ver: ${mysql_version} , bin: ${mysql_bin} )";
 #  done
 fi
-
+echo "";
 
 ## DBMS - oracle
 oracle_version="-";
@@ -181,7 +182,7 @@ else
     echo -e "  dbms_oracle: $(pretty_result ${oraclecheck}) ( ver: oracle/${oracle_version} , home: ${oracle_home} )";
   done
 fi
-
+echo "";
 
 ## config - arp
 ip_gateway=`ip r | grep "^default" | cut -d' ' -f3 | head -n 1`
@@ -196,6 +197,7 @@ echo -e "  cfg_arpstatic: $(pretty_result ${arpcheck}) ( gateway ip: ${ip_gatewa
 if [ "${arpcheck}" == "X" ]; then
   echo -e "    - \033[31m${arplog}\033[0m"
 fi
+echo "";
 
 ## Hardware - partition
 icheck=`df -lh | awk '0+$5 >= 70 {print}' | wc -l`
@@ -206,9 +208,9 @@ else
 fi
 echo -e "  disk freesize: $(pretty_result ${diskcheck}) ( over 70% )";
 if [ "${diskcheck}" != "O" ]; then
-  echo -e "  \033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
+  echo -e "\033[31m$(df -lh | awk '0+$5 >= 70 {print}') \033[0m"
 fi
-
+echo "";
 
 ## Hardware - array
 raidapp_exist="-";
@@ -257,7 +259,7 @@ if [ "${raidresult}" == "X" ]; then
   echo -e "\033[31m${raidlog}\033[0m";
   echo -e "${raidsummary}"
 fi
-
+echo "";
 
 ## Log - message
 logcheck_message="-";
@@ -292,7 +294,7 @@ echo -e "  log_secure: $(pretty_result ${logcheck_sec}) ( find fail/error, file:
 if [ "${logcheck_sec}" != "O" ]; then
   echo -e "  \033[31m${log_info} \033[0m";
 fi
-
+echo "";
 
 ## backup - DBMS(mysql)
 
