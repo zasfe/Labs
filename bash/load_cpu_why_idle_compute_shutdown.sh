@@ -8,3 +8,19 @@
 sudo stress --cpu 1 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' < /proc/meminfo)k --timeout 500
 
 
+# CentOS
+# wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/load_cpu_why_idle_compute_shutdown.sh
+# chmod +x ./load_cpu_why_idle_compute_shutdown.sh
+# echo "" >> /etc/crontab
+# echo "# Load" >> /etc/crontab
+# echo "0 5 * * * * opc /home/opc/load_cpu_why_idle_compute_shutdown.sh" >> /etc/crontab
+# sudo systemctl restart crond
+
+# Ubuntu
+# wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/load_cpu_why_idle_compute_shutdown.sh
+# chmod +x ./load_cpu_why_idle_compute_shutdown.sh
+# echo "" >> /etc/crontab
+# echo "# Load" >> /etc/crontab
+# echo "0 5 * * * * ubuntu /home/ubuntu/load_cpu_why_idle_compute_shutdown.sh" >> /etc/crontab
+# sudo systemctl restart cron
+
