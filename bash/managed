@@ -3,3 +3,5 @@
  - Tomcat (/usr/local/tomcat)
     - Stop  : /usr/local/tomcat/bin/shutdown.sh
     - Start : /usr/local/tomcat/bin/startup.sh
+ - PortCheck
+    ./serviceport_check.sh
