@@ -46,5 +46,11 @@ if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
         echo ""
 fi
+if [ -f ${HOME}/serviceport_check.sh ]; then
+        echo -e "\033[32m # Service Port Check... \033[0m"
+        ${HOME}/serviceport_check.sh
+        echo ""
+fi
+
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo ""
