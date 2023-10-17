@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-
-set -o pipefail
-set -o nounset
-set -o errexit
-
 LANG=C
 
 function pretty_result {
@@ -31,8 +26,8 @@ function portcheck_result {
   return;
 }
 
-server1_ip_private=8.8.8.8
-server1_port=53
+server1_ip_private=127.0.0.1
+server1_port=80
 server1_label="WEB - http"
 server1_result="$(portcheck_result ${server1_ip_private} ${server1_port})"
 server2_ip_private=127.0.0.1
@@ -49,15 +44,15 @@ echo ""
 echo " =========================================================================  "
 if ! [[ "${server1_ip_private}" == "" || "${server1_port}" == "" ]]; then
   echo -e "\033[32m  # ${server1_label} \033[0m "
-  echo -e " ${server1_ip_private}:${server1_port}/tcp : $(pretty_result ${server1_ip_private} ${server1_port}"
+  echo "  ${server1_ip_private}:${server1_port}/tcp : $(pretty_result ${server1_ip_private} ${server1_port})"
+  netstat -nltp | grep ":22 " | grep LISTEN
 fi
 if ! [[ "${server2_ip_private}" == "" || "${server2_port}" == "" ]]; then
   echo -e "\033[32m  # ${server2_label} \033[0m "
-  echo -e " ${server2_ip_private}:${server2_port}/tcp : $(pretty_result ${server2_ip_private} ${server2_port}"
+  echo "  ${server2_ip_private}:${server2_port}/tcp : $(pretty_result ${server2_ip_private} ${server2_port})"
 fi
 if ! [[ "${server3_ip_private}" == "" || "${server3_port}" == "" ]]; then
   echo -e "\033[32m  # ${server3_label} \033[0m "
-  echo -e " ${server3_ip_private}:${server3_port}/tcp : $(pretty_result ${server3_ip_private} ${server3_port}"
+  echo "  ${server3_ip_private}:${server3_port}/tcp : $(pretty_result ${server3_ip_private} ${server3_port})"
 fi
-echo " =========================================================================  "
-
+echo " ========================================================================= "
