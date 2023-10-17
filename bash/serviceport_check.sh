@@ -9,50 +9,29 @@ function pretty_result {
   else
     echo -e "\033[33m-\033[0m";
   fi
-  return;
 }
 
 function portcheck_result {
-  if which nc >/dev/null; then
-    nc -z -w 1 $1 $2
-    if [ $? -eq 0 ]; then
-      echo "O";
-    else
-      echo "X";
-    fi
+  nc -z -w 1 $1 $2
+  if [ $? -eq 0 ]; then
+    echo "O";
   else
-    echo "-";
+    echo "X";
   fi
-  return;
 }
 
-server1_ip_private=127.0.0.1
-server1_port=80
-server1_label="WEB - http"
-server1_result="$(portcheck_result ${server1_ip_private} ${server1_port})"
-server2_ip_private=127.0.0.1
-server2_port=8009
-server2_label="WAS - tomcat"
-server2_result="$(portcheck_result ${server2_ip_private} ${server2_port})"
-server3_ip_private=127.0.0.1
-server3_port=5444
-server3_label="DB - postgresql"
-server3_result="$(portcheck_result ${server3_ip_private} ${server3_port})"
-
+function print_portcheck {
+  if ! [[ "$1" == "" || "$2" == "" ]]; then
+    echo -e "\033[32m  # $3 \033[0m "
+    echo "  $1:$2/tcp : $(pretty_result $(portcheck_result $1 $2))"
+  fi
+}
 
 echo ""
 echo " =========================================================================  "
-if ! [[ "${server1_ip_private}" == "" || "${server1_port}" == "" ]]; then
-  echo -e "\033[32m  # ${server1_label} \033[0m "
-  echo "  ${server1_ip_private}:${server1_port}/tcp : $(pretty_result ${server1_ip_private} ${server1_port})"
-  netstat -nltp | grep ":22 " | grep LISTEN
-fi
-if ! [[ "${server2_ip_private}" == "" || "${server2_port}" == "" ]]; then
-  echo -e "\033[32m  # ${server2_label} \033[0m "
-  echo "  ${server2_ip_private}:${server2_port}/tcp : $(pretty_result ${server2_ip_private} ${server2_port})"
-fi
-if ! [[ "${server3_ip_private}" == "" || "${server3_port}" == "" ]]; then
-  echo -e "\033[32m  # ${server3_label} \033[0m "
-  echo "  ${server3_ip_private}:${server3_port}/tcp : $(pretty_result ${server3_ip_private} ${server3_port})"
-fi
+echo " $(print_portcheck 127.0.0.1 80 'WEB - httpd')"
+echo " $(print_portcheck 127.0.0.1 8009 'WAS - tomcat(ajp)')"
+echo " $(print_portcheck 127.0.0.1 3306 'DB - mysql')"
+echo " $(print_portcheck 127.0.0.1 5444 'DB - postgresql')"
 echo " ========================================================================= "
+echo ""
