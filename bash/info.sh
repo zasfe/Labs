@@ -46,5 +46,8 @@ if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
         echo ""
 fi
+if [ -f ${HOME}/service_check.sh ]; then
+        /bin/bash ${HOME}/service_check.sh
+fi
 echo -e "\033[34m ========================================================================= \033[0m    "
 echo ""
