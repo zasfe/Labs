@@ -12,7 +12,7 @@ function pretty_result {
 }
 
 function portcheck_result {
-  nc -z -w 1 $1 $2
+  tcping -t 1 $1 $2 >null
   if [ $? -eq 0 ]; then
     echo "O";
   else
@@ -33,5 +33,6 @@ echo " $(print_portcheck 127.0.0.1 80 'WEB - httpd')"
 echo " $(print_portcheck 127.0.0.1 8009 'WAS - tomcat(ajp)')"
 echo " $(print_portcheck 127.0.0.1 3306 'DB - mysql')"
 echo " $(print_portcheck 127.0.0.1 5444 'DB - postgresql')"
+echo " $(print_portcheck 127.0.0.1 6443 'master-api - k8s')"
 echo " ========================================================================= "
 echo ""
