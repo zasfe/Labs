@@ -27,12 +27,10 @@ function print_portcheck {
   fi
 }
 
-echo ""
-echo " =========================================================================  "
+echo " ------- [ Service Check ] ----------------------------------------------  "
 echo " $(print_portcheck 127.0.0.1 80 'WEB - httpd')"
 echo " $(print_portcheck 127.0.0.1 8009 'WAS - tomcat(ajp)')"
 echo " $(print_portcheck 127.0.0.1 3306 'DB - mysql')"
 echo " $(print_portcheck 127.0.0.1 5444 'DB - postgresql')"
 echo " $(print_portcheck 127.0.0.1 6443 'master-api - k8s')"
-echo " ========================================================================= "
-echo ""
+echo " ------------------------------------------------------------------------- "
