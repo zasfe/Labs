@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 LANG=C
 
+# yum install nc
+# apt-get install netcat
+
 function pretty_result {
   if [ "$1" == "O" ]; then
     echo -e "\033[32mOK..\033[0m";
@@ -12,7 +15,7 @@ function pretty_result {
 }
 
 function portcheck_result {
-  tcping -t 1 $1 $2 >null
+  nc -zv $1 $2 1>/dev/null 2>&
   if [ $? -eq 0 ]; then
     echo "O";
   else
