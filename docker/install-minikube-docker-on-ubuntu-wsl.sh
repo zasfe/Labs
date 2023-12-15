@@ -30,7 +30,7 @@ curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-
 sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
 # Add User
-sudo useradd -m zasfe
+sudo useradd --create-home --shell /bin/bash zasfe 
 echo "zasfe:P@ssw0rd" | sudo chpasswd
 
 sudo chmod u+w /etc/sudoers.d
@@ -45,3 +45,5 @@ echo \
 # Start minikube
 su - zasfe -c "minikube config set driver docker"
 su - zasfe -c "minikube start --driver=docker"
+su - zasfe -c "minikube addons enable metrics-server"
+
