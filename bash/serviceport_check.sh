@@ -15,7 +15,7 @@ function pretty_result {
 }
 
 function portcheck_result {
-  nc -zv $1 $2 1>/dev/null 2>&
+  nc -zv $1 $2 >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "O";
   else
