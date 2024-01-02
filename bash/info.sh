@@ -46,7 +46,7 @@ if [ -f ${HOME}/managed ]; then
         cat ${HOME}/managed
         echo ""
 fi
-if [ -f ${HOME}/serviceport_check.sh ]; then
+if [ -f ${HOME}/serviceport_check.sh ] && [ -x ${HOME}/serviceport_check.sh ]; then
         /bin/bash ${HOME}/serviceport_check.sh
 fi
 echo -e "\033[34m ========================================================================= \033[0m    "
