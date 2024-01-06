@@ -1,0 +1,10 @@
+/usr/local/apache/logs/*_log { 
+weekly
+rotate 4 
+ifempty
+create
+missingok
+postrotate
+/bin/kill -HUP `cat /usr/local/apache/logs/httpd.pid 2> /dev/null` 2> /dev/null || true
+endscript
+} 
