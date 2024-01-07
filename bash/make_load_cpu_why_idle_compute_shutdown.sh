@@ -9,8 +9,8 @@ sudo stress --cpu 1 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' 
 
 
 # CentOS
-# yum -y install epel-release; 
-# yum -y install stress;
+# sudo yum -y install epel-release; 
+# sudo yum -y install stress;
 # wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/load_cpu_why_idle_compute_shutdown.sh
 # chmod +x ./load_cpu_why_idle_compute_shutdown.sh
 # echo "" >> /etc/crontab
@@ -19,7 +19,7 @@ sudo stress --cpu 1 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0.9;}' 
 # sudo systemctl restart crond
 
 # Ubuntu
-# apt-get install -y stress
+# sudo apt-get install -y stress
 # wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/load_cpu_why_idle_compute_shutdown.sh
 # chmod +x ./load_cpu_why_idle_compute_shutdown.sh
 # echo "" >> /etc/crontab
