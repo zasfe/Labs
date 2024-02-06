@@ -14,6 +14,10 @@ docker run -d --restart=unless-stopped -v ~/ngrinder-controller:/opt/ngrinder-co
 docker service rm agent
 docker service create --name agent --network ngrinder-nw --replicas 4 ngrinder/agent 
 
+# ngrinter manager node drain
+# docker node update --availability drain NODENAME
+
+
 # docker service scale agent=12
 
 
