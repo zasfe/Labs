@@ -12,8 +12,8 @@ LANG=C
 # Apache Log File
 file_apachelog="/usr/local/apache/logs/access_log"
 
-if [ -n $1 ]; then
-    if [ -f $1 ]; then
+if [ -n "$1" ]; then
+    if [ -f "$1" ]; then
         file_apachelog=$1
         echo "";
         echo -e "\033[34m # Log file: ${file_apachelog} \033[0m";
