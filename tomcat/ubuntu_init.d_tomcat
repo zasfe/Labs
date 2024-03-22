@@ -1,0 +1,30 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:    tomcat
+# Required-Start:  $remote_fs $syslog
+# Required-Stop:   $remote_fs $syslog
+# Default-Start:   2 3 4 5
+# Default-Stop:    0 1 6
+# Short-Description: auto start Tomcat server
+# Description: start web server
+### END INIT INFO
+
+case $1 in
+start)
+sh /톰캣위치/bin/startup.sh
+;;
+stop)
+sh /톰캣위치/bin/shutdown.sh
+;;
+restart)
+sh /톰캣위치/bin/shutdown.sh
+sleep 2
+sh /톰캣위치/bin/startup.sh
+;;
+esac
+exit 0
+
+# sudo chmod 755 /etc/init.d/tomcat
+# sudo update-rc.d tomcat defaults
+# service tomcat {start, stop, staus}
