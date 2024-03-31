@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 LANG=C
 
-# yum install nc
-# apt-get install netcat
+# yum install curl
+# apt-get install curl
 
 function pretty_result {
   if [ "$1" == "O" ]; then
@@ -15,7 +15,7 @@ function pretty_result {
 }
 
 function portcheck_result {
-  nc -zv $1 $2 >/dev/null 2>&1
+  curl --connect-timeout 2 -s -o /dev/null "http://$1:$2" >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo "O";
   else
