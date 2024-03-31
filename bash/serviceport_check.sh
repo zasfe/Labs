@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 LANG=C
 
-# yum install curl
-# apt-get install curl
-
 function pretty_result {
   if [ "$1" == "O" ]; then
     echo -e "\033[32mOK..\033[0m";
@@ -15,13 +12,20 @@ function pretty_result {
 }
 
 function portcheck_result {
-  curl --connect-timeout 2 -s -o /dev/null "http://$1:$2" >/dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    echo "O";
+  if which curl >/dev/null; then
+    curl --connect-timeout 2 -s -o /dev/null "http://$1:$2" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "O";
+    else
+      echo "X";
+    fi
   else
-    echo "X";
+    echo "Error! Can't Find curl command"
+    echo " - yum install curl"
+    echo " - apt-get install curl"
+    exit 0
   fi
-}
+ }
 
 function print_portcheck {
   if ! [[ "$1" == "" || "$2" == "" ]]; then
