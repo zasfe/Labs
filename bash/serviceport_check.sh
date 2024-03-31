@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 LANG=C
 
+###  Create .serviceport_check.log file of the last run for debug
+parent_path="$(dirname "${BASH_SOURCE[0]}")"
+FILE=${parent_path}/serviceport_check.log
+if ! [ -x "$FILE" ]; then
+  touch "$FILE"
+fi
+
+LOG_FILE=${parent_path}'/serviceport_check.log'
+
+### Write last run of STDOUT & STDERR as log file and prints to screen
+exec > >(tee $LOG_FILE) 2>&1
+echo "==> $(date "+%Y-%m-%d %H:%M:%S")"
+
+
 function pretty_result {
   if [ "$1" == "O" ]; then
     echo -e "\033[32mOK..\033[0m";
