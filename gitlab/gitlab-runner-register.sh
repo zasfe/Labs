@@ -1,4 +1,5 @@
 #!/bin/sh
+# https://gist.github.com/benoitpetit/cbe19cdd369ec8c1e0defd245d91751f
 ###################################################################
 # Récuperer le token d'enregistrement du runner via ce lien:
 # http://localhost:8080/root/${project}/settings/ci_cd
