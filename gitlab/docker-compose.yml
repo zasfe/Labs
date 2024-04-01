@@ -1,0 +1,43 @@
+version: '4.5'
+services:
+
+# https://gist.github.com/benoitpetit/cbe19cdd369ec8c1e0defd245d91751f
+
+  # GITLAB
+  gitlab-web:
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    container_name: gitlab-web
+    hostname: '192.168.0.14'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://192.168.0.14'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2222:22"
+    volumes:
+      - './gitlab/config:/etc/gitlab'
+      - './gitlab/logs:/var/log/gitlab'
+      - './gitlab/data:/var/opt/gitlab'
+    networks:
+      - gitlab-network
+
+  # RUNNER
+  gitlab-runner1:
+    image: gitlab/gitlab-runner:alpine
+    restart: always
+    container_name: gitlab-runner1
+    hostname: gitlab-runner1
+    depends_on:
+      - gitlab-web
+    volumes:
+     - ./config/gitlab-runner:/etc/gitlab-runner
+     - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+        - gitlab-network
+
+networks:
+  gitlab-network:
+    name: gitlab-network
