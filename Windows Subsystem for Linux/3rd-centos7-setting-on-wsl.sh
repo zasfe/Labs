@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 LANG=C
 
-# sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -"
-# curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -
+# sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/Windows%20Subsystem%20for%20Linux/3rd-centos7-setting-on-wsl.sh | bash -"
+# curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/Windows%20Subsystem%20for%20Linux/3rd-centos7-setting-on-wsl.sh | bash -
 
 docker rm -f ws01 ws02 db01
 
