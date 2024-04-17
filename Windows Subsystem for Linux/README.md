@@ -20,7 +20,7 @@ REM wsl2 업데이트
 wsl --update
 ```
   * wsl2 수동 업데이트
-    * x64 머신용 최신 WSL2 Linux 커널 업데이트 패키지[다운로드](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi)
+    * x64 머신용 최신 WSL2 Linux 커널 업데이트 패키지 [(다운로드)](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi)
 
 ```batch
 REM wsl 기본 버전 변경
@@ -42,7 +42,7 @@ wsl --install -d Ubuntu
 ## 3. WSL 사용 
 ### 1) 도커 설치 - Docker Desktop 없이 (WSL OS에서 실행)
 
-  * 참고 : WSL에서 ML용 GPU 가속 시작[learn.microsoft.com](https://learn.microsoft.com/ko-kr/windows/wsl/tutorials/gpu-compute)
+  * 참고 : WSL에서 ML용 GPU 가속 시작 [(learn.microsoft.com)](https://learn.microsoft.com/ko-kr/windows/wsl/tutorials/gpu-compute)
 
 ```batch
 curl https://get.docker.com | sh
@@ -51,6 +51,6 @@ sudo service docker start
 
 ### 2) 도커 설치 - Docker Desktop (Host PC)
 
-  * Docker Desktop 설치[learn.microsoft.com](https://learn.microsoft.com/ko-kr/windows/wsl/tutorials/wsl-containers#install-docker-desktop)
+  * Docker Desktop 설치 [(learn.microsoft.com)](https://learn.microsoft.com/ko-kr/windows/wsl/tutorials/wsl-containers#install-docker-desktop)
 
 
