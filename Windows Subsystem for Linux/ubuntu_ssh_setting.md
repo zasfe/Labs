@@ -3,13 +3,13 @@
 
 ## 1. WSL 설치(리부팅 필요) (Host PC)
 
-`
+```batch
 REM Microsoft-Windows-Subsystem-Linux 기능을 활성화
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 
 REM VirtualMachinePlatform 기능을 활성화
-dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart`
-
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+```
 
 ## 2. Microsoft Store에서 Ubuntu App 설치 (Host PC)
 
