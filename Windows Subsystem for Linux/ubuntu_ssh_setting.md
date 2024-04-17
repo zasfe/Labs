@@ -78,7 +78,7 @@ SCHTASKS /Create /SC ONSTART /TN WSL_Ubuntu_sshd_restart /TR "%~dpnx0" /RU "" /F
 
 ## 참고
 
-* [nstall Linux on Windows with WSL](https://docs.microsoft.com/en-us/windows/wsl/install)
+* [install Linux on Windows with WSL](https://docs.microsoft.com/en-us/windows/wsl/install)
 
 
 
