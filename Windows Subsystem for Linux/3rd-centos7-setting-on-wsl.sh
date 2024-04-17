@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 LANG=C
 
+# sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -"
+# curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -
+
 docker rm -f ws01 ws02 db01
 
 docker run -d --privileged --name ws01 centos:centos7 /usr/sbin/init
