@@ -19,6 +19,6 @@ EOF
 docker cp ./centos7_vagrant test01:/root/centos7_vagrant.sh
 docker exec -u 0 test01 /bin/bash /root/centos7_vagrant.sh
 
-
+echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" test01` test01.fale.io test01" | sudo tee -a /etc/hosts
 sshpass -p vagrant ssh-copy-id -f -i ~/.ssh/id_rsa vagrant@`docker inspect -f "{{ .NetworkSettings.IPAddress }}" test01`
-echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" test01` test01.fale.io" | sudo tee -a /etc/hosts
+
