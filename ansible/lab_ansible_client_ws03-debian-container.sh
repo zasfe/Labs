@@ -28,7 +28,7 @@ EOF
 docker cp ./debian_vagrant ws03:/root/debian_vagrant.sh
 docker exec -u 0 ws03 /bin/bash /root/debian_vagrant.sh
 
-echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" ws03` ws03.fale.io" | sudo tee -a /etc/hosts
+echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" ws03` ws03.fale.io ws03" | sudo tee -a /etc/hosts
 
 if ! grep -i -q ws03.fale.io "hosts"; then
   sed -i 's/ws02.fale.io/ws02.fale.io\nws03.fale.io/' hosts
