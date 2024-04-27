@@ -31,6 +31,10 @@ docker exec -u 0 ws02 /bin/bash /root/centos7_vagrant.sh
 docker cp ./centos7_vagrant db01:/root/centos7_vagrant.sh
 docker exec -u 0 db01 /bin/bash /root/centos7_vagrant.sh
 
+echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" ws01` ws01.fale.io ws01" | sudo tee -a /etc/hosts
+echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" ws02` ws02.fale.io ws02" | sudo tee -a /etc/hosts
+echo "`docker inspect -f "{{ .NetworkSettings.IPAddress }}" db01` db01.fale.io db01" | sudo tee -a /etc/hosts
+
 sshpass -p vagrant ssh-copy-id -f -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no vagrant@ws01.fale.io
 sshpass -p vagrant ssh-copy-id -f -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no vagrant@ws02.fale.io
 sshpass -p vagrant ssh-copy-id -f -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no vagrant@db01.fale.io
