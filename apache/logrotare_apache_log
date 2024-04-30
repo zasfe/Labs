@@ -1,6 +1,6 @@
 /usr/local/apache/logs/*_log { 
-weekly
-rotate 4 
+daily
+rotate 366 
 ifempty
 create
 missingok
