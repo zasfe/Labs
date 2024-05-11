@@ -34,10 +34,13 @@ function portcheck_result {
       echo "X";
     fi
   else
-    echo "Error! Can't Find curl command"
-    echo " - yum install curl"
-    echo " - apt-get install curl"
-    exit 0
+    timeout 0.5 bash -c "cat < /dev/null >/dev/tcp/$1/$2" >/dev/null 2>&1
+#    echo "Error! Can't Find curl command"
+    if [ $? -eq 0 ]; then
+      echo "O";
+    else
+      echo "X";
+    fi
   fi
  }
 
