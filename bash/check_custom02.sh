@@ -22,9 +22,9 @@ function syscheck() {
         uptime >> $log_file
 #       top -c >> $log_file
 #      pstree |grep mysqld >> $log_file
-       echo "==== pstree ====" >> $log_file
-        pstree |grep httpd >> $log_file
-#        ps awwux >> $log_file
+       echo "==== ps ====" >> $log_file
+#        pstree |grep httpd >> $log_file
+       ps aufxww >> $log_file
        echo "==== free -m ====" >> $log_file
         free -m >> $log_file
 
