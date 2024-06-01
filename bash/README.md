@@ -124,3 +124,17 @@ echo "max packet size: $lower, mtu: $((lower + 28))"
 
 ```
 
+### nfs v4.1 마운트 방법
+
+최상의 성능을 위해서는 NFS 프로토콜 버전 4.1을 통해 스토리지를 탑재해야 합니다. Ubuntu에 대한 다음 bash 예제에서는 옵션을 구성하는 vers 방법을 보여줍니다.
+https://learn.microsoft.com/ko-kr/azure/architecture/example-scenario/infrastructure/wordpress-iaas
+
+```
+# Install an NFS driver and create a directory.
+$ apt-get install -y nfs-common && mkdir -p /var/www/html
+# Add auto-mount on startup. (Replace the following code with
+# instructions from the Azure portal, but change the vers value to 4.1.)
+$ echo '<netapp_private_ip>:/<volume_name> /var/www/html nfs rw,hard,rsize=262144,wsize=262144,sec=sys,vers=4.1,tcp 0 0' >> /etc/fstab
+# Mount the storage.
+$ mount -a
+```
