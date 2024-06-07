@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+## RESULT EXAMPLE
+# # WEB - httpd
+# 127.0.0.1:80/tcp : OK..
+# 127.0.0.1:8080/tcp : Fail..
+
 LANG=C
 
 ###  Create .serviceport_check.log file of the last run for debug
@@ -58,3 +64,5 @@ echo " $(print_portcheck 127.0.0.1 3306 'DB - mysql')"
 echo " $(print_portcheck 127.0.0.1 5444 'DB - postgresql')"
 echo " $(print_portcheck 127.0.0.1 6443 'master-api - k8s')"
 echo " ------------------------------------------------------------------------- "
+
+
