@@ -13,10 +13,10 @@ sudo nohup stress --cpu 2 --vm-bytes $(awk '/MemAvailable/{printf "%d\n", $2 * 0
 # sudo yum -y install epel-release; 
 # sudo yum -y install stress;
 # wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/make_load_cpu_why_idle_compute_shutdown.sh
-# chmod +x ./load_cpu_why_idle_compute_shutdown.sh
+# chmod +x ./make_load_cpu_why_idle_compute_shutdown.sh
 
 # [ Ubuntu ]
 # sudo apt-get install -y stress
 # wget https://raw.githubusercontent.com/zasfe/Labs/master/bash/make_load_cpu_why_idle_compute_shutdown.sh
-# chmod +x ./load_cpu_why_idle_compute_shutdown.sh
+# chmod +x ./make_load_cpu_why_idle_compute_shutdown.sh
 
