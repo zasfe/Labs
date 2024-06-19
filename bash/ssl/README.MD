@@ -7,6 +7,7 @@ testssl.sh
 ```
 wget https://github.com/drwetter/testssl.sh/blob/3.2/testssl.sh
 chmod +x testssl.sh
+
 ./testssl.sh www.google.com:443
 ```
 
