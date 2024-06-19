@@ -4,6 +4,13 @@ openssl tls cipher suites check
 testssl.sh
 -----------
 
+```
+wget https://github.com/drwetter/testssl.sh/blob/3.2/testssl.sh
+chmod +x testssl.sh
+./testssl.sh www.google.com:443
+```
+
+Docker:
 
 ```
 $docker run --rm -ti  drwetter/testssl.sh <your_cmd_line>
