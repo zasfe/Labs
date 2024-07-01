@@ -17,6 +17,7 @@ Examples:
 ```
 call screenCapture notepad.jpg "Notepad"
 call screenCapture screen.png
+screenCapture.bat screen_rdp.png "zasfe.com: 원격 데스크톱 연결"
 ```
 
 Original
