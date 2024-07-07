@@ -19,5 +19,6 @@ Labs
 * nighthawk - L7 (HTTP/HTTPS/HTTP2/HTTP3) performance characterization tool, https://github.com/envoyproxy/nighthawk
   * 리포팅: https://github.com/fortio/fortio#report-only-ui
 * fortio - 작고 빠른 go기반 부하 테스트 도구 - https://github.com/fortio/fortio
-
-
+* k6 - 개발자를 위한 오픈 소스 부하 테스트 도구
+  * https://k6.io/open-source/
+  * s
