@@ -1,10 +1,10 @@
 /usr/local/apache/logs/*_log { 
-daily
-rotate 366 
-ifempty
-create
-missingok
-postrotate
-/bin/kill -HUP `cat /usr/local/apache/logs/httpd.pid 2> /dev/null` 2> /dev/null || true
-endscript
+  daily
+  rotate 366 
+  ifempty
+  create
+  missingok
+  postrotate
+  /bin/kill -HUP `cat /usr/local/apache/logs/httpd.pid 2> /dev/null` 2> /dev/null || true
+  endscript
 } 
