@@ -21,4 +21,7 @@ Labs
 * fortio - 작고 빠른 go기반 부하 테스트 도구 - https://github.com/fortio/fortio
 * k6 - 개발자를 위한 오픈 소스 부하 테스트 도구
   * https://k6.io/open-source/
-  * s
+  * ![k6](./grafana_k6/example_grafana_k6_run.gif)
+
+
+
