@@ -30,7 +30,8 @@ SSLHonorCipherOrder     off
     Header always set Strict-Transport-Security "max-age=63072000"
 
     ErrorLog logs/ssl_error_log
-    TransferLog logs/ssl_access_log
+    # TransferLog logs/ssl_access_log
+    TransferLog "|/usr/bin/rotatelogs -l /var/log/apache2/example.com-ssl_access_log-%Y%m%d 86400"
     CustomLog logs/ssl_request_log \
           "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
 
