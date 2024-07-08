@@ -1,0 +1,17 @@
+#!/bin/bash
+# Apache 로그 데이터를 날짜가 포함된 파일에 저장하는 스크립트
+# 
+# File Permition
+#     chmod +x /usr/local/bin/apache-log-rotator
+# Apache Configure Example
+#     CustomLog "|/usr/local/bin/apache-log-rotator" combined
+
+
+LOG_DIR="/var/log/apache2"
+DATE=$(date "+%Y-%m-%d")
+LOG_FILE="$LOG_DIR/access_log-$DATE.log"
+
+while read line; do
+    echo "$line" >> "$LOG_FILE"
+done
+
