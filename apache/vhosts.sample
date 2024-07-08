@@ -6,6 +6,8 @@
 
     ErrorLog logs/example.com-error.log
     CustomLog logs/example.com-access.log combined
+#    TransferLog "|/usr/bin/rotatelogs -l /var/log/apache2/example.com-access_log-%Y%m%d 86400"
+
 </VirtualHost>
 
 #http -> https Redirect RewriteRule
