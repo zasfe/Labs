@@ -37,4 +37,20 @@ Labs
   - 
 
 
+### kubernetes
+
+
+- 취약한 설계기반 쿠버네티스 구성, https://github.com/madhuakula/kubernetes-goat
+  *  DIND 착취 및 컨테이너 탈출;
+  * 내부 및 노출되지 않은 서비스에 대한 액세스 권한 얻기
+  * 잘못 구성된/과도하게 허용적인 권한을 악용하는 행위
+  * 도커 & 쿠버네티스 CIS 벤치마크
+  * 쿠버네티스 클러스터를 감사하기 위한 kubeaudit
+  * 보안 문제를 감지하기 위한 Falco
+  * 런타임 보안 모니터링을 수행하기 위한 Cilium Tetragon;
+  * Kyverno 정책 엔진.
+
+
+
+
 
