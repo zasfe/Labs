@@ -1,0 +1,8 @@
+/usr/local/apache/logs/*_log { 
+    copytruncate
+    daily
+    rotate 366 
+    ifempty
+    create
+    missingok
+} 
