@@ -13,7 +13,7 @@ ${CATALINA_HOME}/logs/catalina.out
         rotate 366
         missingok
         notifempty
-        # create 640 root adm
+        # create 640 root root
         dateext
         dateformat .%Y-%m-%d
 }
