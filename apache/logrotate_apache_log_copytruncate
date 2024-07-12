@@ -1,8 +1,9 @@
 /usr/local/apache/logs/*_log { 
-    copytruncate
-    daily
-    rotate 366 
-    ifempty
-    create
-    missingok
-} 
+        copytruncate
+        daily
+        rotate 366
+        missingok
+        notifempty
+        dateext
+        dateformat .%Y-%m-%d
+}
