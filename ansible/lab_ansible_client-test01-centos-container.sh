@@ -6,7 +6,14 @@ mv /usr/bin/systemctl /usr/bin/systemctl.old;
 curl https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/master/files/docker/systemctl.py > /usr/bin/systemctl;
 chmod +x /usr/bin/systemctl;
 yum install -y iproute net-tools openssh-server sudo;
-ssh-keygen -A;
+# ssh-keygen -A;
+
+ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa 2>/dev/null <<< y >/dev/nul
+rm -f ~/.ssh/id_rsa.pub
+echo "-----BEGIN RSA PRIVATE KEY-----" > ~/.ssh/id_rsa
+echo $SSH_PRIVATE_KEY | tr ' ' '\n' | tail -n+5 | head -n-4 >> ~/.ssh/id_rsa
+echo "-----END RSA PRIVATE KEY-----" >> ~/.ssh/id_rsa
+
 sed -i "s/#UseDNS yes/UseDNS no/g" /etc/ssh/sshd_config
 sed -i "s/#UseDNS no/UseDNS no/g" /etc/ssh/sshd_config
 systemctl enable sshd; systemctl restart sshd;
