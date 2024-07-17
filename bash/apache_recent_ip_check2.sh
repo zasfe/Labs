@@ -41,7 +41,7 @@ function return_top10_most_url_max10_ip_on_accesslog {
 
 function print_portcheck {
   if ! [[ "$1" == "" || "$2" == "" ]]; then
-    echo -e "\033[32m  # $1 \033[0m ";
+    echo -e "\033[32m  # $1 - $2 \033[0m ";
     echo "$(return_top10_most_ips_on_accesslog $2)";
     echo "$(return_top10_most_url_on_accesslog $2)";
     echo "$(return_top10_most_url_max10_ip_on_accesslog $2)";
