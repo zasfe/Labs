@@ -23,10 +23,10 @@ echo -e "\033[34m  ## STEP2 ::: iso mount \033[0m";
 mkdir -p rootfs unsquashfs;
 test -f ${ISO_FILE} && mount -o loop ${ISO_FILE} rootfs;
 
-find . -type f | grep 'filesystem\.squashfs$';
+find . -type f | grep -i '\.squashfs$' | head -n 1';
 #sudo unsquashfs -f -d unsquashfs/ rootfs/casper/filesystem.squashfs
 
-ISO_ROOTFS=`find . -type f | grep 'filesystem\.squashfs$'`;
+ISO_ROOTFS=`find . -type f | grep -i '\.squashfs$' | head -n 1`;
 test -f ${ISO_ROOTFS} && unsquashfs -f -d unsquashfs/ ${ISO_ROOTFS};
 
 echo -e "\033[34m  ## STEP3 ::: make container images \033[0m";
