@@ -7,7 +7,7 @@ if test -z "${MOUNT_POINT}"
 then
     echo "# Not Find Mount point"
 else
-    echo "# Umount Mount point :${MOUNT_POINT} "
+    echo "# Umount Mount point : $(df -Ph | egrep "^\/.*rootfs$") "
     umount -f ${MOUNT_POINT}
 fi
 
