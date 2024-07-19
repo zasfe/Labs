@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 LANG=C
 
-echo "# prepare";
+echo -e "\033[34m  ## prepare \033[0m";
 ISO_URL="https://releases.ubuntu.com/18.04.6/ubuntu-18.04.6-live-server-amd64.iso";
 
-echo "# STEP1 ::: download iso file, read only filesystem tools";
+echo -e "\033[34m  ## STEP1 ::: download iso file, read only filesystem tools";
 ISO_FILE=`echo ${ISO_URL} | awk -F "/" '{print $NF}'`;
 ISO_OS_VERSION=`echo ${ISO_FILE} | awk -F "-" '{print $1"-"$2}' | awk '{print tolower($0)}'`;
 ISO_OS_NAME=`echo ${ISO_FILE} | awk -F "-" '{print $1}' | awk '{print tolower($0)}'`;
@@ -19,7 +19,7 @@ ISO_VERSION=${input:$position};
 wget -O ${ISO_FILE} ${ISO_URL};
 apt-get install -y squashfs-tools;
 
-echo "# STEP2 ::: iso mount";
+echo -e "\033[34m  ## STEP2 ::: iso mount \033[0m";
 mkdir -p rootfs unsquashfs;
 test -f ${ISO_FILE} && mount -o loop ${ISO_FILE} rootfs;
 
@@ -29,15 +29,15 @@ find . -type f | grep 'filesystem\.squashfs$';
 ISO_ROOTFS=`find . -type f | grep 'filesystem\.squashfs$'`;
 test -f ${ISO_ROOTFS} && unsquashfs -f -d unsquashfs/ ${ISO_ROOTFS};
 
-echo "# STEP3 ::: make container images";
+echo -e "\033[34m  ## STEP3 ::: make container images \033[0m";
 tar -C unsquashfs -c . | docker import - zasfe/${ISO_OS_VERSION}:latest
 
-echo "# STEP4 ::: container running test";
+echo -e "\033[34m  ## STEP4 ::: container running test \033[0m";
 docker exec --rm -h myos -t zasfe/${ISO_OS_VERSION}:latest cat /etc/os-release | grep -i PRETTY_NAME
 echo "docker run -it --rm -h myos -t zasfe/${ISO_OS_VERSION}:latest bash"
 
 
-echo "# STEP5 ::: container image push";
+echo -e "\033[34m  ## STEP5 ::: container image push \033[0m";
 echo "ex)";
 echo " - (local only) docker image name : zasfe/${ISO_OS_VERSION}:latest ";
 echo " - (remote only) docker image name : zasfe/${ISO_OS_NAME}:${ISO_VERSION}";
