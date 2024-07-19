@@ -4,7 +4,7 @@ LANG=C
 echo -e "\033[34m  ## prepare \033[0m";
 ISO_URL="https://releases.ubuntu.com/18.04.6/ubuntu-18.04.6-live-server-amd64.iso";
 
-echo -e "\033[34m  ## STEP1 ::: download iso file, read only filesystem tools";
+echo -e "\033[34m  ## STEP1 ::: download iso file, read only filesystem tools \033[0m";
 ISO_FILE=`echo ${ISO_URL} | awk -F "/" '{print $NF}'`;
 ISO_OS_VERSION=`echo ${ISO_FILE} | awk -F "-" '{print $1"-"$2}' | awk '{print tolower($0)}'`;
 ISO_OS_NAME=`echo ${ISO_FILE} | awk -F "-" '{print $1}' | awk '{print tolower($0)}'`;
