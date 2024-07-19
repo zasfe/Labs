@@ -16,19 +16,6 @@ position=$(expr index "$ISO_FILE" "$delimiter");
 # 구분자 이후 문자열 출력
 ISO_VERSION=${input:$position};
 
-
-input="aa-bb-cc"
-delimiter="-"
-
-# 첫 번째 구분자 위치 찾기
-position=$(expr index "$input" "$delimiter")
-
-# 구분자 이후 문자열 출력
-result=${input:$position}
-echo "$result"
-
-
-
 wget -O ${ISO_FILE} ${ISO_URL};
 apt-get install -y squashfs-tools;
 
