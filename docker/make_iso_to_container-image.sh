@@ -34,7 +34,7 @@ tar -C unsquashfs -c . | docker import - zasfe/${ISO_OS_VERSION}:latest
 
 echo -e "\033[34m  ## STEP4 ::: container running test \033[0m";
 docker exec --rm -h myos -t zasfe/${ISO_OS_VERSION}:latest cat /etc/os-release | grep -i PRETTY_NAME
-echo "docker run -it --rm -h myos -t zasfe/${ISO_OS_VERSION}:latest bash"
+echo -e "\033[35m  docker run -it --rm -h myos -t zasfe/${ISO_OS_VERSION}:latest bash  \033[0m";
 
 
 echo -e "\033[34m  ## STEP5 ::: container image push \033[0m";
@@ -42,6 +42,6 @@ echo "ex)";
 echo " - (local only) docker image name : zasfe/${ISO_OS_VERSION}:latest ";
 echo " - (remote only) docker image name : zasfe/${ISO_OS_NAME}:${ISO_VERSION}";
 echo "";
-echo "docker tag zasfe/${ISO_OS_VERSION}:latest zasfe/${ISO_OS_NAME}:${ISO_VERSION}";
-echo "docker push zasfe/${ISO_OS_NAME}:${ISO_VERSION}";
+echo -e "\033[35m  docker tag zasfe/${ISO_OS_VERSION}:latest zasfe/${ISO_OS_NAME}:${ISO_VERSION} \033[0m";
+echo -e "\033[35m  docker push zasfe/${ISO_OS_NAME}:${ISO_VERSION} \033[0m";
 echo "";
