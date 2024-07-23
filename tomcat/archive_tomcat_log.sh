@@ -12,6 +12,6 @@ find ${folder_tomcat_logs} -maxdepth 1 -type f -name "*" -mtime +30 -exec mv {} 
  
 # 60 Days old file compressed
 cd ${folder_backup}
-find ${folder_backup} -maxdepth 1 -type f -name "*" -and ! -name "*.gz" -mtime +60 -exec sh -c "gzip {};" \;
+find ${folder_backup} -maxdepth 1 -type f -name "*" -and ! -name "*.gz" -mtime +60 -print | xargs gzip -9
 
 exit 0
