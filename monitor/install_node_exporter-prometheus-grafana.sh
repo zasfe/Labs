@@ -111,9 +111,10 @@ Restart=always
 WantedBy=multi-user.target
 EOF
 
-sudo chown -R prometheus:prometheus /data/monitor/prometheus
 mkdir -p /data/monitor/prometheus_data
-sudo chown -R prometheus:prometheus /data/monitor/prometheus_data
+chown -R prometheus:prometheus /data/monitor/prometheus
+chown -R prometheus:prometheus /data/monitor/prometheus_data
+chown -R prometheus:prometheus /data/monitor/prometheus-*
 
 systemctl daemon-reload
 systemctl enable prometheus.service
