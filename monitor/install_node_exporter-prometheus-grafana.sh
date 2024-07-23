@@ -71,7 +71,7 @@ rule_files:
 # A scrape configuration containing exactly one endpoint to scrape:
 # Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  # The job name is added as a label `job=\<job_name\>` to any timeseries scraped from this config.
   #- job_name: "prometheus"
 
     # metrics_path defaults to '/metrics'
@@ -80,7 +80,7 @@ scrape_configs:
         #  static_configs:
         #  - targets: ["localhost:9090"]
 
-  - job_name: "web-server"
+  - job_name: "localhost"
 
     static_configs:
       - targets: ["127.0.0.1:9100"]
@@ -98,12 +98,12 @@ After=network-online.target
 [Service]
 User=prometheus
 Group=prometheus
-ExecStart=/data/monitor/prometheus/prometheus \
-  --config.file=/data/monitor/prometheus/prometheus.yml \
-  --storage.tsdb.path=/data/monitor/prometheus_data \
-  --web.console.templates=/data/monitor/prometheus/consoles \
-  --web.console.libraries=/data/monitor/prometheus/console_libraries \
-  --web.listen-address=0.0.0.0:8989 \
+ExecStart=/data/monitor/prometheus/prometheus \\
+  --config.file=/data/monitor/prometheus/prometheus.yml \\
+  --storage.tsdb.path=/data/monitor/prometheus_data \\
+  --web.console.templates=/data/monitor/prometheus/consoles \\
+  --web.console.libraries=/data/monitor/prometheus/console_libraries \\
+  --web.listen-address=0.0.0.0:8989 \\
   --web.enable-admin-api
 Restart=always
 
@@ -140,9 +140,9 @@ After=network-online.target
 Type=simple
 User=grafana
 Group=grafana
-ExecStart=/data/monitor/grafana/bin/grafana-server \
-  --config=/data/monitor/grafana/conf/defaults.ini \
-  --homepath=/data/monitor/grafana \
+ExecStart=/data/monitor/grafana/bin/grafana-server \\
+  --config=/data/monitor/grafana/conf/defaults.ini \\
+  --homepath=/data/monitor/grafana \\
 Restart=always
 
 [Install]
