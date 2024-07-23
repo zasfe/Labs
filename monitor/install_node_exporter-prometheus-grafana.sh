@@ -154,8 +154,11 @@ useradd -r -g grafana -s /sbin/nologin -d /home/grafana/ -c "grafana Daemons" gr
 chown -R grafana:grafana /data/monitor/grafana
 chown -R grafana:grafana /data/monitor/grafana-v*
 
-
-
 systemctl daemon-reload
 systemctl enable grafana-server.service
 systemctl restart grafana-server.service
+
+
+# Adding datasource without using the web gui (https://github.com/grafana/grafana/issues/1789)
+curl --user admin:admin ' http://127.0.0.1:3000/api/datasources ' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"prometheusLocal","isDefault":true ,"type":"prometheus","url":" http://127.0.0.1:9090","access":"proxy","basicAuth":false} '
+
