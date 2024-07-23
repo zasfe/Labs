@@ -1321,3 +1321,42 @@ Chain InstanceServices (1 references)
 num  target     prot opt source               destination   
 ..
 ```
+
+
+
+**Role**
+
+* 역할 = role
+  * 컨텐츠를 그룹화하고 다른 사용자와 쉽게 공유하고 재사용이 용이하다
+  * 목적에 따라서 역할을 정의할 수 있다
+  * 큰 프로젝트를 관리하기 쉽게 해준다
+* ansible 역할 구조
+  * ansible-galaxy init
+    * defualts
+      * 재정의 하지 않을 변수들
+    * files
+    * handlers
+    * meta
+      * 작성자, 라이센스, role dependency 정보
+    * tasks
+    * templates
+    * tests
+    * var
+* 변수 적용 우선순위
+  * 글로벌
+  * role call 변수
+  * vars
+  * playbook
+  * inventory
+  * defualt
+* 실행 순서 제어
+  * pre_tasks, post_tasks 를 통해서 role 수행 전/후로 추가 수행할 task 를 지정가능
+* 역할 내용 개발을 위한 권장 사례
+  * ansible-galaxy init 후에 필요없는 디렉터리, 파일 삭제
+  * README.md, meta/main.yml 을 유지, 관리하고 사용법을 문서 한다
+  * 역할은 특정 목적이나 기능에 집중한다
+  * 역할은 자주 재사용하고 리팩토링 한다
+
+
+
+
