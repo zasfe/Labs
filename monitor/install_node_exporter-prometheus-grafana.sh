@@ -161,6 +161,30 @@ systemctl restart grafana-server.service
 
 
 # Adding datasource without using the web gui (https://github.com/grafana/grafana/issues/1789)
-curl --user admin:admin ' http://127.0.0.1:3000/api/datasources ' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"prometheusLocal","isDefault":true ,"type":"prometheus","url":" http://127.0.0.1:9090","access":"proxy","basicAuth":false} '
+# curl --user admin:admin ' http://127.0.0.1:3000/api/datasources ' -X POST -H 'Content-Type: application/json;charset=UTF-8' --data-binary '{"name":"prometheusLocal","isDefault":true ,"type":"prometheus","url":" http://127.0.0.1:8989","access":"proxy","basicAuth":false} '
+
+# ref - Simple bash script to wire up Grafana 2.x with InfluxDB 0.8 0 (https://gist.github.com/leehambley/9741431695da3787f6b3)
+
+COOKIEJAR=$(mktemp)
+trap 'unlink ${COOKIEJAR}' EXIT
+
+GRAFANA_URL="http://127.0.0.1:3000/api/"
+GRAFANA_DATASOURCE_NAME="prometheusLocal"
+PROMETHEUS_REMOTE_URL="http://127.0.0.1:8989"
+
+## setup_grafana_session 
+curl -H 'Content-Type: application/json;charset=UTF-8' \
+  --data-binary '{"user":"admin","email":"","password":"admin"}' \
+  --cookie-jar "$COOKIEJAR" \
+  'http://127.0.0.1:3000/api/login' > /dev/null 2>&1 
+
+## grafana_create_data_source 
+curl --cookie "$COOKIEJAR" \
+     -X PUT \
+     --silent \
+     -H 'Content-Type: application/json;charset=UTF-8' \
+     --data-binary "{\"name\":\"prometheusLocal\",\"type\":\"prometheus\",\"url\":\"http://127.0.0.1:8989\",\"access\":\"proxy\",\"basicAuth\":\"false\"}" \
+     "http://127.0.0.1:3000/api/datasources" 2>&1 | grep 'Datasource added' --silent;
+       
 
 # grafana-server web UI: http://SERVER-NAME:3000/
