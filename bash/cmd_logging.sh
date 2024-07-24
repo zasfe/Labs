@@ -10,6 +10,13 @@ SYSLOGD="rsyslog"
 fi
 
 cat <<EEE>> /etc/profile.d/cmd_logging.sh
+
+USER_IP=$`who -m am i 2>/dev/null | awk '{print $NF}' | sed -e 's/[()]//g'`
+if [ -z $USER_IP ]; then
+    USER_IP=`localhost`
+fi
+logger -p local1.notice "[+] ${USER_IP} $USER : Shell Connect"
+
 function logging
 {
   stat="\$?"
