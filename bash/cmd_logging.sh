@@ -13,11 +13,12 @@ cat <<EEE>> /etc/profile.d/cmd_logging.sh
 function logging
 {
   stat="\$?"
-    cmd=\$(history|tail -1)
-    if [ "\$cmd" != "$cmd_old" ]; then
-      logger -p local1.notice "[2] 1-RESULT_CODE=\$stat"
-      logger -p local1.notice "[1] PID=\$\$, PWD=\$PWD, CMD=\$cmd"
-    fi
+  cmd=\$(history|tail -1)
+  user=$(whoami)
+  if [ "\$cmd" != "$cmd_old" ]; then
+    logger -p local1.notice "[2] 1-RESULT_CODE=\$stat"
+    logger -p local1.notice "[1] USER=$user, PPID=$PPID, PID=\$\$, PWD=\$PWD, CMD=\$cmd"
+  fi
   cmd_old=\$cmd
 }
 trap logging DEBUG
