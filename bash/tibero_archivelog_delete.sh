@@ -14,6 +14,6 @@ find ${DB_ARCHIVE_LOG} -maxdepth 1 -type f -name "*" -mtime +14 -exec mv {} ${DB
 find ${DB_ARCHIVE_LOG_BACKUP} -maxdepth 1 -type f -name "*" -and ! -name "*.gz" -mtime +30 -exec gzip -9 {} \;
 
 # 366 Days old file delete
-find ${DB_ARCHIVE_LOG_BACKUP} -maxdepth 1 -type f -name "*" -mtime +366 -delete \;
+find ${DB_ARCHIVE_LOG_BACKUP} -maxdepth 1 -type f -name "*" -mtime +366 -delete
 
 exit 0
