@@ -158,7 +158,7 @@ for record in "${dns_records[@]}"; do
   cloudflare_dns_record_id=$(echo ${cloudflare_record_info} | grep -o '"id":"[^"]*' | cut -d'"' -f4)
 
   ### Push new dns record information to cloudflare's api
-  record_cmt="$(date "+%Y-%m-%d %H:%M") - ${dns_record_ip} =\> ${ip}"
+  record_cmt="$(date "+%Y-%m-%d %H:%M") - from: ${dns_record_ip} to: ${ip}"
   
   update_dns_record=$(curl --insecure -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$cloudflare_dns_record_id" \
     -H "Authorization: Bearer $cloudflare_zone_api_token" \
