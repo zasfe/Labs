@@ -24,11 +24,7 @@ do
 done
 
 echo "<html><body><h1>Tomcat Files</h1><ul>" > $DOWNLOAD_DIR/index.html
-for file in $DOWNLOAD_DIR/*.tar.gz; do
-  if [ -f "$file" ]; then
-    echo "<li><a href='$(basename $file)'>$(basename $file)</a></li>" >> $DOWNLOAD_DIR/index.html
-  fi
-done
+ls -al *.tar.gz | awk '{print$9}' | sort -u | awk '{print "\<li\>\<a href=\""$1"\"\</a\>\</li\>"}' >> $DOWNLOAD_DIR/index.html
 echo "</ul></body></html>" >> $DOWNLOAD_DIR/index.html
 
 
