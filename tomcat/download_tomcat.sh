@@ -23,35 +23,13 @@ do
   done
 done
 
-mkdir -p "${DOWNLOAD_DIR}/{5,6,7,8,9,10}"
-
-cat <<EOF > ${DOWNLOAD_DIR}/index.html
-<html>
-<body>
-<h1>Tomcat Versions</h1>
-<ul>
-<li><a href="5/">Tomcat 5.x</a></li>
-<li><a href="6/">Tomcat 6.x</a></li>
-<li><a href="7/">Tomcat 7.x</a></li>
-<li><a href="8/">Tomcat 8.x</a></li>
-<li><a href="9/">Tomcat 9.x</a></li>
-<li><a href="10/">Tomcat 10.x</a></li>
-</ul>
-</body>
-</html>
-EOF
-
-for dir in ${DOWNLOAD_DIR}/*; do
-  if [ -d "$dir" ]; then
-    echo "<html><body><h1>Tomcat $(basename $dir).x</h1><ul>" > $dir/index.html
-    for file in $dir/*.tar.gz; do
-      if [ -f "$file" ]; then
-        echo "<li><a href='$(basename $file)'>$(basename $file)</a></li>" >> $dir/index.html
-      fi
-    done
-    echo "</ul></body></html>" >> $dir/index.html
+echo "<html><body><h1>Tomcat Files</h1><ul>" > $DOWNLOAD_DIR/index.html
+for file in $DOWNLOAD_DIR/*.tar.gz; do
+  if [ -f "$file" ]; then
+    echo "<li><a href='$(basename $file)'>$(basename $file)</a></li>" >> $DOWNLOAD_DIR/index.html
   fi
 done
+echo "</ul></body></html>" >> $DOWNLOAD_DIR/index.html
 
 
 
