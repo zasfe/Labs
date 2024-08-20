@@ -33,7 +33,6 @@ echo "<html><body><h1>Tomcat Versions</h1><ul>" > ${DOWNLOAD_DIR}/index.html
 for dir in ${DOWNLOAD_DIR}/*; do
   if [ -d "$dir" ]; then
     echo "<li><a href='$dir'/>'$dir'.x</a></li>" >> $dir/index.html
-    echo "<html><body><h1>Tomcat $(basename $dir).x</h1><ul>" > $dir/index.html
   fi
 done
 echo "</ul></body></html>"  >> ${DOWNLOAD_DIR}/index.html
