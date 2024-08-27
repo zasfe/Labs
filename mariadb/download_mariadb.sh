@@ -2,6 +2,8 @@
 
 # ref - https://mariadb.org/mariadb/all-releases/
 # ref - https://mariadb.com/kb/en/mirror-sites-for-mariadb/
+# 
+# run - nohup ./download_mariadb.sh 1> /dev/null 2>&1 & 
 
 MIRROR="archive.mariadb.org::mariadb"
 DOWNLOAD_DIR="/path/to/download/directory"
