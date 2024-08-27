@@ -12,22 +12,24 @@ cd $DOWNLOAD_DIR
 
 rsync ${MIRROR} | grep -oP 'mariadb\-\d+\.\d+\.\d+' | while read version_full
 do
-  echo " # ${version_full}";
-  mkdir -p $DOWNLOAD_DIR/${version_full};
+  echo "${version_full}";
+  version_major_minor=$(echo ${version_full} | awk -F '\\.' '{print$1"."$2".x"}')
   
   rsync ${MIRROR}/${version_full}/ | grep -P "(x86_64|-packages)" | awk '{print$5}'  | while read version_build
   do
-    echo " -> ${version_build}";
     rsync ${MIRROR}/${version_full}/${version_build}/ | grep -oP 'mariadb\-\d+\.\d+\.\d+[^"]*\.tar\.gz|mariadb\-\d+\.\d+\.\d+[^"]*\-winx64\.zip|mariadb\-\d+\.\d+\.\d+[^"]*\-winx64\.msi|mariadb\-\d+\.\d+\.\d+[^"]*\-win32\.zip|mariadb\-\d+\.\d+\.\d+[^"]*\-win32\.msi'  | sort -u | while read file
     do
-      echo " --> ${DOWNLOAD_DIR}/${version_full}/$file";
-      if [ ! -f "${DOWNLOAD_DIR}/${version_full}/$file" ]; then
+      echo " -> ${DOWNLOAD_DIR}/${version_major_minor}/$file";
+      if [ ! -f "${DOWNLOAD_DIR}/${version_major_minor}/$file" ]; then
+        mkdir -p $DOWNLOAD_DIR/${version_major_minor};
         echo "Downloading $file"
-        rsync --bwlimit=2000 -avP ${MIRROR}/${version_full}/${version_build}/${file} $DOWNLOAD_DIR/${version_full}/
+        echo "rsync --bwlimit=2000 -avP ${MIRROR}/${version_full}/${version_build}/${file} $DOWNLOAD_DIR/${version_major_minor}/"
       fi
     done
   done
 done
+
+
 
 echo "<html><body><h1>mariadb Versions</h1><ul>" > ${DOWNLOAD_DIR}/index.html
 for dir in ${DOWNLOAD_DIR}/*; do
