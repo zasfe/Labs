@@ -45,10 +45,15 @@ SSLStaplingCache "shmcb:logs/ssl_stapling(32768)"
     # 나머지를 로그에 남긴다
     # CustomLog logs/access_log common env=!dontlog
 
+    # SetEnvIf Accept-Language "en" english
+    # CustomLog logs/english_log common env=english
+    # CustomLog logs/non_english_log common env=!english
+
     # log
     ErrorLog logs/ssl_error_log
     TransferLog logs/ssl_access_log
     CustomLog logs/ssl_request_log \
           "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+
 
 </VirtualHost>
