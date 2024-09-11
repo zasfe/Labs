@@ -29,6 +29,15 @@ SSLHonorCipherOrder     off
     # HTTP Strict Transport Security (mod_headers is required) (63072000 seconds)
     Header always set Strict-Transport-Security "max-age=63072000"
 
+
+    # loop-back 인터페이스에서 요청을 표시한다
+    SetEnvIf Remote_Addr "127\.0\.0\.1" dontlog
+    # robots.txt 파일에 대한 요청을 표시한다
+    SetEnvIf Request_URI "^/robots\.txt$" dontlog
+    # 나머지를 로그에 남긴다
+    # CustomLog logs/access_log common env=!dontlog
+
+    # Log
     ErrorLog logs/ssl_error_log
     # TransferLog logs/ssl_access_log
     TransferLog "|/usr/bin/rotatelogs -l /var/log/apache2/example.com-ssl_access_log-%Y%m%d 86400"
