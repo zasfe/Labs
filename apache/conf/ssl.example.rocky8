@@ -26,8 +26,11 @@ SSLStaplingCache "shmcb:logs/ssl_stapling(32768)"
     DocumentRoot /home/public_html/example
 
     SSLEngine on
+    # curl https://ssl-config.mozilla.org/ffdhe2048.txt >> /path/to/signed_cert_and_intermediate_certs_and_dhparams
     SSLCertificateFile      /path/to/signed_cert_and_intermediate_certs_and_dhparams
     SSLCertificateKeyFile   /path/to/private_key
+    SSLCertificateChainFile /path/to/chain_cert.crt
+    SSLCACertificateFile    /path/to/root_cert.crt
 
     # enable HTTP/2, if available
     Protocols h2 http/1.1
@@ -35,6 +38,7 @@ SSLStaplingCache "shmcb:logs/ssl_stapling(32768)"
     # HTTP Strict Transport Security (mod_headers is required) (63072000 seconds)
     Header always set Strict-Transport-Security "max-age=63072000"
 
+    # log
     ErrorLog logs/ssl_error_log
     TransferLog logs/ssl_access_log
     CustomLog logs/ssl_request_log \
