@@ -4,6 +4,17 @@
 
     DocumentRoot /home/public_html/example
 
+    # loop-back 인터페이스에서 요청을 표시한다
+    SetEnvIf Remote_Addr "127\.0\.0\.1" dontlog
+    # robots.txt 파일에 대한 요청을 표시한다
+    SetEnvIf Request_URI "^/robots\.txt$" dontlog
+    # 나머지를 로그에 남긴다
+    # CustomLog logs/access_log common env=!dontlog
+
+    # SetEnvIf Accept-Language "en" english
+    # CustomLog logs/english_log common env=english
+    # CustomLog logs/non_english_log common env=!english
+
     ErrorLog logs/example.com-error.log
     CustomLog logs/example.com-access.log combined
 #    TransferLog "|/usr/bin/rotatelogs -l /var/log/apache2/example.com-access_log-%Y%m%d 86400"
