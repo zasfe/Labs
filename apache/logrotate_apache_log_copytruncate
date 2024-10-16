@@ -1,3 +1,8 @@
+# Apache Log Rotate config
+#
+# - PATH: /etc/logrotate.d/logrotate_apache_log_copytruncate
+# - Test: logrotate -d /etc/logrotate.d/logrotate_apache_log_copytruncate
+# 
 /usr/local/apache/logs/*_log { 
         copytruncate
         daily
