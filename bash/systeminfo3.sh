@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# sudo bash -c "curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -"
-# curl --tlsv1.2 -s https://raw.githubusercontent.com/zasfe/Labs/master/bash/systeminfo3.sh | bash -
+# bash -c "$(wget -qLO - https://github.com/community-scripts/ProxmoxVE/raw/main/ct/podman.sh)"
+
 
 # TODO: add php(apache module, php-fpm)
 # 
