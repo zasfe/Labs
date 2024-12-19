@@ -5,7 +5,7 @@ folder_tomcat_logs="/usr/local/tomcat/logs"
 folder_backup="/data/tomcat8_log/"
 
 # 3 Days old file move
-find ${folder_tomcat_logs} -maxdepth 1 -type f -name "catalina*.out-*" -mtime +3 -exec mv {} ${folder_backup} \;
+find ${folder_tomcat_logs} -maxdepth 1 -type f -name "catalina*.out.*" -mtime +3 -exec mv {} ${folder_backup} \;
   
 # 30 Days old file move
 find ${folder_tomcat_logs} -maxdepth 1 -type f -name "*" -mtime +30 -exec mv {} ${folder_backup} \;
