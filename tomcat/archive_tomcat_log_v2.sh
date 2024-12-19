@@ -39,7 +39,7 @@ for catalina_base in "${catalina_bases[@]}"; do
   echo "Processing logs for $catalina_base..."
 
   # 3일 이상 된 catalina 로그 파일 이동
-  find ${folder_tomcat_logs} -maxdepth 1 -type f -name "catalina*.out-*" -mtime +3 -exec mv {} ${folder_backup} \;
+  find ${folder_tomcat_logs} -maxdepth 1 -type f -name "catalina*.out.*" -mtime +3 -exec mv {} ${folder_backup} \;
 
   # 10일 이상 된 모든 로그 파일 이동
   find ${folder_tomcat_logs} -maxdepth 1 -type f -name "*" -mtime +10 -exec mv {} ${folder_backup} \;
