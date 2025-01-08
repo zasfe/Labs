@@ -32,14 +32,14 @@ function pretty_result {
 }
 
 function portcheck_result {
-  if which curl >/dev/null; then
-    curl --connect-timeout 2 -s -o /dev/null "http://$1:$2" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      echo "O";
-    else
-      echo "X";
-    fi
-  else
+#  if which curl >/dev/null; then
+#    curl --connect-timeout 2 -s -o /dev/null "http://$1:$2" >/dev/null 2>&1
+#    if [ $? -eq 0 ]; then
+#      echo "O";
+#    else
+#      echo "X";
+#    fi
+#  else
     timeout 0.5 bash -c "cat < /dev/null >/dev/tcp/$1/$2" >/dev/null 2>&1
 #    echo "Error! Can't Find curl command"
     if [ $? -eq 0 ]; then
@@ -47,8 +47,8 @@ function portcheck_result {
     else
       echo "X";
     fi
-  fi
- }
+#  fi
+}
 
 function print_portcheck {
   if ! [[ "$1" == "" || "$2" == "" ]]; then
