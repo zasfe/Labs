@@ -7,7 +7,8 @@
 # IP;PORT;DESCRIPTION;START_COMMAND;STOP_COMMAND;RESTART_COMMAND
 # 예:
 # 127.0.0.1;80;WEB - httpd;sudo systemctl start httpd;sudo systemctl stop httpd;sudo systemctl restart httpd
-# 127.0.0.1;8009;WAS - tomcat(ajp);sudo systemctl start tomcat;sudo systemctl stop tomcat;sudo systemctl restart tomcat
+# 192.168.1.10;8080;REMOTE WEB - nginx;;;
+# 원격 서버(명령어 없음) 예시: 192.168.1.10;8080;REMOTE WEB - nginx;;;
 
 LANG=C
 
@@ -18,10 +19,6 @@ parent_path="$(dirname "${BASH_SOURCE[0]}")"
 SERVICES_FILE="${parent_path}/service_list.txt"
 if [ ! -f "$SERVICES_FILE" ]; then
   echo "Error: Service list file not found: $SERVICES_FILE"
-  echo "example)"
-  echo "127.0.0.1 80 WEB - httpd"
-  echo "127.0.0.1 8009 WAS - tomcat(ajp)"
-  echo "127.0.0.1 3306 DB - mysql"
   exit 1
 fi
 
@@ -110,12 +107,15 @@ while IFS=';' read -r ip port desc start_cmd stop_cmd restart_cmd; do
     continue
   fi
 
+  # 포트 체크 결과 출력
   print_portcheck "$ip" "$port" "$desc"
-  echo "  Start Command   : $start_cmd"
-  echo "  Stop Command    : $stop_cmd"
-  echo "  Restart Command : $restart_cmd"
+  
+  # 시작, 중지, 재시작 명령어가 있는 경우에만 출력 (즉, 로컬 서버의 경우만 출력)
+  if [[ -n "$start_cmd" || -n "$stop_cmd" || -n "$restart_cmd" ]]; then
+    echo "  Start Command   : $start_cmd"
+    echo "  Stop Command    : $stop_cmd"
+    echo "  Restart Command : $restart_cmd"
+  fi
   echo ""
 done < "$SERVICES_FILE"
 echo " ------------------------------------------------------------------------- "
-
-
