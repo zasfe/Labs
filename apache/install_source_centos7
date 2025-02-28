@@ -1,0 +1,80 @@
+#!/bin/bash
+# CentOS 7.9
+
+FILDER_APACHE="apache2.4.63"
+FILE_APACHE="httpd-2.4.63"
+FILE_APR="apr-1.7.5"
+FILE_APR_UTIL="apr-util-1.6.3"
+FILE_TOMCAT_CONNECTORS="tomcat-connectors-1.2.50-src"
+
+
+# 필요한 패키지 설치
+yum -y install wget perl gcc gcc-c++ pcre-devel openssl-devel expat-devel zlib-devel ncurses ncurses-devel perl-Data-Dumper systemd-devel
+yum -y groupinstall "Development Tools" "Development Libraries" 
+
+mkdir -p /usr/local/src/apm
+cd /usr/local/src/apm
+
+# Apache 소스 다운로드 및 컴파일
+wget https://dlcdn.apache.org/httpd/${FILE_APACHE}.tar.gz
+tar -xvf ${FILE_APACHE}.tar.gz
+
+# APR 다운로드
+wget https://dlcdn.apache.org/apr/${FILE_APR}.tar.bz2
+tar -xvf ${FILE_APR}.tar.bz2
+mv ${FILE_APR} /usr/local/src/apm/${FILE_APACHE}/srclib/apr
+
+# APR-util 다운로드
+wget https://dlcdn.apache.org//apr/${FILE_APR_UTIL}.tar.bz2
+tar -xvf ${FILE_APR_UTIL}.tar.bz2
+mv ${FILE_APR_UTIL} /usr/local/src/apm/${FILE_APACHE}/srclib/apr-util
+
+cd /usr/local/src/apm/${FILE_APACHE}
+make clean
+export CFLAGS="${CFLAGS} -DDEFAULT_SERVER_LIMIT=4096"
+
+./configure --prefix=/usr/local/${FILDER_APACHE} --enable-load-all-modules --enable-so --enable-ssl --enable-rewrite --enable-unique-id --enable-proxy --enable-proxy-ajp --enable-systemd --enable-mods-shared=most --enable-mpms-shared=all --with-included-apr --with-included-apr-util --with-mpm=prefork 
+
+make && make install
+
+
+cp -pa /usr/local/${FILDER_APACHE}/conf/httpd.conf /usr/local/${FILDER_APACHE}/conf/httpd.conf.default
+sed -i 's/#ServerName www.example.com:80/ServerName localhost:80/g' /usr/local/${FILDER_APACHE}/conf/httpd.conf
+
+cat <<EOF > /usr/local/${FILDER_APACHE}/conf/extra/httpd-mpm-2.conf
+#
+# Server-Pool Management (MPM specific)
+#
+
+<IfModule !mpm_netware_module>
+    PidFile "logs/httpd.pid"
+</IfModule>
+
+# prefork MPM
+# StartServers: number of server processes to start
+# MinSpareServers: minimum number of server processes which are kept spare
+# MaxSpareServers: maximum number of server processes which are kept spare
+# MaxRequestWorkers: maximum number of server processes allowed to start
+# MaxConnectionsPerChild: maximum number of connections a server process serves
+#                         before terminating
+<IfModule mpm_prefork_module>
+    StartServers            10
+    MinSpareServers         10
+    MaxSpareServers         20
+    MaxRequestWorkers     2048
+    MaxConnectionsPerChild   0
+</IfModule>
+
+# The maximum number of free Kbytes that every allocator is allowed
+# to hold without calling free(). In threaded MPMs, every thread has its own
+# allocator. When not set, or when set to zero, the threshold will be set to
+# unlimited.
+<IfModule !mpm_netware_module>
+    MaxMemFree            2048
+</IfModule>
+<IfModule mpm_netware_module>
+    MaxMemFree             100
+</IfModule>
+EOF
+echo '# Server-pool management (MPM specific)' >> /usr/local/${FILDER_APACHE}/conf/httpd.conf
+echo 'Include conf/extra/httpd-mpm-2.conf' >> /usr/local/${FILDER_APACHE}/conf/httpd.conf
