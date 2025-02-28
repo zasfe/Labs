@@ -78,3 +78,62 @@ cat <<EOF > /usr/local/${FILDER_APACHE}/conf/extra/httpd-mpm-2.conf
 EOF
 echo '# Server-pool management (MPM specific)' >> /usr/local/${FILDER_APACHE}/conf/httpd.conf
 echo 'Include conf/extra/httpd-mpm-2.conf' >> /usr/local/${FILDER_APACHE}/conf/httpd.conf
+
+
+
+
+
+
+###############
+# mod_jk 설치 #
+###############
+
+cd /usr/local/src/apm
+wget https://dlcdn.apache.org/tomcat/tomcat-connectors/jk/${FILE_TOMCAT_CONNECTORS}.tar.gz
+tar -xvf ${FILE_TOMCAT_CONNECTORS}.tar.gz
+cd /usr/local/src/apm/${FILE_TOMCAT_CONNECTORS}/native
+./configure --with-apxs=/usr/local/${FILDER_APACHE}/bin/apxs
+make && make install
+
+
+cat <<EOF >> /usr/local/${FILDER_APACHE}/conf/httpd.conf
+LoadModule jk_module modules/mod_jk.so
+<IfModule mod_jk.c>
+  # workers.properties 파일의 위치를 지정
+  # worker란 들어온 요청을 처리하기 위한 톰캣 인스턴스
+  JkWorkersFile conf/workers.properties
+
+  # mod_jk 로그파일 위치를 지정
+  JkLogFile logs/mod_jk.log
+
+  # 로그레벨을 지정 [debug/error/info]
+  JkLogLevel info
+
+  # 로그에 출력되는 시간 포멧을 지정
+  JkLogStampFormat "[%a %b %d %H:%M:%S %Y] "
+
+  # 아파치로 부터 들어오는 요청에 대해서 Url 패턴별로 workers.properties에
+  # 정의한 worker에게 매핑시키는 설정을 지정
+  JkMountFile conf/uriworkermap.properties
+</IfModule>
+EOF
+
+cat <<EOF > /usr/local/${FILDER_APACHE}/conf/workers.properties
+# list는 mod_jk가 사용할 모든 작업자리스트 기술(콤마로 구분)
+# type은 톰캣과 통신할 프로토콜을 정의(ajp12, ajp13, ajp14, jni, lb) 
+#        ajp13프로토콜이 가장 널리 사용되며, lb는 로드밸런싱에 사용.
+# host는 대상 톰캣의 IP
+# port는 톰캣과 통신할 포트
+worker.list=worker1
+worker.worker1.type=ajp13
+worker.worker1.host=127.0.0.1
+worker.worker1.port=8009
+EOF
+
+cat <<EOF > /usr/local/${FILDER_APACHE}/conf/uriworkermap.properties
+# /docs 경로가 들어오면 workers.properties에 정의한
+# worker1 톰캣인스턴스로 매핑
+# 설치된 톰캣의 도큐먼트 페이지로 이동
+/docs/=worker1
+EOF
+
