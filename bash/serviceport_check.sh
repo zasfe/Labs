@@ -88,7 +88,9 @@ function print_portcheck {
   local port="$2"
   local desc="$3"
   echo -e "\033[32m# ${desc}\033[0m"
-  echo "  ${ip}:${port}/tcp : $(pretty_result $(portcheck_result "$ip" "$port"))"
+  if validate_ip "$ip"; then
+    echo "  ${ip}:${port}/tcp : $(pretty_result $(portcheck_result "$ip" "$port"))"
+  fi
 }
 
 echo " ------- [ Service Check ] ----------------------------------------------  "
