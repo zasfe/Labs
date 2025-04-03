@@ -8,34 +8,34 @@
 # 예:
 # 127.0.0.1;80;WEB - httpd;sudo systemctl start httpd;sudo systemctl stop httpd;sudo systemctl restart httpd
 # 192.168.1.10;8080;REMOTE WEB - nginx;;;
-# 원격 서버(명령어 없음) 예시: 192.168.1.10;8080;REMOTE WEB - nginx;;;
+# ;;3rd - tomcat;su - tomcat -c "/app/tomcat/bin & ./startup.sh";su - tomcat -c "/app/tomcat/bin & ./shutdown.sh";
 
+# 스크립트 설정: 적용할 언어를 C로 설정
 LANG=C
 
-# 스크립트가 위치한 디렉토리 설정
+# 스크립트가 위치한 디렉토리 경로를 설정
 parent_path="$(dirname "${BASH_SOURCE[0]}")"
 
-# 서비스 정보가 담긴 파일 (예: service_list.txt)
+# 서비스 정보가 담긴 파일(SERVICES_FILE)을 설정
 SERVICES_FILE="${parent_path}/service_list.txt"
 if [ ! -f "$SERVICES_FILE" ]; then
   echo "Error: Service list file not found: $SERVICES_FILE"
   exit 1
 fi
 
-###  Create .serviceport_check.log file of the last run for debug
-parent_path="$(dirname "${BASH_SOURCE[0]}")"
+# 로그 파일 생성 및 설정
 FILE=${parent_path}/serviceport_check.log
 if ! [ -x "$FILE" ]; then
   touch "$FILE"
 fi
 
-LOG_FILE=${parent_path}'/serviceport_check.log'
+LOG_FILE=${parent_path}/serviceport_check.log
 
-### Write last run of STDOUT & STDERR as log file and prints to screen
+# 로그 파일 및 화면으로 동시에 출력하도록 설정
 exec > >(tee -a $LOG_FILE) 2>&1
 echo "==> $(date "+%Y-%m-%d %H:%M:%S")"
 
-# IP 주소와 포트가 유효한지 검증하는 함수
+# IP 주소 검증 함수: IP가 올바른 형식인지 확인
 function validate_ip {
   local ip="$1"
   local regex="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
@@ -52,6 +52,7 @@ function validate_ip {
   fi
 }
 
+# 포트 번호 검증 함수: 포트 번호가 유효 범위 내에 있는지 확인
 function validate_port {
   local port="$1"
   if [[ $port =~ ^[0-9]+$ ]] && ((port > 0 && port <= 65535)); then
@@ -61,24 +62,24 @@ function validate_port {
   fi
 }
 
-# 결과를 색상으로 예쁘게 출력하는 함수 (O: 성공, X: 실패, 그 외: 미정)
+# 포트 체크 결과를 색상으로 출력하는 함수
 function pretty_result {
   if [ "$1" == "O" ]; then
-    echo -e "\033[32mOK..\033[0m";
-  elif  [ "$1" == "X" ]; then
-    echo -e "\033[31mFail..\033[0m";
+    echo -e "\033[32mOK..\033[0m"
+  elif [ "$1" == "X" ]; then
+    echo -e "\033[31mFail..\033[0m"
   else
-    echo -e "\033[33m-\033[0m";
+    echo -e "\033[33m-\033[0m"
   fi
 }
 
-# 지정된 IP와 포트에 대해 연결 시도를 수행하고 결과 반환하는 함수
+# 지정된 IP와 포트에 연결 시도 결과를 반환하는 함수
 function portcheck_result {
   timeout 0.5 bash -c "cat < /dev/null >/dev/tcp/$1/$2" >/dev/null 2>&1
   if [ $? -eq 0 ]; then
-    echo "O";
+    echo "O"
   else
-    echo "X";
+    echo "X"
   fi
 }
 
@@ -88,31 +89,28 @@ function print_portcheck {
   local port="$2"
   local desc="$3"
   echo -e "\033[32m# ${desc}\033[0m"
-  if validate_ip "$ip"; then
-    echo "  ${ip}:${port}/tcp : $(pretty_result $(portcheck_result "$ip" "$port"))"
+  if [[ -n "$ip" && -n "$port" ]]; then
+    if validate_ip "$ip" && validate_port "$port"; then
+      echo "  ${ip}:${port}/tcp : $(pretty_result $(portcheck_result "$ip" "$port"))"
+    else
+      echo "  Invalid IP or Port, skipping port check."
+    fi
+  else
+    echo "  IP or Port is missing, skipping port check."
   fi
 }
 
 echo " ------- [ Service Check ] ----------------------------------------------  "
 # service_list.txt 파일에서 각 줄을 읽어옴
 while IFS=';' read -r ip port desc start_cmd stop_cmd restart_cmd; do
-  # 빈 줄 또는 '#'으로 시작하는 주석은 건너뜁니다.
-  [[ -z "$ip" || "$ip" =~ ^# ]] && continue
-
-  # IP와 포트 값 검증
-  if ! validate_ip "$ip"; then
-    echo "Warning: Invalid IP format in service_list.txt -> $ip (Skipping entry)"
-    continue
-  fi
-  if ! validate_port "$port"; then
-    echo "Warning: Invalid port number in service_list.txt -> $port (Skipping entry)"
-    continue
-  fi
+  # 주석이거나 설명 필드가 비어 있는 경우 건너뜀
+  [[ -z "$desc" || "$desc" =~ ^# ]] && continue
+  [[ "$ip" =~ ^# ]] && continue
 
   # 포트 체크 결과 출력
   print_portcheck "$ip" "$port" "$desc"
-  
-  # 시작, 중지, 재시작 명령어가 있는 경우에만 출력 (즉, 로컬 서버의 경우만 출력)
+
+  # 시작, 중지, 재시작 명령어가 있는 경우 출력
   if [[ -n "$start_cmd" || -n "$stop_cmd" || -n "$restart_cmd" ]]; then
     echo "  Start Command   : $start_cmd"
     echo "  Stop Command    : $stop_cmd"
