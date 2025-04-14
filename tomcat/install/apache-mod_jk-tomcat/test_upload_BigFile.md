@@ -20,11 +20,11 @@ curl -v -F "file=@/root/test20gb.dat" --resolve example.local:80:10.9.88.40 http
 ## 설정 요약
 ### mod_jk 설정
 
-* workers.properties 에서 timeout 과 buffer, connection_pool_size 설정 추가
-  * socket_buffer 는 server.xml 의 packetSize 와 동일하도록 설정
-* vhost.conf 에서 Timeout 과 LimitRequestBody 무제한 설정 추가(기본값이지만 변경되었을 수 있으니 다시 설정함)
-* tomcat server.xml 에서 maxPostSize, maxSwallowSize, packetSize, connectionTimeout 설정 추가
-  *  packetSize 는 workers.properties 의 socket_buffer 와 동일하도록 설정
+* `workers.properties` 에서 timeout 과 buffer, connection_pool_size 설정 추가
+* `vhost.conf` 에서 Timeout 과 LimitRequestBody 무제한 설정 추가(기본값이지만 변경되었을 수 있으니 다시 설정함)
+* tomcat `server.xml` 에서 maxPostSize, maxSwallowSize, packetSize, connectionTimeout 설정 추가
+* `workers.properties` 에서 socket_buffer 는 `server.xml` 의 packetSize 와 동일하도록 설정해야함.
+
 
 **./conf.d/mod_jk.conf**
 ```
