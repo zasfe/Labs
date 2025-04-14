@@ -37,6 +37,15 @@ JkMount /upload ajp_worker
 ```
 
 **/etc/httpd/conf/workers.properties**
+
+* `socket_timeout` : 원격 호스트가 지정된 시간 초과 내에 응답하지 않으면 JK는 오류를 생성하고 다시 시도합니다. 0(기본값)으로 설정하면 JK는 모든 소켓 작업을 무한정 대기합니다.
+* `reply_timeout` : Tomcat에서 수신한 두 패킷 사이의 최대 시간
+* `connection_pool_size` : 연결 풀로 유지되는 AJP 백엔드에 대한 연결 수
+  * Apache 2.x의 prefork MPM 이나 Apache 1.3.x 에서는 connection_pool_size 값을 1보다 높게 사용하지 마세요 !
+  * IIS의 경우 기본값은 250입니다(1.2.20 이전 버전: 10).
+
+https://tomcat.apache.org/connectors-doc/reference/workers.html
+
 ```
 # /etc/httpd/conf/workers.properties
 worker.list=ajp_worker
@@ -52,6 +61,9 @@ worker.ajp_worker.connection_pool_size=20
 ```
 
 **./conf.d/vhost-tomcat.conf**
+
+https://tomcat.apache.org/connectors-doc/reference/apache.html
+
 ```
 # ./conf.d/vhost-tomcat.conf
 <VirtualHost *:80>
