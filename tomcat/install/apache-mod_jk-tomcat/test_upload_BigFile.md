@@ -20,9 +20,13 @@ curl -v -F "file=@/root/test20gb.dat" --resolve example.local:80:10.9.88.40 http
 ## 설정 요약
 ### mod_jk 설정
 
-* workers.properties 에서 timeout 과 buffer, connection_pool_size 추가 설정
+* workers.properties 에서 timeout 과 buffer, connection_pool_size 설정 추가
+  * socket_buffer 는 server.xml 의 packetSize 와 동일하도록 설정
 * vhost.conf 에서 Timeout 과 LimitRequestBody 무제한 설정 추가(기본값이지만 변경되었을 수 있으니 다시 설정함)
+* tomcat server.xml 에서 maxPostSize, maxSwallowSize, packetSize, connectionTimeout 설정 추가
+  *  packetSize 는 workers.properties 의 socket_buffer 와 동일하도록 설정
 
+**./conf.d/mod_jk.conf**
 ```
 # ./conf.d/mod_jk.conf
 LoadModule jk_module modules/mod_jk.so
@@ -32,6 +36,7 @@ JkLogLevel info
 JkMount /upload ajp_worker
 ```
 
+**/etc/httpd/conf/workers.properties**
 ```
 # /etc/httpd/conf/workers.properties
 worker.list=ajp_worker
@@ -46,6 +51,7 @@ worker.ajp_worker.socket_buffer=65536
 worker.ajp_worker.connection_pool_size=20
 ```
 
+**./conf.d/vhost-tomcat.conf**
 ```
 # ./conf.d/vhost-tomcat.conf
 <VirtualHost *:80>
@@ -62,5 +68,19 @@ worker.ajp_worker.connection_pool_size=20
     TransferLog logs/vhost-tomcat_access_log
     LogLevel warn
 </VirtualHost>
-
 ``
+
+**tomcat server.xml** 
+```
+# tomcat server.xml
+        <Connector protocol="AJP/1.3"
+           port="7019"
+           address="0.0.0.0"
+           redirectPort="8443"
+           maxThreads="500"
+           secretRequired="false"
+           maxPostSize="21474836480"
+           maxSwallowSize="-1"
+           packetSize="65536"
+           connectionTimeout="7200000" />
+```
