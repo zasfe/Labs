@@ -1,6 +1,10 @@
 
 ## 대용량 파일 생성 및 업로드 테스트
 
+* 실행환경
+  * OS: Rocky linux 8
+  * WEB: Apache/2.4.37, mod_jk/1.2.49
+  * WAS: Tomcat/9.0.85, java-1.8.0-openjdk
 * **web ip : 10.9.88.40**
 * **도메인: example.local**
     * 미등록된 도메인으로 curl 파일 업로드 테스트
