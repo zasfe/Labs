@@ -82,7 +82,16 @@ https://tomcat.apache.org/connectors-doc/reference/apache.html
 </VirtualHost>
 ``
 
-**tomcat server.xml** 
+**tomcat server.xml**
+
+- maxPostSize : 기본값 2097152(2 MiB), 무제한(-1), FORM 으로 보내는 최대 크기.
+- maxSwallowSize : 기본값 2097152(2 MiB), 크기 초과 연결 등을 버퍼만큼 삼켜서 오류를 반환할 수 있도록 함
+- packetSize : 기본값 8192, 최대 65536, 최대 AJP 패킷크기, mod_jk 의 max_packet_size 와 동일하도록 설정해야함
+- connectionTimeout : 기본값 60000(60초), 무제한(-1), 연결후 URI응답을 기다리는 시간
+
+https://tomcat.apache.org/tomcat-8.5-doc/config/http.html
+https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html
+
 ```
 # tomcat server.xml
         <Connector protocol="AJP/1.3"
