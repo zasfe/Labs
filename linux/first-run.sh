@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+tee ~/.bashrc<<EOF
+PS1="\[\e[34m\\]\u@\h\[\e[0m\\]:\[\e[33m\\]\w\[\e[0m\\]\$ "
+EOF
+
 mkdir update-cloudflare-dns; cd update-cloudflare-dns
 wget https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/Cloudflare/v4/update-cloudflare-dns.sh
 wget https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/Cloudflare/v4/update-cloudflare-dns.conf
