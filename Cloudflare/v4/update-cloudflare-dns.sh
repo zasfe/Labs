@@ -40,8 +40,8 @@ if [ "${proxied}" != "false" ] && [ "${proxied}" != "true" ]; then
 fi
 
 ### Check validity of "what_ip" parameter
-if [ "${what_ip}" != "external" ] && [ "${what_ip}" != "internal" ] && [ "${what_ip}" != "api_awsec2" ]; then
-  echo 'Error! Incorrect "what_ip" parameter choose "external" or "internal" or "api_awsec2"'
+if [ "${what_ip}" != "external" ] && [ "${what_ip}" != "internal" ] && [ "${what_ip}" != "api_ec2" ]; then
+  echo 'Error! Incorrect "what_ip" parameter choose "external" or "internal" or "api_ec2"'
   exit 0
 fi
 
@@ -52,25 +52,26 @@ if [ "${what_ip}" == "internal" ] && [ "${proxied}" == "true" ]; then
 fi
 
 ### Check if set to api_ec2 and instance id
-if [ "${what_ip}" == "api_awsec2" ] && [ "${aws_instance_ids}" == "" ]; then
+if [ "${what_ip}" == "api_ec2" ] && [ "${aws_instance_ids}" == "" ]; then
   echo 'Error! Missing configuration aws ec2 Instance id'
   exit 0
 fi
 
 
 ### Get API ip from aws cli
-if [ "${what_ip}" == "api_awsec2" ]; then
+if [ "${what_ip}" == "api_ec2" ]; then
   ip=$(aws ec2 describe-instances --instance-ids ${aws_instance_ids} --query "Reservations[*].Instances[*].PublicIpAddress" | egrep -v "\[|\]" | awk -F \" '{print$2}')
   if [ -z "$ip" ]; then
-    echo "Error! Can't get ec2 public ip from aws cli"
+    echo "Error! Can't get ec2 ip from aws cli"
     exit 0
   fi
-  echo "==> API IP is: $ip"
+  echo "==> AWS EC2 External IP is: $ip"
 fi
 
 
+
 ### Get External ip from https://checkip.amazonaws.com
-if [ "${what_ip}" == "external" ]; then
+if [ "${what_ip}" == "external" ] && [ "${what_ip}" != "api_ec2" ]; then
   ip=$(curl --insecure -4 -s -X GET https://checkip.amazonaws.com --max-time 10)
   if [ -z "$ip" ]; then
     echo "Error! Can't get external ip from https://checkip.amazonaws.com"
@@ -99,6 +100,8 @@ if [ "${what_ip}" == "internal" ]; then
   echo "==> Internal ${interface} IP is: $ip"
 fi
 
+dns_server1="1.1.1.1"
+dns_server2=$(cat /etc/resolv.conf | grep -v "#" | grep -i nameserver | head -n 1 | awk '{print$2}')
 ### Build coma separated array fron dns_record parameter to update multiple A records
 IFS=',' read -d '' -ra dns_records <<<"$dns_record,"
 unset 'dns_records[${#dns_records[@]}-1]'
@@ -109,16 +112,34 @@ for record in "${dns_records[@]}"; do
   if [ "${proxied}" == "false" ]; then
     ### Check if "nsloopup" command is present
     if which nslookup >/dev/null; then
-      dns_record_ip=$(nslookup ${record} 1.1.1.1 | awk '/Address/ { print $2 }' | sed -n '2p')
+      dns_record_ip=$(nslookup ${record} ${dns_server1} | awk '/Address/ { print $2 }' | sed -n '2p')
     else
       ### if no "nslookup" command use "host" command
-      dns_record_ip=$(host -t A ${record} 1.1.1.1 | awk '/has address/ { print $4 }' | sed -n '1p')
+      dns_record_ip=$(host -t A ${record} ${dns_server1} | awk '/has address/ { print $4 }' | sed -n '1p')
     fi
 
     if [ -z "$dns_record_ip" ]; then
-      echo "Error! Can't resolve the ${record} via 1.1.1.1 DNS server"
+      echo "Error! Can't resolve the ${record} via ${dns_server1} DNS server"
+      echo "Try resolve the ${record} via ${dns_server2} DNS server by /etc/resolv.conf"
+      ### Check if "nsloopup" command is present
+      if which nslookup >/dev/null; then
+        dns_record_ip=$(nslookup ${record} ${dns_server2} | awk '/Address/ { print $2 }' | sed -n '2p')
+      else
+        ### if no "nslookup" command use "host" command
+        dns_record_ip=$(host -t A ${record} ${dns_server2} | awk '/has address/ { print $4 }' | sed -n '1p')
+      fi
+
+      if [ -z "$dns_record_ip" ]; then
+        echo "Error! Can't resolve the ${record} via ${dns_server2} DNS server"
+      fi
+    fi
+
+
+    if [ -z "$dns_record_ip" ]; then
+      echo "Error! Can't resolve the ${record} via ALL DNS server"
       exit 0
     fi
+
     is_proxed="${proxied}"
   fi
 
@@ -158,8 +179,9 @@ for record in "${dns_records[@]}"; do
   cloudflare_dns_record_id=$(echo ${cloudflare_record_info} | grep -o '"id":"[^"]*' | cut -d'"' -f4)
 
   ### Push new dns record information to cloudflare's api
-  record_cmt="$(date "+%Y-%m-%d %H:%M") - from: ${dns_record_ip} to: ${ip}"
-  
+
+  record_cmt="$(date "+%Y-%m-%d %H:%M") - ${dns_record_ip} => ${ip}"
+
   update_dns_record=$(curl --insecure -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$cloudflare_dns_record_id" \
     -H "Authorization: Bearer $cloudflare_zone_api_token" \
     -H "Content-Type: application/json" \
@@ -169,6 +191,8 @@ for record in "${dns_records[@]}"; do
     echo "Error! Update Failed"
     exit 0
   fi
+
+
 
   echo "==> Success!"
   echo "==> $record DNS Record Updated To: $ip, ttl: $ttl, proxied: $proxied"
