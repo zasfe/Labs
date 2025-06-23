@@ -51,3 +51,14 @@ docker swarm init
 #  <hostname>
 # 
 # ex) docker swarm join --token SWMTKN-1-0p6o2h2ljg6t5au37e5vs4qxe3ylswlbunbleurpyxjdn1i11w-0fzjcydog6yhjsaes6ssqizap 10.24.25.4:2377
+
+## Docker Swarm Node join-token Get
+# > docker swarm join-token worker
+
+## Docker Swarm Manager join-token Get
+# > docker swarm join-token manager
+
+## Docker Swarm Node join-token ReCreate
+# > docker swarm join-token --rotate worker
+# > docker swarm join-token --rotate manager
+
