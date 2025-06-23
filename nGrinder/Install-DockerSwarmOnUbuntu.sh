@@ -8,7 +8,7 @@ EOF
 
 source /etc/profile 
 
-cat <EOF >> /etc/security/limits.conf
+cat <<EOF >> /etc/security/limits.conf
 *               soft    nproc          65535
 *               hard    nproc          65535
 root            soft    nproc          65535
