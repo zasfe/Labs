@@ -63,7 +63,9 @@ EOF
 @echo.
 
 @echo - 기본 사용자를 root로 변경
-ubuntu config --default-user root
+REM wsl --manage <distro> --set-default-user
+wsl --manage ubuntu --set-default-user root
+
 
 @echo - sshd: no hostkeys available -- exiting. 에러 방지
 "C:\Windows\System32\bash.exe" -c "ssh-keygen -A"
