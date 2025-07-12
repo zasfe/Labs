@@ -11,6 +11,7 @@ chmod 700 update-cloudflare-dns.sh
 
 sudo tee /etc/ssh/sshd_config.d/70-port-38317-add.conf<<EOF
 Port 22
+port 38317
 EOF
 
 sudo tee /etc/ssh/sshd_config.d/70-usedns-no.conf<<EOF
