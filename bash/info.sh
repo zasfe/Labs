@@ -40,7 +40,7 @@ then
     df -h | awk '{if (NF>1) {print $0} else {printf ("%s ", $1)}}' | grep -ie ":" -e "^/" -e "Filesystem" | grep -v "/dev/loop" | grep -e "[7-9][0-9]%" -e "100%" -e "Filesystem"
     echo ""
 fi
-
+echo -e "\033[0m"
 if [ -f ${HOME}/managed ]; then
         echo -e "\033[32m # Important execute command \033[0m"
         echo ""
