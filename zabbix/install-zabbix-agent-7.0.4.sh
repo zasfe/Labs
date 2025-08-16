@@ -9,7 +9,8 @@ LogFile=/dev/null
 DebugLevel=1
 ServerActive=127.0.0.1:10051
 StartAgents=0
-HostMetadata=linux gcloud gen1 classic
+RefreshActiveChecks=60
+HostMetadata=linux seroul
 UserParameter=web.response.time[*],curl -o /dev/null -s -w "%{time_total}" "$1"
 EOF
 echo "Hostname=vm-seoul1-$(hostname -I | awk '{print $1}' | sed -e 's/\./-/g')" | tee -a /etc/zabbix/zabbix_agentd_managed.conf
