@@ -7,12 +7,12 @@ rpm -Uvh zabbix-agent-7.0.4-release1.el8.x86_64.rpm
 PidFile=/run/zabbix/zabbix_agentd_managed.pid
 LogFile=/dev/null
 DebugLevel=1
-ServerActive=45.115.154.252:10051
+ServerActive=127.0.0.1:10051
 StartAgents=0
 HostMetadata=linux gcloud gen1 classic
 UserParameter=web.response.time[*],curl -o /dev/null -s -w "%{time_total}" "$1"
 EOF
-echo "Hostname=vm-gen1-classic-$(hostname -I | awk '{print $1}' | sed -e 's/\./-/g')" | tee -a /etc/zabbix/zabbix_agentd_managed.conf
+echo "Hostname=vm-seoul1-$(hostname -I | awk '{print $1}' | sed -e 's/\./-/g')" | tee -a /etc/zabbix/zabbix_agentd_managed.conf
 
 echo << 'EOF' > /usr/lib/systemd/system/zabbix-agent-managed.service
 [Unit]
