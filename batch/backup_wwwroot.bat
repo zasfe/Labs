@@ -3,8 +3,8 @@ setlocal
 
 REM wwwroot 백업 - C:\backup\backup_wwwroot.bat
 
-REM 작업 스케줄 생성: SCHTASKS /Create /SC DAILY /MO 1 /TN gabia_Backup_wwwroot /ST 01:00 /TR "C:\backup\backup_wwwroot.bat" /RU ""
-REM 작업 스케줄 실행: SCHTASKS /run /TN "gabia_Backup_wwwroot"
+REM 작업 스케줄 생성: SCHTASKS /Create /SC DAILY /MO 1 /TN Backup_wwwroot /ST 01:00 /TR "C:\backup\backup_wwwroot.bat" /RU ""
+REM 작업 스케줄 실행: SCHTASKS /run /TN "Backup_wwwroot"
 
 
 REM 현재 날짜를 YYYY-MM-DD 형식으로 설정합니다.
