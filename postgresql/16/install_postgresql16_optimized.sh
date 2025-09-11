@@ -179,7 +179,7 @@ track_io_timing = on
 track_wal_io_timing = on
 track_functions = all
 
-# postgresql16 deleted 
+# postgresql15 deleted 
 # stats_temp_directory = '/var/run/postgresql/16-main.pg_stat_tmp'
 
 #------------------------------------------------------------------------------
