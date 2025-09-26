@@ -52,7 +52,10 @@ hw_model=`dmidecode | grep "Product\ Name" | head -n 1 | awk -F':' '{gsub(/^[ \t
 echo -e "  hw: \033[32m${hw_vendor} ${hw_model}\033[0m";
 
 ## OS
-if [ -f '/etc/os-release' ] ; then
+if [ -f '/etc/system-release' ] ; then
+  os_release=`cat /etc/os-release`
+  os_namefile="/etc/system-release";
+elif [ -f '/etc/os-release' ] ; then
   os_release=`cat /etc/os-release  | grep PRETTY_NAME | cut -d'"' -f2`
   os_namefile="/etc/os-release";
 elif [ -f '/etc/redhat-release' ] ; then
