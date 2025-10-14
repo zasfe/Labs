@@ -1,5 +1,5 @@
 #!/bin/bash
-# fix_postgresql_universal.sh - PostgreSQL 완전 복구 (버전 독립적)
+# postgresql_restore_force_universal.sh - PostgreSQL 완전 복구 (버전 독립적)
 
 # set -euo pipefail # 진단 스크립트는 오류 발생 시에도 최대한 많은 정보를 수집해야 하므로 set -e를 사용하지 않습니다.
 
