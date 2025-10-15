@@ -30,7 +30,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # 1. 설치된 PostgreSQL 버전 및 경로 확인 (setup_datadir_universal.sh 실행 후 가정)
-PG_MAJOR_VERSION=$(dpkg -l | grep -E '^ii.*postgresql-[0-9]+\.[0-9]' | awk '{print $2}' | grep -oE '[0-9]+\.[0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
+PG_MAJOR_VERSION=$(dpkg -l | grep -E '^ii.*postgresql-[0-9][\.0-9]' | awk '{print $2}' | grep -oE '[0-9][\.0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
 
 if [ -z "$PG_MAJOR_VERSION" ]; then
     echo "ERROR: PostgreSQL version could not be determined. Run installation script first."
