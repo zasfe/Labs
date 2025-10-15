@@ -39,7 +39,7 @@ echo "[3/4] Installing latest PostgreSQL version..."
 apt install -y postgresql postgresql-client postgresql-contrib
 
 # 설치된 가장 높은 버전 확인
-INSTALLED_VERSIONS=$(dpkg -l | grep -E '^ii.*postgresql-[0-9]+\.[0-9]' | awk '{print $2}' | grep -oE '[0-9]+\.[0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
+INSTALLED_VERSIONS=$(dpkg -l | grep -E '^ii.*postgresql-[0-9][\.0-9]' | awk '{print $2}' | grep -oE '[0-9][\.0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
 if [ -z "$INSTALLED_VERSIONS" ]; then
     echo "ERROR: PostgreSQL installation failed or version could not be determined."
     exit 1
