@@ -25,7 +25,7 @@ fi
 
 # 1. 설치된 PostgreSQL 버전 확인
 # dpkg를 사용하여 설치된 가장 높은 버전을 동적으로 찾습니다.
-PG_MAJOR_VERSION=$(dpkg -l | grep -E '^ii.*postgresql-[0-9]+\.[0-9]' | awk '{print $2}' | grep -oE '[0-9]+\.[0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
+PG_MAJOR_VERSION=$(dpkg -l | grep -E '^ii.*postgresql-[0-9][\.0-9]' | awk '{print $2}' | grep -oE '[0-9][\.0-9]$' | cut -d'.' -f1 | sort -nr | head -1)
 
 if [ -z "$PG_MAJOR_VERSION" ]; then
     echo "ERROR: PostgreSQL version could not be determined. Run installation script first."
@@ -55,7 +55,7 @@ chmod -R 700 "$PG_DATA_DIR"
 
 # 3. 기존 데이터 디렉토리 백업 및 삭제 (선택적)
 DEFAULT_DATA_DIR="/var/lib/postgresql/${PG_MAJOR_VERSION}/${PG_CLUSTER_NAME}"
-if [ -d "$DEFAULT_DATA_DIR" ]; then
+ if [ -d "$DEFAULT_DATA_DIR" ]; then
     echo "[2/5] Backing up default data directory: $DEFAULT_DATA_DIR -> ${DEFAULT_DATA_DIR}.bak"
     mv "$DEFAULT_DATA_DIR" "${DEFAULT_DATA_DIR}.bak"
 fi
