@@ -54,9 +54,13 @@ fi
 # 기능별 버전 호환성 체크
 # -----------------------------------------------------------------------------
 
+# !! 외래키 및 고유 제약 오류 가능성으로 인해 사용안함
 # 병렬 옵션(-j) 사용 가능 여부 (PostgreSQL 9.3+ 및 directory/tar 포맷)
 # NOTE: 여기서는 BACKUP_FORMAT이 'directory'로 설정되어 있어야만 유효합니다.
 is_parallel_supported() {
+return 1 # false
+}
+is_parallel_supported_backup() {
     # 예: 9.3보다 크거나 같으면 true (pg_dump -j는 9.3에서 도입)
     if echo "$PG_VERSION" | grep -qE '^(1[0-9]|9\.[3-9])'; then
         return 0 # true
