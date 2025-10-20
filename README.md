@@ -49,6 +49,10 @@ Labs
   * 보안 문제를 감지하기 위한 Falco
   * 런타임 보안 모니터링을 수행하기 위한 Cilium Tetragon;
   * Kyverno 정책 엔진.
+- 여러 포드에서 동시에 Kubernetes 로그를 추적하는 Bash 스크립트, https://github.com/johanhaleby/kubetail
+  * 
+
+
 
 
 
