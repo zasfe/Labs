@@ -50,7 +50,10 @@ Labs
   * 런타임 보안 모니터링을 수행하기 위한 Cilium Tetragon;
   * Kyverno 정책 엔진.
 - 여러 포드에서 동시에 Kubernetes 로그를 추적하는 Bash 스크립트, https://github.com/johanhaleby/kubetail
-  * 
+  * 여러 Pod의 로그를 하나의 스트림으로 집계(tail/follow)할 수 있는 Bash 스크립트입니다. "kubectl logs -f"를 실행하는 것과 동일하지만, 여러 Pod에 적용됩니다.
+  * bash 에서 자동완성 설정방법
+    * ``cp -pa $HOME/kubetail/completion/kubetail.bash ~/.bash_completion``
+    * ``curl -L "https://raw.githubusercontent.com/johanhaleby/kubetail/refs/heads/master/completion/kubetail.bash" -o ~/.bash_completion``
 
 
 
