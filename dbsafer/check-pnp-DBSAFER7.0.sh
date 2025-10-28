@@ -63,12 +63,15 @@ check_service_status() {
   cd /dbsafer || { print_red "Failed to enter /dbsafer directory"; return 1; }
 
   ./pnp_agent service-list > _service_status.txt
-  error_count=$(grep -ci error _service_status.txt)
+  cat /dbsafer/_service_status.txt
 
-  if [ "$error_count" -eq 1 ]; then
-    print_green ">> No 'Error' found in service status."
+  # Sum the numbers in the "Error" column (6th field, assuming table format)
+  error_sum=$(awk -F'|' 'NR>3 && NF>6 {gsub(/ /,"",$6); if($6~/^[0-9]+$/) s+=$6} END{print s+0}' _service_status.txt)
+
+  if [ "$error_sum" -gt 0 ]; then
+    print_red ">> Total Error count in service status is $error_sum! Please check _service_status.txt."
   else
-    print_red ">> $error_count service(s) show 'Error' status! Please check _service_status.txt."
+    print_green ">> No error(s) found in service status."
   fi
 
   if grep -i dynamic _service_status.txt > /dev/null; then
@@ -88,9 +91,6 @@ check_service_processes() {
   else
     print_red ">> No DBMS-related module processes found!"
   fi
-
-  echo
-  print_green ">> For detailed dynamic port allocation, check './pnp_agent service-list' output in /dbsafer directory."
 }
 
 # Main execution
@@ -99,4 +99,4 @@ check_service_status
 check_service_processes
 
 echo
-print_green "All checks are completed."
+echo "All checks are completed."
