@@ -36,7 +36,9 @@ check_essential_processes() {
     "pnp_msg_tunnel"
     "pnp_watcher"
   )
-
+  
+  echo " - check command : ps -ef | grep pnp | grep -v grep | grep -v drop | grep -v sshd";
+  echo ""
   missing=0
   for pname in "${essential[@]}"; do
     if ps -ef | grep "$pname" | grep -v grep | grep -v drop | grep -v sshd > /dev/null; then
@@ -54,6 +56,7 @@ check_essential_processes() {
   else
     print_green ">> All essential processes are running."
   fi
+  echo ""
 }
 
 # [4] Service Status Check
