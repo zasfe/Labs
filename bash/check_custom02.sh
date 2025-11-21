@@ -58,7 +58,7 @@ function syscheck() {
         echo "" >> $log_file
         echo "==== iotop ====" >> $log_file
         if command -v iotop &>/dev/null; then
-          iotop --batch --time --iter=1 --accumulated | head -n 30  >> $log_file
+          iotop --batch --time --iter=1  | head -n 30  >> $log_file
         else
           echo "Not Found iotop" >> $log_file
         fi
