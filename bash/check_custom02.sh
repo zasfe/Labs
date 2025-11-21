@@ -17,15 +17,12 @@ function syscheck() {
                 rm -f $dlog_file
         fi
         echo " " >> $log_file
-#        date +%Y-%m-%d-%H:%M >> $log_file ;
-#      w >> $log_file
+        w >> $log_file
         uptime >> $log_file
-#       top -c >> $log_file
-#      pstree |grep mysqld >> $log_file
-       echo "==== ps ====" >> $log_file
-#        pstree |grep httpd >> $log_file
-       ps aufxww >> $log_file
-       echo "==== free -m ====" >> $log_file
+        top -c >> $log_file
+        echo "==== ps ====" >> $log_file
+        ps aufxww >> $log_file
+        echo "==== free -m ====" >> $log_file
         free -m >> $log_file
 
         echo "==== netstat countdown ====" >> $log_file
@@ -47,6 +44,14 @@ function syscheck() {
         netstat -nltp  >> $log_file
         netstat -ano |grep EST >> $log_file
         netstat -ano| grep TIME_WAIT  >> $log_file
+
+        echo "==== docker ====" >> $log_file
+        if command -v docker &>/dev/null; then
+          docker ps -a   >> $log_file
+          docker stats --all --no-stream --no-trunc  >> $log_file
+        else
+          echo "Not Found docker" >> $log_file
+        fi
 
 }
 
