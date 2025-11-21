@@ -1,16 +1,16 @@
 #!/bin/bash
 
-mkdir -p /var/log/syslog/
+mkdir -p /var/log/systemlog/
 
 #생성 파일
-log_file="/var/log/syslog/`date +%Y%m%d`"
+log_file="/var/log/systemlog/`date +%Y%m%d`"
 
 #7일마다 삭제
-dlog_file="/var/log/syslog/`date +%Y%m%d --date '7 day ago'`"
+dlog_file="/var/log/systemlog/`date +%Y%m%d --date '7 day ago'`"
 
 function syscheck() {
-        if [ ! -d "/var/log/syslog" ]; then
-                mkdir -p /var/log/syslog
+        if [ ! -d "/var/log/systemlog" ]; then
+                mkdir -p /var/log/systemlog
         fi
         if test -f $dlog_file
         then
