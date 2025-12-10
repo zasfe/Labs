@@ -1,5 +1,6 @@
 # Copyright: (c) 2019, Jordan Borean (@jborean93) <jborean93@gmail.com>
 # MIT License (see LICENSE or https://opensource.org/licenses/MIT)
+# ref : https://gist.github.com/jborean93/58bba8236fac313e3d4b3970b8213cb6
 
 Function Get-ServiceCredential {
     <#
