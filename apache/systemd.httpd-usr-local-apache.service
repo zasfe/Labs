@@ -5,10 +5,12 @@ After=network-online.target
 
 [Service]
 Type=forking
+PIDFile=/usr/local/apache/logs/httpd.pid
 ExecStart=/usr/local/apache/bin/apachectl start
 ExecReload=/usr/local/apache/bin/apachectl graceful
 ExecStop=/usr/local/apache/bin/apachectl stop
-KillMode=mixed
+KillMode=control-group
+KillSignal=SIGTERM
 PrivateTmp=true
 Restart=on-abort
 
