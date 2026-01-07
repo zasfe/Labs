@@ -1,12 +1,12 @@
 <#
 schtasks /Create ^
  /SC MINUTE /MO 5 ^
- /TN "MultiPingLogger" ^
+ /TN "MultiPingTracertLogger" ^
  /TR "powershell.exe -ExecutionPolicy Bypass -File \"C:\Scripts\MultiPingTracert.ps1\"" ^
  /RU "SYSTEM"
 
-schtasks /Query /TN "MultiPingLogger"
-schtasks /Delete /TN "MultiPingLogger" /F
+schtasks /Query /TN "MultiPingTracertLogger"
+schtasks /Delete /TN "MultiPingTracertLogger" /F
 #>
 
 $IpListPath = "C:\Scripts\iplist.txt"
