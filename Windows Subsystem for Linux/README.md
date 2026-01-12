@@ -13,14 +13,24 @@ REM VirtualMachinePlatform 기능을 활성화
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 ```
 
+```batch
+REM 장비 리부팅
+shutdown /r /t 0
+```
+
 ### 2) WSL2 업데이트 (Host PC)
 
 ```batch
 REM wsl2 업데이트
 wsl --update
 ```
-  * wsl2 수동 업데이트
-    * x64 머신용 최신 WSL2 Linux 커널 업데이트 패키지 [(다운로드)](https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi)
+
+```batch
+REM wsl2 수동 업데이트
+REM - x64 머신용 최신 WSL2 Linux 커널 업데이트 패키지 다운로드 - https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+
+powershell Invoke-Expression (Invoke-WebRequest "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi" -UseBasicParsing).Content
+```
 
 ```batch
 REM wsl 기본 버전 변경
