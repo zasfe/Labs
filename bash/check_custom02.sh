@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# crontab 설정
+# */1 * * * * root /root/check_systemlog.sh > /dev/null 2>&
+
 mkdir -p /var/log/systemlog/
 
 #생성 파일
