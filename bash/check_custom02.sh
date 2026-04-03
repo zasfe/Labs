@@ -1,79 +1,108 @@
 #!/bin/bash
 
-# crontab 설정
-# */1 * * * * root /root/check_systemlog.sh > /dev/null 2>&
+# crontab
+# * * * * * root /root/check.sh
 
-mkdir -p /var/log/systemlog/
+set -u
 
-#생성 파일
-log_file="/var/log/systemlog/`date +%Y%m%d`"
+LOG_DIR="/var/log/syslog"
+LOG_FILE="${LOG_DIR}/$(date +%Y%m%d)"
+LOCK_FILE="/var/run/check.sh.lock"
 
-#7일마다 삭제
-dlog_file="/var/log/systemlog/`date +%Y%m%d --date '7 day ago'`"
+mkdir -p "${LOG_DIR}"
 
-function syscheck() {
-        if [ ! -d "/var/log/systemlog" ]; then
-                mkdir -p /var/log/systemlog
-        fi
-        if test -f $dlog_file
-        then
-                rm -f $dlog_file
-        fi
-        echo " " >> $log_file
-        w >> $log_file
+# 중복 실행 방지
+exec 9>"${LOCK_FILE}"
+flock -n 9 || exit 0
 
-        echo "" >> $log_file
-        echo "==== free -m ====" >> $log_file
-        free -m >> $log_file
-
-        echo "" >> $log_file
-        echo "==== top ==== "  >> $log_file
-        top -c -b -n 1 -w  >> $log_file
-
-        echo "" >> $log_file
-        echo "==== ps ====" >> $log_file
-        ps aufxww >> $log_file
-
-        echo "" >> $log_file
-        echo "==== pstree ====" >> $log_file
-        if command -v pstree &>/dev/null; then
-          pstree --ascii --long   >> $log_file
-        else
-          echo "Not Found pstree" >> $log_file
-        fi
-
-        echo "" >> $log_file
-        echo "==== netstat ====" >> $log_file
-        netstat -nltp  >> $log_file
-        netstat -anop |grep EST >> $log_file
-        netstat -anop | grep TIME_WAIT  >> $log_file
-        
-        echo "" >> $log_file
-        echo "==== docker ====" >> $log_file
-        if command -v docker &>/dev/null; then
-          docker ps -a   >> $log_file
-          echo "" >> $log_file
-          docker stats --all --no-stream --no-trunc  >> $log_file
-        else
-          echo "Not Found docker" >> $log_file
-        fi
-
-        echo "" >> $log_file
-        echo "==== iotop ====" >> $log_file
-        if command -v iotop &>/dev/null; then
-          iotop --batch --time --iter=1  | head -n 30  >> $log_file
-        else
-          echo "Not Found iotop" >> $log_file
-        fi
-        
+log() {
+    echo "$*" >> "${LOG_FILE}"
 }
 
-#function mysql_processlist() {
-#        /usr/local/mariadb/bin/mysqladmin -u backup_user -p"backup_password"  processlist >> $log_file
-#
-#}
-#
-echo "===================== START `date +%Y-%m-%d-%H:%M` =====================" >> $log_file
+run_section() {
+    local name="$1"
+    shift
+
+    log ""
+    log "==== ${name} BEGIN $(date '+%F %T') ===="
+
+    if ! timeout 20s bash -c "$*" >> "${LOG_FILE}" 2>&1; then
+        rc=$?
+        log "[WARN] ${name} failed or timed out (rc=${rc}) at $(date '+%F %T')"
+    fi
+
+    log "==== ${name} END $(date '+%F %T') ===="
+}
+
+cleanup_old_logs() {
+    find "${LOG_DIR}" -maxdepth 1 -type f -name '20*' -mtime +7 -delete 2>/dev/null
+}
+
+syscheck() {
+    run_section "w" "w"
+    run_section "free -m" "free -m"
+    run_section "top" "top -b -n 1 -w"
+    run_section "ps" "ps aufxww"
+    run_section "pstree" '
+        if command -v pstree >/dev/null 2>&1; then
+            pstree --ascii --long
+        else
+            echo "Not Found pstree"
+        fi
+    '
+
+    run_section "network" '
+        if command -v ss >/dev/null 2>&1; then
+            echo "[ss -s]"
+            ss -s
+            echo
+            echo "[ss -nltp]"
+            ss -nltp
+            echo
+            echo "[ESTABLISHED count]"
+            ss -tan state established | wc -l
+            echo
+            echo "[TIME-WAIT count]"
+            ss -tan state time-wait | wc -l
+            echo
+            echo "[ESTABLISHED top 200]"
+            ss -tanop state established | head -n 200
+            echo
+            echo "[TIME-WAIT top 200]"
+            ss -tanop state time-wait | head -n 200
+        else
+            echo "[netstat -nltp]"
+            netstat -nltp
+            echo
+            echo "[ESTABLISHED]"
+            netstat -anop | grep EST | head -n 200
+            echo
+            echo "[TIME_WAIT]"
+            netstat -anop | grep TIME_WAIT | head -n 200
+        fi
+    '
+
+    run_section "docker" '
+        if command -v docker >/dev/null 2>&1; then
+            docker ps -a
+            echo
+            docker stats --all --no-stream --no-trunc
+        else
+            echo "Not Found docker"
+        fi
+    '
+
+    run_section "iotop" '
+        if command -v iotop >/dev/null 2>&1; then
+            iotop --batch --time --iter=1 | head -n 30
+        else
+            echo "Not Found iotop"
+        fi
+    '
+}
+
+cleanup_old_logs
+
+log "===================== START $(date '+%F %T') ====================="
 syscheck
-#mysql_processlist
-echo "===================== END =====================" >> $log_file
+log "===================== END   $(date '+%F %T') ====================="
