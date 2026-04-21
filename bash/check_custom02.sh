@@ -5,7 +5,7 @@
 
 set -u
 
-LOG_DIR="/var/log/syslog"
+LOG_DIR="/var/log/systemlog"
 LOG_FILE="${LOG_DIR}/$(date +%Y%m%d)"
 LOCK_FILE="/var/run/check.sh.lock"
 
