@@ -1,0 +1,47 @@
+# 0. TLS 1.2 보안 프로토콜 설정 (다운로드 오류 방지)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# 1. Enable Windows Container Features 
+Enable-WindowsOptionalFeature -Online -FeatureName Containers -All
+
+# Run this command to enable the "Hyper-V" feature (required for isolation):
+# Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+
+# 2. 설치 경로 설정 및 폴더 생성
+$installPath = "C:\docker"
+if (!(Test-Path $installPath)) { New-Item -ItemType Directory -Path $installPath }
+
+# 3. 최신 안정판 바이너리 다운로드 (static binaries)
+$zipFile = "$Env:TEMP\docker.zip"
+$rootUrl = "https://download.docker.com/win/static/stable/x86_64/"
+$html = Invoke-RestMethod -Uri $rootUrl -UseBasicParsing
+$latestZipFile = ([regex]::Matches($html, 'docker-[\d\.]+(-ce)?\.zip')).Value[-1]
+$downloadUrl = $rootUrl + $latestZipFile
+
+Write-Host "Downloading Docker binaries..." -ForegroundColor Cyan
+Invoke-WebRequest -Uri $downloadUrl -OutFile $zipFile
+
+# 4. 압축 해제 및 바이너리 이동
+Write-Host "Extracting binaries to $installPath..." -ForegroundColor Cyan
+Expand-Archive -Path $zipFile -DestinationPath "$Env:TEMP\docker_temp" -Force
+Copy-Item -Path "$Env:TEMP\docker_temp\docker\*" -Destination $installPath -Recurse -Force
+
+# 5. 환경 변수(Path)에 추가 (이미 등록되어 있는지 확인 후 추가)
+$currentPath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+if ($currentPath -notlike "*$installPath*") {
+    Write-Host "Adding $installPath to System PATH..." -ForegroundColor Cyan
+    [Environment]::SetEnvironmentVariable("Path", $currentPath + ";$installPath", "Machine")
+    $env:Path += ";$installPath" # 현재 세션에도 즉시 반영
+}
+
+# 6. Docker 엔진을 윈도우 서비스로 등록 및 시작
+Write-Host "Registering and starting Docker service..." -ForegroundColor Cyan
+& "$installPath\dockerd.exe" --register-service
+Start-Service docker
+
+# 7. 설치 확인
+Write-Host "Installation complete!" -ForegroundColor Green
+docker version
+
+# 8. 동작 확인
+docker run hello-world
