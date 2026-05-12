@@ -12,5 +12,5 @@ https://gist.github.com/spilist/c468cbf1ed0ffc91100f813aabdcd520?#file-token-eff
 ```
 
 ```
-https://gist.github.com/spilist/c468cbf1ed0ffc91100f813aabdcd520?#file-token-efficiency-analysis-prompt-md 를 읽고 그대로 실행해줘
+https://github.com/zasfe/Labs/blob/master/prompt/token-efficiency-analysis-prompt.md 를 읽고 그대로 실행해줘
 ```
