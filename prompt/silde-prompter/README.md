@@ -2,6 +2,8 @@
 
 > https://slide-prompter.tonylee.im/
 
+> 원문 : https://www.linkedin.com/posts/jyoung105_codex-%EB%A1%9C-%EB%A7%8C%EB%93%9C%EB%8A%94-%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%93%9C-%EC%9D%B4%EB%AF%B8%EC%A7%80-%EA%B4%80%EB%A0%A8-%EB%91%90-%EA%B0%80%EC%A7%80-%EC%A4%80%EB%B9%84%EB%90%90%EC%8A%B5%EB%8B%88%EB%8B%A4-%EC%96%B4%EC%A0%9C-share-7460840113929879552-hUD8/
+
 * 👉 Codex → npx skills add bytonylee/future-slide-skill → With $tightened-slide skill, 붙여서 사용 
 * 👉 ChatGPT → 프롬프트 그대로 사용 (표현 붙이지 않음)
 
