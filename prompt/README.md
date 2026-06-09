@@ -22,3 +22,6 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/token-effi
 https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/HANDOFF.md 를 읽고 그대로 실행해줘
 ```
 
+```
+나머지 계획 내용을 현재 폴더에 HANDOFF.md 파일로 저장하세요. 시도했던 내용, 성공했던 부분, 실패했던 부분을 자세히 설명하여, 다음 담당자가 새로운 환경에서 해당 파일만 불러와도 바로 작업을 시작하고 완료할 수 있도록 하세요.
+```
