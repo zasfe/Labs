@@ -1,1 +1,1 @@
- the rest of the plan in the system-prompt-extraction folder as HANDOFF.md. Explain what you have tried, what worked, what didn’t work, so that the next agent with fresh context is able to just load that file and nothing else to get started on this task and finish it up.
+Put the rest of the plan in the current folder as HANDOFF.md. Explain what you have tried, what worked, what didn’t work, so that the next agent with fresh context is able to just load that file and nothing else to get started on this task and finish it up.
