@@ -115,7 +115,9 @@ Do not over-explain. Execute.
 > **이것은 바이브 코딩이 아닙니다.** AI가 주는 코드를 읽지도 않고 수락하는 것이 아닙니다.
 > 모든 계획은 검토되고, 모든 결과물은 검증되며, 모든 결정의 뒤에는 사람이 있습니다.
 
-이 프로젝트는 **[Hyper-Waterfall 방법론](https://github.com/edwardkim/rhwp/wiki/Hyper%E2%80%90Waterfall-%EB%AC%B8%EC%84%9C-%EC%B2%B4%EA%B3%84-%EA%B0%80%EC%9D%B4%EB%93%9C)** 을 따른다.
+https://github.com/zasfe/Labs/blob/master/prompt/info-Hyper-Waterfall.md
+
+이 프로젝트는 **[Hyper-Waterfall 방법론](https://github.com/zasfe/Labs/blob/master/prompt/info-Hyper-Waterfall.md)** 을 따른다.
 거시적 워터폴(계획→승인→구현→검증) + 미시적 애자일(단계별 반복)을 AI가 동시에 가능하게 한다.
 
 ### 핵심 원칙
