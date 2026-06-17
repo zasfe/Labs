@@ -1,9 +1,15 @@
 # OpenStack VM + Load Balancer 환경 TCP 성능 분석 및 튜닝 가이드
+
 ## 문서 목적
+
 본 문서는 OpenStack 기반 VM 환경에서 Load Balancer(LB) 뒤에 위치한 WEB/WAS/DB 서버의 TCP 성능을 분석하고 적절한 커널 파라미터를 산정하기 위한 절차를 정리한 문서이다.
+
 LB 설정값이 공개되지 않은 환경을 전제로 하며, 클라이언트 및 서버에서 수집 가능한 정보만을 이용하여 LB 특성을 추정하고 이를 기반으로 TCP 튜닝 방향을 결정하는 것을 목표로 한다.
+
 ---
+
 # 환경 가정
+
 ```text
 Client
   ↓
@@ -14,14 +20,18 @@ OpenStack VM
   ├─ WAS
   └─ DB
 ```
+
 제약사항
 - LB 설정 접근 불가
 - LB 종류 미확인
 - OpenStack VM SSH 접근 가능
 - Client 시스템 제어 가능
 - 서비스 중단 없는 분석 필요
+
 ---
+
 # LB 환경에서 TCP 튜닝이 어려운 이유
+
 일반적인 서버 튜닝은 다음 구조를 전제로 한다.
 ```text
 Client
