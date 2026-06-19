@@ -42,6 +42,7 @@ mydocs/
 ├── report/           # 최종 결과보고서 — "결과가 무엇인가"
 ├── feedback/         # 코드 리뷰 피드백 — "무엇이 틀렸는가" (AI가 스스로 만들 수 없는 문서)
 ├── tech/             # 기술 사항 정리 — "무엇을 발견했는가" (세션 간 지식 영구화)
+├── spec/             # 설계 사항 정리 — "무엇을 기반으로 하는가" (세션 간 지식 영구화)
 └── troubleshootings/ # 트러블슈팅 — "이 함정에 다시 빠지지 마라"
 ```
 
@@ -58,6 +59,7 @@ mydocs/
 | 최종 보고서 | `report/` | `task_{번호}_report.md` | `task_1_report.md` |
 | 피드백 | `feedback/` | `task_{번호}_feedback.md` | `task_1_feedback.md` |
 | 기술 정리 | `tech/` | 주제별 자유 명명 | `spring_security_block.md` |
+| 설계 정리 | `spec/` | 주제별 자유 명명 | `spring_spec.md` |
 | 트러블슈팅 | `troubleshootings/` | 주제별 자유 명명 | `ims_keepalive_bug.md` |
 
 ## 푸시 전 점검 (사용자 인터페이스 변경 시 필수)
