@@ -15,5 +15,7 @@ mkdir -p mydocs/plans/archives
 
 curl -fsSLO "${BASE_URL}/AGENTS.md"
 curl -fsSLO "${BASE_URL}/info-Hyper-Waterfall.md"
+curl -fsSLO "${BASE_URL}/RAW/.gitignore"
+curl -fsSLO "${BASE_URL}/RAW/.gitattributes"
 
 echo "프로젝트 초기화 완료"
