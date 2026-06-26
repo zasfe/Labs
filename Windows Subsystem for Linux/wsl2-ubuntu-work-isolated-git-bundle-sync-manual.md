@@ -1,4 +1,3 @@
-````markdown
 # WSL2 Ubuntu Work/Isolated 이중 환경 구성 매뉴얼
 
 ## 1. 목적
@@ -1063,6 +1062,3 @@ Windows PC
 ## 24. 참고 출처
 
 > 📄출처: [Microsoft, Basic commands for WSL, 2025, [https://learn.microsoft.com/en-us/windows/wsl/basic-commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)], [Microsoft, How to install Linux on Windows with WSL, 2025, [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install)], [Microsoft, Advanced settings configuration in WSL, 2026, [https://learn.microsoft.com/ko-kr/windows/wsl/wsl-config](https://learn.microsoft.com/ko-kr/windows/wsl/wsl-config)], [Microsoft, Accessing network applications with WSL, 2025, [https://learn.microsoft.com/en-us/windows/wsl/networking](https://learn.microsoft.com/en-us/windows/wsl/networking)], [Git SCM, git-bundle Documentation, 2025, [https://git-scm.com/docs/git-bundle](https://git-scm.com/docs/git-bundle)], [Kernel.org, git-bundle Manual Page, 2025, [https://www.kernel.org/pub/software/scm/git/docs/git-bundle.html](https://www.kernel.org/pub/software/scm/git/docs/git-bundle.html)]
-
-```
-```
