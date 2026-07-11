@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Version,
 
-    [string]$TLauncherPath = "$env:USERPROFILE\Downloads\TLauncher.exe",
+    [string]$TLauncherPath = "$env:APPDATA\.minecraft\TLauncher.exe",
 
     [string]$ConfigPath = "$env:APPDATA\.tlauncher\tlauncher-2.0.properties",
 
