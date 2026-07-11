@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Version,
 
-    [string]$TLauncherPath = "$env:APPDATA\.minecraft\TLauncher.exe",
+    [string]$TLauncherPath = "$env:USERPROFILE\Downloads\TLauncher.exe",
 
     [string]$ConfigPath = "$env:APPDATA\.tlauncher\tlauncher-2.0.properties",
 
@@ -10,8 +10,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
 $VersionKey = "login.version.game"
+
+# Windows PowerShell 출력 인코딩
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
 
 function Write-Utf8WithoutBom {
     param(
@@ -22,68 +25,34 @@ function Write-Utf8WithoutBom {
         [string[]]$Content
     )
 
-    $Utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+    $Encoding = New-Object System.Text.UTF8Encoding($false)
     $Text = ($Content -join [Environment]::NewLine) + [Environment]::NewLine
 
     [System.IO.File]::WriteAllText(
         $Path,
         $Text,
-        $Utf8WithoutBom
+        $Encoding
     )
 }
 
 if (-not (Test-Path -LiteralPath $ConfigPath)) {
-    throw "TLauncher 설정 파일을 찾을 수 없습니다: $ConfigPath"
+    throw "Config file not found: $ConfigPath"
 }
 
 if (-not (Test-Path -LiteralPath $TLauncherPath)) {
-    throw "TLauncher 실행 파일을 찾을 수 없습니다: $TLauncherPath"
+    throw "TLauncher executable not found: $TLauncherPath"
 }
 
-$RunningProcesses = Get-Process |
-    Where-Object {
-        $_.ProcessName -in @(
-            "TLauncher",
-            "java",
-            "javaw"
-        )
-    }
+# 다른 Java 프로그램은 무시하고 TLauncher만 검사
+$RunningTLauncher = Get-Process -Name "TLauncher" -ErrorAction SilentlyContinue
 
-if ($RunningProcesses -and -not $Force) {
-    $Names = $RunningProcesses.ProcessName |
-        Sort-Object -Unique
-
-    throw "실행 중인 프로세스가 있습니다: $($Names -join ', '). 먼저 종료하거나 -Force를 사용하십시오."
+if ($RunningTLauncher -and -not $Force) {
+    throw "TLauncher is already running. Close it first or use -Force."
 }
 
-if ($Force) {
-    Get-Process -Name "TLauncher" -ErrorAction SilentlyContinue |
-        Stop-Process -Force
-}
-
-$MinecraftDirectoryLine = Get-Content -LiteralPath $ConfigPath |
-    Where-Object {
-        $_ -match "^minecraft\.gamedir="
-    } |
-    Select-Object -First 1
-
-if ($MinecraftDirectoryLine) {
-    $MinecraftDirectory = $MinecraftDirectoryLine `
-        -replace "^minecraft\.gamedir=", "" `
-        -replace "\\:", ":" `
-        -replace "\\\\", "\"
-}
-else {
-    $MinecraftDirectory = "$env:APPDATA\.minecraft"
-}
-
-$VersionDirectory = Join-Path `
-    $MinecraftDirectory `
-    "versions\$Version"
-
-if (-not (Test-Path -LiteralPath $VersionDirectory)) {
-    Write-Warning "버전 디렉터리를 찾지 못했습니다: $VersionDirectory"
-    Write-Warning "TLauncher에서 해당 버전을 먼저 설치해야 할 수 있습니다."
+if ($Force -and $RunningTLauncher) {
+    $RunningTLauncher | Stop-Process -Force
+    Start-Sleep -Seconds 1
 }
 
 $Timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
@@ -115,7 +84,7 @@ Write-Utf8WithoutBom `
     -Path $ConfigPath `
     -Content $UpdatedLines
 
-$SavedValue = Get-Content -LiteralPath $ConfigPath |
+$SavedValue = [System.IO.File]::ReadAllLines($ConfigPath) |
     Where-Object {
         $_.StartsWith("$VersionKey=")
     } |
@@ -127,13 +96,13 @@ if ($SavedValue -ne "$VersionKey=$Version") {
         -Destination $ConfigPath `
         -Force
 
-    throw "버전 설정 검증에 실패했습니다. 설정 파일을 복원했습니다."
+    throw "Version setting verification failed. Config restored."
 }
 
-Write-Host "TLauncher 버전 설정 완료"
-Write-Host "  버전: $Version"
-Write-Host "  설정: $SavedValue"
-Write-Host "  백업: $BackupPath"
+Write-Host "TLauncher version configured"
+Write-Host "Version : $Version"
+Write-Host "Config  : $SavedValue"
+Write-Host "Backup  : $BackupPath"
 
 Start-Process `
     -FilePath $TLauncherPath `
