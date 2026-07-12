@@ -31,6 +31,409 @@
 
 각 **[승인]** 지점이 품질 게이트다. 방향성 오류를 코드가 쌓이기 전에 잡는다.
 
+## AI Context Loading / Memory / Context Budget
+
+> AI는 모든 문서를 읽지 않는다.
+> 필요한 문서만 읽고, 필요한 지식만 기억하며, 제한된 Context를 효율적으로 사용한다.
+
+---
+
+### 1. Context Loading 규칙
+
+#### 목적
+
+프로젝트가 커질수록 모든 문서를 읽는 것은 비효율적이다.
+
+모든 AI Agent는 동일한 순서로 Context를 로드하여
+항상 동일한 판단을 수행하도록 한다.
+
+#### Context Loading 순서
+
+```
+1. AGENTS.md
+2. 현재 Task 관련 HANDOFF.md
+3. orders/yyyyMMdd.md
+4. 현재 Task 수행계획서
+5. 현재 Task 구현계획서
+6. 가장 최신 working 보고서
+7. 현재 Task와 직접 연결된 spec
+8. 현재 Task와 직접 연결된 tech
+9. 현재 Task와 직접 연결된 troubleshooting
+10. 현재 Task와 관련된 ADR
+```
+
+읽는 순서는 반드시 위 순서를 따른다.
+
+상위 문서는 하위 문서보다 우선한다.
+
+예)
+
+```
+AGENTS.md
+
+↓
+
+Task Plan
+
+↓
+
+Working
+
+↓
+
+Spec
+
+↓
+
+Tech
+```
+
+---
+
+#### 문서 선택 규칙
+
+##### 반드시 읽는다
+
+- 현재 Task 계획서
+- 최신 Working
+- AGENTS.md
+
+##### 필요 시 읽는다
+
+- spec
+- tech
+- troubleshooting
+- ADR
+
+관련성이 없는 문서는 읽지 않는다.
+
+예)
+
+Task
+
+```
+로그인 버그 수정
+```
+
+읽음
+
+```
+spec/auth.md
+
+tech/jwt.md
+
+troubleshooting/login_timeout.md
+```
+
+읽지 않음
+
+```
+spec/payment.md
+
+tech/openstack.md
+```
+
+---
+
+#### Context 우선순위
+
+동일한 내용이 여러 문서에 존재할 경우
+
+우선순위는
+
+```
+AGENTS.md
+
+>
+
+현재 Task Plan
+
+>
+
+Working
+
+>
+
+ADR
+
+>
+
+Spec
+
+>
+
+Tech
+
+>
+
+Troubleshooting
+```
+
+이다.
+
+---
+
+### 2. Memory 승격 기준
+
+#### 목적
+
+모든 정보를 Memory로 저장하지 않는다.
+
+반복적으로 사용될 가치가 있는 정보만
+Project Memory로 승격한다.
+
+---
+
+#### 승격 대상
+
+다음 조건 중 하나 이상 만족하면
+Memory 승격 후보이다.
+
+□ 프로젝트 전체 Coding Rule
+□ Architecture Rule
+□ Agent 운영 규칙
+□ 반복적으로 발생한 장애 해결법
+□ 동일한 패턴이 3회 이상 발생
+□ 향후 모든 Task에서 사용될 규칙
+
+---
+
+#### 승격 제외
+
+다음은 Memory에 저장하지 않는다.
+
+- 현재 Task 전용 정보
+- 임시 실험 결과
+- 개인 메모
+- 미검증 정보
+- 승인되지 않은 설계
+
+---
+
+#### 승격 절차
+
+```
+Task 완료
+
+↓
+
+Tech 또는 Spec 작성
+
+↓
+
+Review
+
+↓
+
+Human 승인
+
+↓
+
+Memory 등록
+
+↓
+
+다음 Task부터 자동 사용
+```
+
+---
+
+#### Memory 수정
+
+기존 Memory와 충돌하는 경우
+
+```
+기존 Memory 삭제 금지
+
+↓
+
+Deprecated 표시
+
+↓
+
+새로운 Memory 추가
+
+↓
+
+ADR 기록
+```
+
+---
+
+### 3. Context Budget
+
+#### 목적
+
+LLM Context는 유한하다.
+
+모든 문서를 읽는 것이 아니라
+가장 가치 있는 정보를 우선 사용한다.
+
+---
+
+#### 권장 Budget
+
+| 구분 | 최대 비율 |
+|-------|----------|
+| Global Rule | 20% |
+| Project Memory | 20% |
+| 현재 Task | 35% |
+| Working | 15% |
+| Spec | 5% |
+| Tech | 5% |
+| Troubleshooting | 5% |
+| ADR | 5% |
+
+현재 Task Context는
+항상 가장 높은 우선순위를 가진다.
+
+---
+
+#### Budget 부족 시 제거 순서
+
+Context가 부족하면
+아래 순서대로 제거한다.
+
+```
+History
+
+↓
+
+Working(오래된 것)
+
+↓
+
+Tech
+
+↓
+
+Troubleshooting
+
+↓
+
+Spec
+
+↓
+
+ADR
+
+↓
+
+Project Memory
+```
+
+다음 항목은 절대 제거하지 않는다.
+
+- AGENTS.md
+- 현재 Task
+- 현재 Plan
+- 최신 Working
+- Human 지시사항
+
+---
+
+### Sub Agent Context
+
+Sub Agent는 Main Agent의 전체 Context를 복사하지 않는다.
+
+Main Agent는 필요한 정보만 요약하여 전달한다.
+
+```
+Main Agent
+
+↓
+
+Task 요약
+
+관련 파일
+
+제약사항
+
+참고 문서
+
+↓
+
+Sub Agent
+```
+
+Sub Agent는
+
+- 독립적인 Context
+- 독립적인 Token
+- 독립적인 추론
+
+을 수행한다.
+
+---
+
+### Context 최소화 원칙
+
+Sub Agent에는
+
+"작업 수행에 필요한 정보만"
+
+전달한다.
+
+절대로
+
+- 전체 History
+- 전체 Working
+- 전체 Spec
+- 전체 Repository 설명
+
+을 전달하지 않는다.
+
+---
+
+### Context 전달 템플릿
+
+```
+Task
+
+목표
+
+완료 조건
+
+관련 파일
+
+수정 가능 파일
+
+수정 금지 파일
+
+제약사항
+
+참고 Spec
+
+참고 Tech
+
+참고 ADR
+
+예상 결과
+```
+
+---
+
+### 최종 원칙
+
+AI는
+
+많이 읽는 것이 아니라
+
+**정확하게 읽는 것**을 목표로 한다.
+
+Memory는
+
+많이 저장하는 것이 아니라
+
+**반복 가치가 있는 정보만 저장**한다.
+
+Context는
+
+최대한 크게 사용하는 것이 아니라
+
+**최대한 작게 사용하여 정확도를 높인다.**
+
+
 ## 문서 체계 (mydocs/)
 
 ```
