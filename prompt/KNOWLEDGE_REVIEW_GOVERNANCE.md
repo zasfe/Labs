@@ -478,7 +478,12 @@ follow_up_date:
 
 승인 기록과 이전 상태를 추적할 수 있도록 유지 또는 보관한다.
 
-Case는 승인 대상이 아니다.
+
+Case 문서는 승인 대상이 아니다.
+
+Case는 원본 기록과 구조화 결과를 보존하는 역할이며 수정될 수 있다.
+
+승인 대상은 Case에서 제안된 Object, Relationship, Action, Workflow, Rule이다.
 
 ⸻
 
@@ -534,6 +539,10 @@ affected_cases:
 ⸻
 
 5. 장기 지식 승격 절차
+
+Memory는 Case를 승격하는 것이 아니다.
+
+여러 Case에서 반복적으로 검증된 운영지식만 Memory로 승격한다.
 
 07-memory/에는 검증된 지식만 승격한다.
 
