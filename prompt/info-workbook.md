@@ -163,12 +163,21 @@ AI는 이전 대화를 이어받지 않는다.
 | 구현 계획서 | `plans/` | `task_{번호}_impl.md` | `task_1_impl.md` |
 | 단계별 완료보고서 | `working/` | `task_{번호}_{작업단위}_stage{N}.md` | `task_1_backend_stage1.md` |
 | 단계 승인요약서 | `working/` | `task_{번호}_{작업단위}_stage{N}_summary.md` | `task_1_backend_stage1_summary.md` |
+| 진행현황 | working | task_{번호}_progress.md | task_1_progress.md |
 | 최종 보고서 | `report/` | `task_{번호}_report.md` | `task_1_report.md` |
 | 피드백 | `feedback/` | `task_{번호}_feedback.md` | `task_1_feedback.md` |
 | 기술 정리 | `tech/` | 주제별 자유 명명 | `spring_security_block.md` |
 | 설계 정리 | `spec/` | 주제별 자유 명명 | `spring_spec.md` |
 | 트러블슈팅 | `troubleshootings/` | 주제별 자유 명명 | `ims_keepalive_bug.md` |
 
+
+### 파일 작성 원칙
+
+- Stage Summary는 다음 세션에서 읽는 대표 문서다.
+- Progress는 작업 전체의 진행 현황만 누적 관리한다.
+- 완료보고서는 작업 단위별 상세 기록으로 유지한다.
+- Report는 최종 결과만 기록한다.
+- 영구 지식은 tech/spec/troubleshootings에만 승격한다.
 
 ### 작업단위 이름 규칙
 
