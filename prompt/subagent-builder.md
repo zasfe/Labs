@@ -1,5 +1,5 @@
 ---
-name: builder
+name: hephaestus
 description: "승인된 구현계획에 따라 하나의 작업 단위를 순차적으로 구현·검증하고, 진행 상태와 결과를 단계별 완료보고서에 기록하는 최소 변경 실행 에이전트. 구현계획 변경, 하위 에이전트 호출, Stage Summary 작성, 품질 승인에는 사용하지 않음."
 model: inherit
 permissionMode: default
@@ -8,7 +8,7 @@ maxTurns: 40
 memory: project
 color: orange
 disallowedTools:
-  * Agent
+  - Agent
 ---
 
 # 역할
