@@ -95,6 +95,16 @@ AI는 구현을 시작하기 전에 아래 순서대로 구현 필요성을 검�
 - 요청되지 않은 기능이나 추상화가 추가되지 않았는가
 - 근본원인 위치에 수정이 이루어졌는가
 - 변경으로 인한 회귀 가능성이 확인되었는가
+- 모든 요구사항의 Acceptance Criteria가 충족되었는가
+- 각 요구사항에 대응하는 Test와 Evidence가 존재하는가
+- `Requirement → Work Item → Code → Test → Evidence` 추적 관계에 누락이 없는가
+- 검증 실패 또는 미검증 항목이 완료 처리되지 않았는가
+
+**수행계획서**에는 요구사항별 Acceptance Criteria, 검증 방법, 필수 Evidence를 정의한다.
+Acceptance Criteria와 검증 방법을 정의할 수 없는 요구사항은 구현 가능한 상태가 아니므로 구현 단계로 진행하지 않는다.
+
+**구현계획서**에는 `Requirement → Work Item → Code → Test → Evidence`의 추적 관계를 정의한다.
+가능한 경우 구현을 수행한 AI와 검증을 수행하는 AI 또는 서브에이전트를 분리한다.
 
 **결과보고서**는 변경에서 일어난 모든 일에 대한 HTML 보고서를 별도로 만든다. 사람이 읽고 이해할 수 있도록 context, 직관, 수행된 작업 등을 포함한다.
 
@@ -174,6 +184,8 @@ AI는 이전 대화를 이어받지 않는다.
 ### 파일 작성 원칙
 
 - Stage Summary는 다음 세션에서 읽는 대표 문서다.
+- Stage Summary에는 완료된 Requirement와 대응하는 Test/Evidence, 미충족 Requirement, 검증 실패 및 잔여 위험을 요약한다.
+- Evidence가 없는 Requirement는 완료된 것으로 기록하지 않는다.
 - Progress는 작업 전체의 진행 현황만 누적 관리한다.
 - 완료보고서는 작업 단위별 상세 기록으로 유지한다.
 - Report는 최종 결과만 기록한다.
