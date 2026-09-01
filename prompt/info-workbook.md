@@ -182,8 +182,8 @@ AI는 이전 대화를 이어받지 않는다.
 | 오늘 할일 | `orders/` | `yyyymmdd.md` | `20260525.md` |
 | 수행 계획서 | `plans/` | `task_{번호}.md` | `task_1.md` |
 | 구현 계획서 | `plans/` | `task_{번호}_impl.md` | `task_1_impl.md` |
-| 단계별 완료보고서 | `working/` | `task_{번호}_{작업단위}_stage{N}.md` | `task_1_backend_stage1.md` |
-| 단계 승인요약서 | `working/` | `task_{번호}_{작업단위}_stage{N}_summary.md` | `task_1_backend_stage1_summary.md` |
+| 단계별 완료보고서 | `working/` | `task_{번호}_{작업단위번호}_{작업단위}_stage{N}.md` | `task_1_1_backend_stage1.md` |
+| 단계 승인요약서 | `working/` | `task_{번호}_{작업단위번호}_{작업단위}_stage{N}_summary.md` | `task_1_1_backend_stage1_summary.md` |
 | 진행현황 | working | task_{번호}_progress.md | task_1_progress.md |
 | 최종 보고서 | `report/` | `task_{번호}_report.md` | `task_1_report.md` |
 | 피드백 | `feedback/` | `task_{번호}_feedback.md` | `task_1_feedback.md` |
