@@ -16,6 +16,10 @@
 | **디버깅** | AI에게 AI 버그 수정 요청 | 사람이 진단, AI가 구현 |
 | **문서** | 없음 | mydocs/ 에 전 과정 기록 |
 
+- 프로젝트 가장 상단 폴더에 최소한의 파일이나 폴더만 유지한다.
+- 별도의 도구를 설치하지 말고 devcontainer 를 활용한다.
+- 개발한 코드는 안정적인 배포를 위해 컨테이너 기반으로 개발한다.
+
 ### AI의 자율 판단 원칙
 
 AI에게 구현 절차를 모두 지시하지 않는다.
@@ -147,7 +151,7 @@ mydocs/
 
 **왜 문서가 필요한가**: AI는 세션이 끊기면 기억이 사라진다. 문서가 있으면 새 세션에서도 컨텍스트 전달 없이 `orders/` → `working/` → `plans/` 순으로 읽어 즉시 작업 재개 가능.
 
-* 프로젝트 가장 상단 폴더에 최소한의 파일이나 폴더만 유지합니다.
+
 
 ### 문서 역할
 
@@ -184,8 +188,8 @@ AI는 이전 대화를 이어받지 않는다.
 | 오늘 할일 | `orders/` | `yyyymmdd.md` | `20260525.md` |
 | 수행 계획서 | `plans/` | `task_{번호}.md` | `task_1.md` |
 | 구현 계획서 | `plans/` | `task_{번호}_impl.md` | `task_1_impl.md` |
-| 단계별 완료보고서 | `working/` | `task_{번호}_{작업단위번호}_{작업단위}_stage{N}.md` | `task_1_1_backend_stage1.md` |
-| 단계 승인요약서 | `working/` | `task_{번호}_{작업단위번호}_{작업단위}_stage{N}_summary.md` | `task_1_1_backend_stage1_summary.md` |
+| 단계별 완료보고서 | `working/` | `task_{번호}_stage{N}_{작업단위}.md` | `task_1_stage1_backend.md` |
+| 단계 승인요약서 | `working/` | `task_{번호}_stage{N}_{작업단위}_summary.md` | `task_1_stage1_backend_summary.md` |
 | 진행현황 | working | task_{번호}_progress.md | task_1_progress.md |
 | 최종 보고서 | `report/` | `task_{번호}_report.md` | `task_1_report.md` |
 | 피드백 | `feedback/` | `task_{번호}_feedback.md` | `task_1_feedback.md` |
