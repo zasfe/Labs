@@ -61,5 +61,7 @@ https://github.com/zasfe/Labs/blob/master/prompt/example/Secret%2520scanning%252
   각 단계 완료 후 근거 기반 다음 작업을 정확히 한 개 제안하라.
 ```
 
+## 스킬
 
+* 업체 리서치 - https://github.com/zasfe/Labs/blob/master/prompt/skills/customer-research/SKILL.md
 
