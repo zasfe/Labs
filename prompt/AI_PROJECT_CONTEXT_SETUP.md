@@ -4,12 +4,15 @@
 
 - `ARCHITECTURE.md`
 - `DESIGN.md`
+- `FEATURE_MAP.md`
 - `HANDOFF.md`
 - 기존 `AGENTS.md`의 문서 참조 규칙
 
 문서를 먼저 작성하지 말고 실제 저장소를 충분히 조사한 후 작성한다.
 
-## 1. 프로젝트 조사
+---
+
+# 1. 프로젝트 조사
 
 먼저 다음을 조사한다.
 
@@ -24,6 +27,13 @@
 - 테스트 구조
 - 주요 데이터 구조와 알고리즘
 - 코드에서 확인되는 중요한 invariant와 제약조건
+- 사용자가 인식하는 주요 기능
+- 각 기능의 진입점과 주요 사용자 흐름
+- 기능을 구현하는 UI, route, command, API, service/module 및 주요 코드
+- 기능과 테스트 사이의 연결 관계
+- 기능을 실제 실행하여 검증하는 방법
+- UI가 존재하는 경우 주요 화면과 식별 가능한 UI 요소
+- 기능 간 의존 관계
 - 현재 진행 중인 작업
 - Git history에서 확인할 필요가 있는 주요 설계 변경
 
@@ -95,13 +105,13 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 가능한 경우 다음 관계가 드러나도록 작성한다.
 
-    Design decision
-        ↓
-    Implementation
-        ↓
-    Invariant
-        ↓
-    Test
+Design decision
+↓
+Implementation
+↓
+Invariant
+↓
+Test
 
 코드만 읽어서는 쉽게 알 수 없는 설계 지식을 우선적으로 기록한다.
 
@@ -111,7 +121,163 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 ---
 
-# 4. HANDOFF.md
+# 4. FEATURE_MAP.md
+
+`FEATURE_MAP.md`는 다음 질문에 답하도록 작성한다.
+
+> 사용자가 인식하는 기능은 무엇이며, 그 기능은 어디에서 시작하여 어떤 코드와 시스템을 거쳐 동작하고 어떻게 검증할 수 있는가?
+
+Feature Map은 단순한 기능 목록이나 파일 목록이 아니다.
+
+AI 에이전트가 기능 이름, 사용자 요청, 버그 증상 또는 UI 단서만 전달받아도 관련 구현을 빠르게 찾고, 필요한 경우 애플리케이션을 직접 실행하여 기능을 재현하고 검증할 수 있도록 작성한다.
+
+## 4.1 작성 기준
+
+Feature Map의 기준은 코드 구조가 아니라 사용자 기능이다.
+
+다음과 같은 코드 중심 구조를 Feature Map의 최상위 구조로 사용하지 않는다.
+
+src/
+├── components
+├── services
+└── utils
+
+대신 사용자가 인식하는 기능을 기준으로 구성한다.
+
+Features
+├── Authentication
+├── Project Management
+├── Search
+├── Settings
+└── Export
+
+하나의 기능이 여러 컴포넌트, 서비스 또는 저장소에 걸쳐 구현되어 있다면 해당 경로를 연결하여 기록한다.
+
+내부 구현이 존재하더라도 사용자가 독립적인 기능으로 인식하지 않는다면 무조건 별도의 Feature로 분리하지 않는다.
+
+## 4.2 기능별 기록 내용
+
+주요 기능마다 가능한 범위에서 다음 내용을 기록한다.
+
+- 기능 이름
+- 사용자 관점의 목적
+- 기능 진입점
+- 주요 사용자 흐름
+- 관련 화면 또는 route
+- 식별 가능한 주요 UI 요소
+- 관련 command 또는 API
+- 관련 service/module
+- 주요 데이터 또는 상태
+- 주요 구현 파일
+- 관련 테스트
+- 기능 검증 방법
+- 관련 `DESIGN.md` 항목
+- 알려진 제약조건
+
+프로젝트 유형에 존재하지 않는 항목을 억지로 생성하지 않는다. 예를 들어 CLI 프로젝트라면 UI 또는 DOM 정보를 요구하지 않는다.
+
+가능하면 다음 관계가 드러나도록 작성한다.
+
+User Feature
+↓
+Entry Point / UI / CLI
+↓
+Route / Command / API
+↓
+Service / Module
+↓
+Data / State
+↓
+Test
+↓
+Runtime Verification
+
+예:
+
+## 사용자 로그인
+
+Purpose:
+사용자가 계정 인증을 수행한다.
+
+Entry points:
+- `/login`
+- `LoginButton`
+
+Flow:
+LoginPage
+→ POST /api/login
+→ AuthService.authenticate()
+→ SessionStore
+
+Implementation:
+- src/pages/Login.tsx
+- src/api/auth.ts
+- src/services/AuthService.ts
+
+Tests:
+- tests/auth/login.spec.ts
+
+Verification:
+1. 애플리케이션을 실행한다.
+2. `/login`으로 이동한다.
+3. 테스트 계정으로 로그인한다.
+4. 예상된 인증 상태와 세션 생성 여부를 확인한다.
+
+Related design:
+- DESIGN.md#authentication
+
+## 4.3 Runtime Verification
+
+가능한 프로젝트에서는 정적 코드 분석만으로 기능이 정상이라고 판단하지 않는다.
+
+에이전트가 사용할 수 있는 실행 환경, 브라우저, CLI, 테스트 도구 또는 관찰 도구가 있다면 실제 기능을 실행하여 검증한다.
+
+Feature Map
+↓
+관련 구현 탐색
+↓
+애플리케이션 실행
+↓
+기능 재현
+↓
+테스트 / 로그 / 상태 확인
+↓
+검증
+
+UI 애플리케이션에서는 필요한 경우 route, 접근 순서, 안정적으로 식별할 수 있는 UI 요소 또는 자동화에 필요한 정보를 기록한다.
+
+단, 일시적인 DOM 구조나 쉽게 변경되는 selector를 무분별하게 장기 문서에 고정하지 않는다. 에이전트가 기능을 안정적으로 찾고 조작하는 데 실제로 필요한 정보만 기록한다.
+
+검증 방법이 복잡하거나 여러 기능에서 반복적으로 사용된다면 상세 절차를 `FEATURE_MAP.md`에 중복하지 말고 별도의 Skill 또는 프로젝트 지침으로 분리한다.
+
+예:
+
+skills/
+└── verification/
+└── SKILL.md
+
+`FEATURE_MAP.md`에서는 해당 Skill과 필요한 검증 절차를 연결한다.
+
+## 4.4 Feature Map 갱신 원칙
+
+다음 변경이 발생하면 관련 Feature Map을 확인하고 필요한 경우 갱신한다.
+
+- 사용자 기능 추가 또는 삭제
+- 사용자 흐름 변경
+- route 또는 주요 UI 변경
+- command 또는 API 변경
+- 기능의 주요 구현 위치 변경
+- 데이터 또는 상태 흐름의 중요한 변경
+- 관련 테스트 변경
+- 기능 검증 방법 변경
+
+단순한 내부 리팩터링으로 사용자 기능과 주요 탐색 경로가 변하지 않았다면 불필요하게 갱신하지 않는다.
+
+Feature Map 전체를 매번 다시 생성하지 않는다. 변경된 기능과 그 주변 관계를 우선적으로 갱신한다.
+
+---
+
+# 5. HANDOFF.md
 
 `HANDOFF.md`는 다음 질문에 답하도록 작성한다.
 
@@ -142,18 +308,29 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 ---
 
-# 5. 세 문서의 책임 분리
+# 6. 네 문서의 책임 분리
 
 내용을 중복해서 복사하지 않는다.
 
-    ARCHITECTURE.md
-    └─ 무엇이 어디에 있으며 어떻게 연결되는가?
+ARCHITECTURE.md
+└─ 무엇이 어디에 있으며 어떻게 연결되는가?
 
-    DESIGN.md
-    └─ 왜 이렇게 설계했으며 무엇을 유지해야 하는가?
+DESIGN.md
+└─ 왜 이렇게 설계했으며 무엇을 유지해야 하는가?
 
-    HANDOFF.md
-    └─ 현재 어디까지 진행되었으며 다음에 무엇을 해야 하는가?
+FEATURE_MAP.md
+└─ 사용자 기능은 무엇이며 구현과 검증 경로가 어디인가?
+
+HANDOFF.md
+└─ 현재 어디까지 진행되었으며 다음에 무엇을 해야 하는가?
+
+`ARCHITECTURE.md`는 시스템 전체의 구조와 경계를 설명한다.
+
+`DESIGN.md`는 설계 의도, invariant, 알고리즘과 trade-off처럼 코드를 안전하게 변경하기 위해 알아야 할 지식을 설명한다.
+
+`FEATURE_MAP.md`는 여러 시스템 컴포넌트를 가로질러 사용자 기능과 실제 구현, 테스트 및 실행 검증 경로를 연결한다.
+
+`HANDOFF.md`는 현재 진행 중인 작업의 상태를 다음 에이전트에게 전달한다.
 
 필요한 경우 다른 문서를 링크한다.
 
@@ -161,9 +338,11 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 시스템 구조 자체가 변경되었다면 `ARCHITECTURE.md`도 갱신한다.
 
+사용자 기능이나 기능의 주요 구현 또는 검증 경로가 변경되었다면 `FEATURE_MAP.md`도 갱신한다.
+
 ---
 
-# 6. AGENTS.md 연동
+# 7. AGENTS.md 연동
 
 기존 `AGENTS.md`를 먼저 확인한다.
 
@@ -177,27 +356,48 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 - `ARCHITECTURE.md`: 시스템 구성, 컴포넌트 책임, 인터페이스, 데이터 흐름과 경계를 이해할 때 확인한다.
 - `DESIGN.md`: 구현을 추가하거나 변경하기 전에 관련 설계 의도, 데이터 구조, 알고리즘, invariant와 trade-off를 확인한다.
+- `FEATURE_MAP.md`: 사용자 기능을 추가·변경·수정하거나 기능 관련 버그를 조사할 때 기능의 진입점, 구현 경로, 관련 테스트와 검증 방법을 확인한다.
 - `HANDOFF.md`: 진행 중인 작업을 이어받을 때 현재 상태, 기존 시도, 문제점과 다음 작업을 확인한다.
 
-구조 변경 시 `ARCHITECTURE.md`, 장기적으로 유지해야 할 설계 결정 변경 시 `DESIGN.md`, 미완료 작업을 다른 에이전트에게 넘길 때 `HANDOFF.md`를 함께 갱신한다.
+다음 변경이 발생하면 관련 문서를 함께 갱신한다.
 
-문서와 실제 코드가 충돌하면 임의로 어느 한쪽을 정답으로 가정하지 않는다. 코드, 테스트, Git history와 관련 근거를 확인하여 원인을 판단하고 필요한 경우 구현과 문서를 함께 수정한다.
+구조 또는 시스템 경계 변경
+→ ARCHITECTURE.md
+
+장기적으로 유지해야 할 설계 결정 변경
+→ DESIGN.md
+
+사용자 기능 또는 주요 구현/검증 경로 변경
+→ FEATURE_MAP.md
+
+진행 중인 작업 상태 또는 인수인계 내용 변경
+→ HANDOFF.md
+
+문서와 실제 코드가 충돌하면 임의로 어느 한쪽을 정답으로 가정하지 않는다.
+
+코드, 테스트, 실행 결과, Git history와 관련 근거를 확인하여 원인을 판단하고 필요한 경우 구현과 문서를 함께 수정한다.
 
 ---
 
-# 7. 검증
+# 8. 검증
 
 문서 작성 후 다시 실제 저장소와 대조한다.
 
 다음을 확인한다.
 
 1. 존재하지 않는 컴포넌트나 기능을 문서화하지 않았는가?
-2. Architecture와 Design을 혼동하지 않았는가?
+2. Architecture, Design, Feature Map과 Handoff의 책임을 혼동하지 않았는가?
 3. 현재 구현과 문서가 일치하는가?
 4. 중요한 invariant가 누락되지 않았는가?
-5. 다음 에이전트가 `HANDOFF.md`만으로 현재 작업을 재개할 수 있는가?
-6. 새로운 에이전트가 `ARCHITECTURE.md`와 `DESIGN.md`를 읽고 중요한 코드를 안전하게 변경할 수 있는가?
-7. 세 문서 사이에 불필요한 내용 중복이 없는가?
-8. `AGENTS.md`의 기존 지침을 훼손하지 않았는가?
+5. 주요 사용자 기능을 `FEATURE_MAP.md`에서 찾을 수 있는가?
+6. Feature에서 실제 구현 코드까지 추적할 수 있는가?
+7. 구현 코드에서 관련 테스트와 검증 방법까지 추적할 수 있는가?
+8. 가능한 기능은 실제 실행 또는 테스트를 통해 검증했는가?
+9. 다음 에이전트가 `HANDOFF.md`만으로 현재 작업을 재개할 수 있는가?
+10. 새로운 에이전트가 `ARCHITECTURE.md`, `DESIGN.md`, `FEATURE_MAP.md`를 이용하여 중요한 코드를 안전하게 탐색하고 변경할 수 있는가?
+11. 네 문서 사이에 불필요한 내용 중복이 없는가?
+12. `AGENTS.md`의 기존 지침을 훼손하지 않았는가?
+
+문서에 기록한 경로, 명령, route, API, 테스트 이름이 실제 저장소에 존재하는지도 확인한다.
 
 마지막으로 생성 또는 수정한 파일 목록과 각 파일에서 기록한 핵심 내용을 간략하게 보고한다.
