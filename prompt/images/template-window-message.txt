@@ -1,0 +1,38 @@
+[템플릿 프롬프트]
+
+high quality photorealistic cinematic still.
+
+A close-up view from inside, looking through a softly fogged glass window at [장소]. 
+The glass must dominate the foreground.
+
+The fog on the glass must look like smooth breath condensation made by warm human breath on cold glass: soft, milky, translucent, and evenly diffused. 
+The surface should feel gentle and velvety, not rough. 
+Avoid coarse frost, gritty dirt, heavy grime, crusted ice, harsh speckling, or dirty gray texture. 
+Use only subtle tiny droplets, delicate moisture beads, faint natural wipe marks, and a few soft vertical drips.
+
+A real human hand must be visible in the frame, entering from the right side, with one fingertip touching or finishing writing on the fogged glass. 
+The fingertip has gently cleared the breath-fogged surface, creating smooth transparent handwritten strokes with slightly wet edges and small natural dripping trails below some letters.
+
+On the fogged glass, the message must read exactly:
+"[메시지]"
+
+The message should look handwritten by a fingertip on misted glass: natural, slightly imperfect, readable, and softly embedded in the condensation. 
+Do not add extra words, random letters, misspellings, logos, signatures, or watermark.
+
+Time of day: [시간대]. 
+Match the lighting, color temperature, reflections, and background atmosphere to this time of day.
+
+The background outside the glass should show [장소] softly out of focus, with natural depth of field and cinematic bokeh. 
+Keep the outside scene recognizable but blurred, so the smooth breath-fogged glass, handwritten message, water moisture, and human hand remain the main focus.
+
+Photorealistic, natural camera perspective, shallow depth of field, realistic skin texture, realistic smooth moisture on glass, soft ambient light, subtle reflections, quiet emotional atmosphere, high detail but not over-sharpened.
+
+
+[시간대 샘플]
+*시간대가 애매하시면 이걸 넣으셔도 됩니다.
+아침: early morning, cool soft light, pale blue sky, gentle reflections, quiet atmosphere
+한낮: midday, bright natural daylight, clearer reflections, neutral color temperature
+오후: late afternoon, warm angled sunlight, mild golden highlights, soft shadows
+저녁: evening blue hour, warm city lights, cool outdoor tone, glowing bokeh
+심야: deep night, dark background, strong warm artificial lights, high contrast bokeh
+새벽: pre-dawn, dim blue-gray light, quiet empty atmosphere, faint distant lights
