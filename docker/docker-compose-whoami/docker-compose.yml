@@ -1,0 +1,73 @@
+services:
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+    environment:
+      DOMAIN: whoami.example.com
+      EMAIL: admin@example.com
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        set -eu
+        while :; do
+          if [ ! -s "/etc/letsencrypt/live/$${DOMAIN}/fullchain.pem" ]; then
+            certbot certonly --standalone \
+              --non-interactive \
+              --agree-tos \
+              --email "$${EMAIL}" \
+              -d "$${DOMAIN}"
+          else
+            certbot renew --standalone --quiet
+          fi
+          sleep 12h
+        done
+
+  whoami:
+    image: traefik/whoami:latest
+    container_name: whoami
+    restart: unless-stopped
+    depends_on:
+      - certbot
+    ports:
+      - "443:443"
+    volumes:
+      - letsencrypt:/etc/letsencrypt:ro
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        set -eu
+        CERT=/etc/letsencrypt/live/whoami.example.com/fullchain.pem
+        KEY=/etc/letsencrypt/live/whoami.example.com/privkey.pem
+
+        while [ ! -s "$$CERT" ] || [ ! -s "$$KEY" ]; do
+          echo "Waiting for Let's Encrypt certificate..."
+          sleep 5
+        done
+
+        while :; do
+          /whoami --port=443 --cert="$$CERT" --key="$$KEY" &
+          PID=$$!
+
+          OLD=$$(sha256sum "$$CERT" "$$KEY")
+
+          while kill -0 "$$PID" 2>/dev/null; do
+            sleep 60
+            NEW=$$(sha256sum "$$CERT" "$$KEY")
+            if [ "$$OLD" != "$$NEW" ]; then
+              echo "Certificate changed, restarting whoami..."
+              kill "$$PID"
+              wait "$$PID" || true
+              break
+            fi
+          done
+        done
+
+volumes:
+  letsencrypt:
