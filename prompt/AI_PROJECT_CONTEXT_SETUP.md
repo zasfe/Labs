@@ -105,6 +105,7 @@ https://raw.githubusercontent.com/zasfe/Labs/refs/heads/master/prompt/design/REA
 
 가능한 경우 다음 관계가 드러나도록 작성한다.
 
+```
 Design decision
 ↓
 Implementation
@@ -112,6 +113,7 @@ Implementation
 Invariant
 ↓
 Test
+```
 
 코드만 읽어서는 쉽게 알 수 없는 설계 지식을 우선적으로 기록한다.
 
@@ -136,21 +138,21 @@ AI 에이전트가 기능 이름, 사용자 요청, 버그 증상 또는 UI 단�
 Feature Map의 기준은 코드 구조가 아니라 사용자 기능이다.
 
 다음과 같은 코드 중심 구조를 Feature Map의 최상위 구조로 사용하지 않는다.
-
+```
 src/
 ├── components
 ├── services
 └── utils
-
+```
 대신 사용자가 인식하는 기능을 기준으로 구성한다.
-
+```
 Features
 ├── Authentication
 ├── Project Management
 ├── Search
 ├── Settings
 └── Export
-
+```
 하나의 기능이 여러 컴포넌트, 서비스 또는 저장소에 걸쳐 구현되어 있다면 해당 경로를 연결하여 기록한다.
 
 내부 구현이 존재하더라도 사용자가 독립적인 기능으로 인식하지 않는다면 무조건 별도의 Feature로 분리하지 않는다.
@@ -177,7 +179,7 @@ Features
 프로젝트 유형에 존재하지 않는 항목을 억지로 생성하지 않는다. 예를 들어 CLI 프로젝트라면 UI 또는 DOM 정보를 요구하지 않는다.
 
 가능하면 다음 관계가 드러나도록 작성한다.
-
+```
 User Feature
 ↓
 Entry Point / UI / CLI
@@ -191,14 +193,14 @@ Data / State
 Test
 ↓
 Runtime Verification
-
+```
 예:
 
 ## 사용자 로그인
 
 Purpose:
 사용자가 계정 인증을 수행한다.
-
+```
 Entry points:
 - `/login`
 - `LoginButton`
@@ -225,13 +227,14 @@ Verification:
 
 Related design:
 - DESIGN.md#authentication
+```
 
 ## 4.3 Runtime Verification
 
 가능한 프로젝트에서는 정적 코드 분석만으로 기능이 정상이라고 판단하지 않는다.
 
 에이전트가 사용할 수 있는 실행 환경, 브라우저, CLI, 테스트 도구 또는 관찰 도구가 있다면 실제 기능을 실행하여 검증한다.
-
+```
 Feature Map
 ↓
 관련 구현 탐색
@@ -243,6 +246,7 @@ Feature Map
 테스트 / 로그 / 상태 확인
 ↓
 검증
+```
 
 UI 애플리케이션에서는 필요한 경우 route, 접근 순서, 안정적으로 식별할 수 있는 UI 요소 또는 자동화에 필요한 정보를 기록한다.
 
@@ -251,11 +255,11 @@ UI 애플리케이션에서는 필요한 경우 route, 접근 순서, 안정적�
 검증 방법이 복잡하거나 여러 기능에서 반복적으로 사용된다면 상세 절차를 `FEATURE_MAP.md`에 중복하지 말고 별도의 Skill 또는 프로젝트 지침으로 분리한다.
 
 예:
-
+```
 skills/
 └── verification/
 └── SKILL.md
-
+```
 `FEATURE_MAP.md`에서는 해당 Skill과 필요한 검증 절차를 연결한다.
 
 ## 4.4 Feature Map 갱신 원칙
