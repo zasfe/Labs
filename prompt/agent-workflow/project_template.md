@@ -9,6 +9,7 @@
 | 항목 | 값 |
 |---|---|
 | 복사한 playbook 버전 | |
+| 작업 강도 프로필(`dev`·`dev-fast`·`standard` 중 하나 — [profiles.md](profiles.md)) | |
 | playbook 정본 위치(받은 출처) | |
 | 적용 문서 위치(playbook 폴더 밖) | |
 | 제안 접수 창구(교훈 제안을 보내는 방법 — 정본 보유 쪽이 정함) | |
