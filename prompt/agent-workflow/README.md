@@ -1,6 +1,6 @@
 # playbook
 
-버전 `1.2.0` — 프로젝트에 독립적인 작업 절차·구현 지침 묶음.
+버전 `1.3.0` — 프로젝트에 독립적인 작업 절차·구현 지침 묶음.
 
 이 폴더의 **정본 위치**는 <https://github.com/zasfe/Labs/tree/master/prompt/agent-workflow> 하나다. 복사받는 쪽은 복사한 버전과 이 위치를 적용 문서 머리 기록란에 적는다. 이 문서는 복사본에서 고치지 않는다.
 
@@ -13,6 +13,7 @@
 | `README.md` | — | 이 문서. 구성·읽기 순서·채택 절차·자리 이름 규칙·교훈 전달·갱신 규칙 |
 | `CHANGELOG.md` | — | 버전별 변경 기록 |
 | `workflow.md` | 공통 | 작업 절차(언어·빌드 도구·AI 제품 무관). dev 프로필 기준 |
+| `alignment.md` | 공통 | 루트 `ALIGNS.md`(작업지시자의 목표·판단 기준)를 Task마다 참조해 작업 결과의 기준을 정하고 대조하는 규칙. 프로필과 무관하게 적용한다 |
 | `profiles.md` | 프로필 | 작업 강도 프로필(dev·dev-fast·standard)별로 workflow.md와 다른 점 |
 | `go.md` | 언어 | Go 구현 지침 |
 | `go_httpcli.md` | 유형 | HTTP 요청 기반 클라이언트 구현 지침. 원칙은 언어 무관이고 Go 표기는 예시다. 실서버에 요청하는 모든 CLI에 적용한다 — 인증 없는 공개 API라도 응답 원문 열람 금지와 격리 시험은 적용 대상이다 |
@@ -29,15 +30,17 @@
 
 1. 프로젝트 적용 문서(`project_template.md`를 복사해 채운 것) — 값과 예외
 2. `workflow.md` — 절차
-3. `profiles.md` — 적용 문서에 적은 프로필의 차이(dev면 건너뛴다)
-4. `go.md` — 언어 문서
-5. `go_httpcli.md` — 실서버에 요청하는 CLI인 경우
-6. `env_docker_wsl.md` — 선택 부록, 채택한 경우만
+3. `alignment.md` — 작업 결과 기준 합의
+4. `profiles.md` — 적용 문서에 적은 프로필의 차이(dev면 건너뛴다)
+5. `go.md` — 언어 문서
+6. `go_httpcli.md` — 실서버에 요청하는 CLI인 경우
+7. `env_docker_wsl.md` — 선택 부록, 채택한 경우만
 
 **읽는 시점 규칙**
 
 - 세션을 시작할 때는 아래 현황 블록을 읽는다.
 - 규범 블록은 Task에 착수할 때 한 번 읽고, 이후에는 필요한 절·ID만 다시 읽는다.
+- 프로젝트 루트의 `ALIGNS.md`는 규범 블록과 별개로 **Task마다** 착수할 때 읽는다(workflow.md §5 절차 4).
 - 결정 원장(`{DECISION_LEDGER}`)·설계 문서(`{DESIGN_DOC}`)·백로그(`{BACKLOG_FILE}`)는 항상 읽지 않고 **필요 시** 읽는다 — 위임 승인과 대조할 때, 중단된 작업을 재개할 때, 코드를 변경하기 전에.
 
 **현황 블록 — 세션을 시작할 때 지금 상태를 파악하는 순서**
@@ -60,7 +63,7 @@
 3. 프로젝트 진입 문서(`{ENTRY_DOC}`)에 위 「표준 읽기 순서」를 넣는다.
 4. 복사한 playbook 버전, 정본 위치(받은 출처), 적용 문서 위치, 제안 접수 창구를 적용 문서 머리 기록란에 적는다.
 5. (권장) 프로젝트가 자기 고유어로 playbook 무참조 게이트(`{NEUTRAL_GATE}`)를 둔다. 검사 범주별 판정은 아래 「무참조 게이트」를 본다. 고유어 목록은 프로젝트의 것이므로 playbook에는 넣지 않는다.
-6. **채택 직후 첫 정식 Task로 문서 골격을 만든다.** 만들 것: 적용 문서(값 채움 완료) · 진입 문서 · 로드맵(`{ROADMAP_FILE}`, 첫 Task 등재 때 `{ROADMAP_ENTRY_FORMAT}`을 정해 바인딩에 적고 이후 바꾸지 않는다) · 결정 원장(`{DECISION_LEDGER}`) · 설계 문서(`{DESIGN_DOC}`) · 쓰기로 한 게이트. 로드맵·오늘할일·원장·설계 문서의 최소 양식은 `project_template.md`에 있다.
+6. **채택 직후 첫 정식 Task로 문서 골격을 만든다.** 만들 것: 적용 문서(값 채움 완료) · 진입 문서 · 로드맵(`{ROADMAP_FILE}`, 첫 Task 등재 때 `{ROADMAP_ENTRY_FORMAT}`을 정해 바인딩에 적고 이후 바꾸지 않는다) · 결정 원장(`{DECISION_LEDGER}`) · 설계 문서(`{DESIGN_DOC}`) · 루트 `ALIGNS.md`(작업지시자가 확인한 기준만 저장 — `alignment.md` §4) · 쓰기로 한 게이트. 로드맵·오늘할일·원장·설계 문서의 최소 양식은 `project_template.md`에 있다.
    - 첫 Task는 절차 1 전에 Task 번호 표기(`{TASK_ID_FORMAT}`)·오늘할일 경로(`{ORDERS_FILE}`)·브랜치 패턴(`{BRANCH_PATTERN}`)을 정해 적용 문서 초안에 먼저 적는다.
    - 게이트·CI 골격은 이 첫 Task에 넣거나 별도 Task로 두며, 어느 쪽인지 적용 문서에 기록한다. `{TASK_CI_CMD}`가 아직 없으면 `project_template.md`의 `{TASK_CI_CMD}` 의미문에 있는 최소 검사 목록을 사람이 수동으로 확인하고 결과를 기록한다.
 
